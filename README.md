@@ -25,7 +25,7 @@ The library is compiled using Visual Studio 2012 and at runtime has no other ext
 
 ## Licensing ##
 
-The library is licensed under the MIT license. This means you're free to modify the source and use the library in whatever way you want, as long as you attribute the original authors. The native library is licensed under a BSD license. Please be kind enough to include the licensing text file (it contains both licenses).
+The library is licensed under the [MIT](https://opensource.org/licenses/MIT) license. This means you're free to modify the source and use the library in whatever way you want, as long as you attribute the original authors. The native library is licensed under the [3-Clause BSD](https://opensource.org/licenses/BSD-3-Clause) license. Please be kind enough to include the licensing text file (it contains both licenses).
 
 ## Contact ##
 
