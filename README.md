@@ -1,7 +1,7 @@
 **The latest release can be downloaded from the [Downloads](https://bitbucket.org/Starnick/assimpnet/downloads) section or via [NuGet](https://www.nuget.org/packages/AssimpNet/).**
 
 ## Introduction ##
-This is the official repository for **AssimpNet**, the cross-platform .NET wrapper for the Open Asset Import Library (otherwise known as [Assimp](https://github.com/assimp/assimp) - it's German). This wrapper leverages P/Invoke to communicate with the native library's C-API. Since the managed assembly is compiled as AnyCpu and the native DLLs are loaded dynamically, the library fully supports usage with 32 and 64 bit applications without needing to be recompiled.
+This is the official repository for **AssimpNet**, the cross-platform .NET wrapper for the Open Asset Import Library (otherwise known as [Assimp](https://github.com/assimp/assimp) - it's German). This wrapper leverages P/Invoke to communicate with the native library's C-API. Since the managed assembly is compiled as **AnyCpu** and the native DLLs are loaded dynamically, the library fully supports usage with 32 and 64 bit applications without needing to be recompiled.
 
 The library is split between two parts, a low level and a high level. The intent is to give as much freedom as possible to the developer to work with the native library from managed code.
 
