@@ -33,4 +33,6 @@ Follow project updates and more on [Twitter](https://twitter.com/Tesla3D/).
 
 In addition, check out these other projects from the same author:
 
+[TeximpNet](https://bitbucket.org/Starnick/teximpnet) - A wrapper for the Nvidia Texture Tools and FreeImage libraries, which is a sister library to this one.
+
 [Tesla Graphics Engine](https://bitbucket.org/Starnick/tesla3d) - A 3D rendering engine written in C# and the primary driver for developing AssimpNet.
