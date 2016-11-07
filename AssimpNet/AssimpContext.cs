@@ -180,11 +180,12 @@ namespace Assimp
         /// and loads the model into managed memory, releasing the unmanaged memory used by Assimp. It is up to the caller to dispose of the stream.
         /// </summary>
         /// <param name="stream">Stream to read from</param>
-        /// <param name="formatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="formatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful.</param>
         /// <returns>The imported scene</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
-        public Scene ImportFileFromStream(Stream stream, String formatHint)
+        public Scene ImportFileFromStream(Stream stream, String formatHint = null)
         {
             return ImportFileFromStream(stream, PostProcessSteps.None, formatHint);
         }
@@ -195,19 +196,17 @@ namespace Assimp
         /// </summary>
         /// <param name="stream">Stream to read from</param>
         /// <param name="postProcessFlags">Post processing flags, if any</param>
-        /// <param name="formatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="formatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful.</param>
         /// <returns>The imported scene</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
-        public Scene ImportFileFromStream(Stream stream, PostProcessSteps postProcessFlags, String formatHint)
+        public Scene ImportFileFromStream(Stream stream, PostProcessSteps postProcessFlags, String formatHint = null)
         {
             CheckDisposed();
 
             if(stream == null || stream.CanRead != true)
                 throw new AssimpException("stream", "Can't read from the stream it's null or write-only");
-
-            if(String.IsNullOrEmpty(formatHint))
-                throw new AssimpException("formatHint", "Format hint is null or empty");
 
             IntPtr ptr = IntPtr.Zero;
             PrepareImport();
@@ -620,11 +619,12 @@ namespace Assimp
         /// Converts the model contained in the stream to the specified format and save it to a file.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
-        /// <param name="importFormatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful</param>
         /// <param name="outputFilename">Output file name to export to</param>
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <returns>True if the conversion was successful or not, false otherwise.</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
         public bool ConvertFromStreamToFile(Stream inputStream, String importFormatHint, String outputFilename, String exportFormatId)
         {
@@ -635,12 +635,13 @@ namespace Assimp
         /// Converts the model contained in the stream to the specified format and save it to a file.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
-        /// <param name="importFormatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful</param>
         /// <param name="outputFilename">Output file name to export to</param>
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <param name="exportProcessSteps">Pre processing steps used for the export</param>
         /// <returns>True if the conversion was successful or not, false otherwise.</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
         public bool ConvertFromStreamToFile(Stream inputStream, String importFormatHint, String outputFilename, String exportFormatId, PostProcessSteps exportProcessSteps)
         {
@@ -651,7 +652,8 @@ namespace Assimp
         /// Converts the model contained in the stream to the specified format and save it to a file.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
-        /// <param name="importFormatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful</param>
         /// <param name="importProcessSteps">Post processing steps used for import</param>
         /// <param name="outputFilename">Output file name to export to</param>
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
@@ -705,10 +707,11 @@ namespace Assimp
         /// Converts the model contained in the stream to the specified format and save it to a data blob.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
-        /// <param name="importFormatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful</param>
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <returns>Data blob containing the exported scene in a binary form</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
         public ExportDataBlob ConvertFromStreamToBlob(Stream inputStream, String importFormatHint, String exportFormatId)
         {
@@ -719,11 +722,12 @@ namespace Assimp
         /// Converts the model contained in the stream to the specified format and save it to a data blob.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
-        /// <param name="importFormatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful</param>
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <param name="exportProcessSteps">Pre processing steps used for the export</param>
         /// <returns>Data blob containing the exported scene in a binary form</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
         public ExportDataBlob ConvertFromStreamToBlob(Stream inputStream, String importFormatHint, String exportFormatId, PostProcessSteps exportProcessSteps)
         {
@@ -734,7 +738,8 @@ namespace Assimp
         /// Converts the model contained in the stream to the specified format and save it to a data blob.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
-        /// <param name="importFormatHint">Format extension to serve as a hint to Assimp to choose which importer to use</param>
+        /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
+        /// try to detect what importer to use from the data which may or may not be successful</param>
         /// <param name="importProcessSteps">Post processing steps used for import</param>
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <param name="exportProcessSteps">Pre processing steps used for the export</param>

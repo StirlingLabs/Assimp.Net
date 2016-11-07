@@ -33,6 +33,23 @@ namespace Assimp.Test
     [TestFixture]
     public class AssimpContextTestFixture
     {
+        [TestFixtureSetUp]
+        public void Setup()
+        {
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output");
+
+            if (!Directory.Exists(outputPath))
+                Directory.CreateDirectory(outputPath);
+
+            IEnumerable<String> filePaths = Directory.EnumerateFiles(outputPath);
+
+            foreach(String filePath in filePaths)
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+        }
+
         [Test]
         public void TestExportBadFormatId()
         {
@@ -48,11 +65,11 @@ namespace Assimp.Test
 
             Scene collada = importer.ImportFile(Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae"));
 
-            bool success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/exportedCollada.dae"), "dae");
+            bool success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/output/exportedCollada.dae"), "dae");
 
             Assert.IsFalse(success);
 
-            success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/exportedCollada.dae"), "collada");
+            success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/output/exportedCollada.dae"), "collada");
 
             Assert.IsTrue(success);
         }
@@ -75,7 +92,7 @@ namespace Assimp.Test
         public void TestImportExportFile()
         {
             String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.ply");
+            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck.ply");
 
             AssimpContext context = new AssimpContext();
             Scene ducky = context.ImportFile(colladaPath);
@@ -86,7 +103,7 @@ namespace Assimp.Test
         public void TestImportExportImportFile()
         {
             String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck2.dae");
+            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck2.dae");
 
             AssimpContext context = new AssimpContext();
             Scene ducky = context.ImportFile(colladaPath);
@@ -230,6 +247,31 @@ namespace Assimp.Test
         }
 
         [Test]
+        public void TestImportFromStreamNoFormatHint()
+        {
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+
+            FileStream fs = File.OpenRead(path);
+
+            AssimpContext importer = new AssimpContext();
+            LogStream.IsVerboseLoggingEnabled = true;
+
+            LogStream logstream = new LogStream(delegate (String msg, String userData)
+            {
+                Console.WriteLine(msg);
+            });
+
+            logstream.Attach();
+
+            Scene scene = importer.ImportFileFromStream(fs, String.Empty); //null also seems to work well
+
+            fs.Close();
+
+            Assert.IsNotNull(scene);
+            Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+        }
+
+        [Test]
         public void TestSupportedFormats()
         {
             AssimpContext importer = new AssimpContext();
@@ -250,7 +292,7 @@ namespace Assimp.Test
         public void TestConvertFromFile()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.dae");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/Bob.dae");
 
             AssimpContext importer = new AssimpContext();
             importer.ConvertFromFileToFile(path, outputPath, "collada");
@@ -259,22 +301,44 @@ namespace Assimp.Test
         }
 
         [Test]
-        public void TestConvertFromStream()
+        public void TestConvertFromStreamNoFormatHint()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.obj");
-            String outputPath2 = Path.Combine(TestHelper.RootPath, "TestFiles/duck-fromBlob.obj");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duckNoHint.obj");
+
+            if (File.Exists(outputPath))
+                File.Delete(outputPath);
 
             FileStream fs = File.OpenRead(path);
 
             new ConsoleLogStream().Attach();
 
             AssimpContext importer = new AssimpContext();
-            importer.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
+            bool success = importer.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
+            Assert.IsTrue(success);
+
+            Assert.IsTrue(File.Exists(outputPath));
+        }
+
+        [Test]
+        public void TestConvertFromStream()
+        {
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck.obj");
+            String outputPath2 = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck-fromBlob.obj");
+
+            FileStream fs = File.OpenRead(path);
+
+            new ConsoleLogStream().Attach();
+
+            AssimpContext importer = new AssimpContext();
+            bool success = importer.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
+            Assert.IsTrue(success);
 
             fs.Position = 0;
 
             ExportDataBlob blob = importer.ConvertFromStreamToBlob(fs, ".dae", "collada");
+            Assert.IsNotNull(blob);
 
             fs.Close();
 
@@ -285,11 +349,13 @@ namespace Assimp.Test
 
             memStream.Position = 0;
 
-            importer.ConvertFromStreamToFile(memStream, ".dae", outputPath2, "obj");
+            success = importer.ConvertFromStreamToFile(memStream, ".dae", outputPath2, "obj");
 
             memStream.Close();
 
             LogStream.DetachAllLogstreams();
+
+            Assert.IsTrue(success);
         }
 
         [Test]
