@@ -351,6 +351,9 @@ namespace Assimp
             if(scene == null)
                 throw new ArgumentNullException("scene", "Scene must exist.");
 
+            if (!TestIfExportIdIsValid(exportFormatId))
+                return false;
+
             try
             {
                 scenePtr = Scene.ToUnmanagedScene(scene);
@@ -401,6 +404,9 @@ namespace Assimp
 
             if(scene == null)
                 throw new ArgumentNullException("scene", "Scene must exist.");
+
+            if (!TestIfExportIdIsValid(exportFormatId))
+                return null;
 
             try
             {
@@ -469,6 +475,9 @@ namespace Assimp
         public bool ConvertFromFileToFile(String inputFilename, PostProcessSteps importProcessSteps, String outputFilename, String exportFormatId, PostProcessSteps exportProcessSteps)
         {
             CheckDisposed();
+
+            if (!TestIfExportIdIsValid(exportFormatId))
+                return false;
 
             IntPtr ptr = IntPtr.Zero;
             IntPtr fileIO = IntPtr.Zero;
@@ -558,6 +567,9 @@ namespace Assimp
         {
             CheckDisposed();
 
+            if (!TestIfExportIdIsValid(exportFormatId))
+                return null;
+
             IntPtr ptr = IntPtr.Zero;
             IntPtr fileIO = IntPtr.Zero;
 
@@ -645,7 +657,7 @@ namespace Assimp
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <param name="exportProcessSteps">Pre processing steps used for the export</param>
         /// <returns>True if the conversion was successful or not, false otherwise.</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
         public bool ConvertFromStreamToFile(Stream inputStream, String importFormatHint, PostProcessSteps importProcessSteps, String outputFilename, String exportFormatId, PostProcessSteps exportProcessSteps)
         {
@@ -654,8 +666,8 @@ namespace Assimp
             if(inputStream == null || inputStream.CanRead != true)
                 throw new AssimpException("stream", "Can't read from the stream it's null or write-only");
 
-            if(String.IsNullOrEmpty(importFormatHint))
-                throw new AssimpException("formatHint", "Format hint is null or empty");
+            if (!TestIfExportIdIsValid(exportFormatId))
+                return false;
 
             IntPtr ptr = IntPtr.Zero;
             PrepareImport();
@@ -727,7 +739,7 @@ namespace Assimp
         /// <param name="exportFormatId">Format id that specifies what format to export to</param>
         /// <param name="exportProcessSteps">Pre processing steps used for the export</param>
         /// <returns>Data blob containing the exported scene in a binary form</returns>
-        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only) or if the format hint is null or empty.</exception>
+        /// <exception cref="AssimpException">Thrown if the stream is not valid (null or write-only).</exception>
         /// <exception cref="System.ObjectDisposedException">Thrown if the context has already been disposed of.</exception>
         public ExportDataBlob ConvertFromStreamToBlob(Stream inputStream, String importFormatHint, PostProcessSteps importProcessSteps, String exportFormatId, PostProcessSteps exportProcessSteps)
         {
@@ -736,8 +748,8 @@ namespace Assimp
             if(inputStream == null || inputStream.CanRead != true)
                 throw new AssimpException("stream", "Can't read from the stream it's null or write-only");
 
-            if(String.IsNullOrEmpty(importFormatHint))
-                throw new AssimpException("formatHint", "Format hint is null or empty");
+            if (!TestIfExportIdIsValid(exportFormatId))
+                return null;
 
             IntPtr ptr = IntPtr.Zero;
             PrepareImport();
@@ -1034,6 +1046,29 @@ namespace Assimp
             {
                 m_ioSystem.CloseAllFiles();
             }
+        }
+
+        //Tests if a export format ID matches any in the supported list, and if not logs a warning
+        private bool TestIfExportIdIsValid(String exportFormatId)
+        {
+            if (m_exportFormats == null)
+                m_exportFormats = AssimpLibrary.Instance.GetExportFormatDescriptions();
+
+            foreach(ExportFormatDescription descr in m_exportFormats)
+            {
+                if (descr.FormatId.Equals(exportFormatId, StringComparison.InvariantCulture))
+                    return true;
+            }
+
+            //Assimp doesn't seem to emit a logstream message, so make sure we log that the format ID is not valid
+            IEnumerable<LogStream> loggers = LogStream.GetAttachedLogStreams();
+
+            foreach(LogStream logger in loggers)
+            {
+                logger.Log(String.Format("Info,  Invalid export format: {0}", exportFormatId));
+            }
+
+            return false;
         }
 
         #endregion

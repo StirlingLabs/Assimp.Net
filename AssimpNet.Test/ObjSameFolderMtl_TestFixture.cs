@@ -32,7 +32,7 @@ namespace Assimp.Test
         [Test]
         public void TestObjLoad()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\sphere.obj");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/sphere.obj");
 
             AssimpContext importer = new AssimpContext();
             Scene scene = importer.ImportFile(path);

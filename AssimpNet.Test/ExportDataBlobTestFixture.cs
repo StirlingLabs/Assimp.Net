@@ -32,7 +32,7 @@ namespace Assimp.Test
         [Test]
         public void TestToStream()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
             AssimpContext importer = new AssimpContext();
             ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "obj");

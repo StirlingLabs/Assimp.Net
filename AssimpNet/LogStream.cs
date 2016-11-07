@@ -206,7 +206,7 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Detatches the logstream from the library.
+        /// Detaches the logstream from the library.
         /// </summary>
         public void Detach()
         {
@@ -220,6 +220,18 @@ namespace Assimp
                 AssimpLibrary.Instance.DetachLogStream(m_logstreamPtr);
                 OnDetach();
             }
+        }
+
+        /// <summary>
+        /// Logs a message.
+        /// </summary>
+        /// <param name="msg">Message contents</param>
+        public void Log(String msg)
+        {
+            if (!m_isAttached || String.IsNullOrEmpty(msg))
+                return;
+
+            OnAiLogStreamCallback(msg, IntPtr.Zero);
         }
 
         /// <summary>

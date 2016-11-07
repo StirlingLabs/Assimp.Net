@@ -34,9 +34,33 @@ namespace Assimp.Test
     public class AssimpContextTestFixture
     {
         [Test]
+        public void TestExportBadFormatId()
+        {
+            AssimpContext importer = new AssimpContext();
+            NormalSmoothingAngleConfig config = new NormalSmoothingAngleConfig(66.0f);
+            importer.SetConfig(config);
+
+            LogStream logStream = new LogStream(delegate (string msg, string userData)
+            {
+                Console.WriteLine(msg);
+            });
+            logStream.Attach();
+
+            Scene collada = importer.ImportFile(Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae"));
+
+            bool success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/exportedCollada.dae"), "dae");
+
+            Assert.IsFalse(success);
+
+            success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/exportedCollada.dae"), "collada");
+
+            Assert.IsTrue(success);
+        }
+
+        [Test]
         public void TestExportToBlob()
         {
-            String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
+            String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
             AssimpContext context = new AssimpContext();
             Scene ducky = context.ImportFile(colladaPath);
@@ -50,8 +74,8 @@ namespace Assimp.Test
         [Test]
         public void TestImportExportFile()
         {
-            String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
-            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.ply");
+            String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.ply");
 
             AssimpContext context = new AssimpContext();
             Scene ducky = context.ImportFile(colladaPath);
@@ -61,8 +85,8 @@ namespace Assimp.Test
         [Test]
         public void TestImportExportImportFile()
         {
-            String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
-            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck2.dae");
+            String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            String plyPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck2.dae");
 
             AssimpContext context = new AssimpContext();
             Scene ducky = context.ImportFile(colladaPath);
@@ -75,7 +99,7 @@ namespace Assimp.Test
         [Test]
         public void TestExportToFile()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\ExportedTriangle.obj");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/ExportedTriangle.obj");
 
             //Create a very simple scene a single node with a mesh that has a single face, a triangle and a default material
             Scene scene = new Scene();
@@ -150,7 +174,7 @@ namespace Assimp.Test
         [Test]
         public void TestImportFromFile()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\sphere.obj");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/sphere.obj");
 
             AssimpContext importer = new AssimpContext();
 
@@ -183,7 +207,7 @@ namespace Assimp.Test
         [Test]
         public void TestImportFromStream()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
             FileStream fs = File.OpenRead(path);
 
@@ -225,8 +249,8 @@ namespace Assimp.Test
         [Test]
         public void TestConvertFromFile()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\Bob.md5mesh");
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles\\Bob.dae");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.dae");
 
             AssimpContext importer = new AssimpContext();
             importer.ConvertFromFileToFile(path, outputPath, "collada");
@@ -237,9 +261,9 @@ namespace Assimp.Test
         [Test]
         public void TestConvertFromStream()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.obj");
-            String outputPath2 = Path.Combine(TestHelper.RootPath, "TestFiles\\duck-fromBlob.obj");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.obj");
+            String outputPath2 = Path.Combine(TestHelper.RootPath, "TestFiles/duck-fromBlob.obj");
 
             FileStream fs = File.OpenRead(path);
 
@@ -276,7 +300,7 @@ namespace Assimp.Test
 
             AssimpLibrary.Instance.LoadLibrary();
 
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
             AssimpContext importer = new AssimpContext();
             importer.ImportFile(path);
             importer.Dispose();
@@ -308,7 +332,7 @@ namespace Assimp.Test
         {
             Console.WriteLine("Thread A: Starting import.");
             AssimpContext importer = new AssimpContext();
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\Bob.md5mesh");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
 
             new ConsoleLogStream("Thread A:").Attach();
             Console.WriteLine("Thread A: Importing");
@@ -320,7 +344,7 @@ namespace Assimp.Test
         {
             Console.WriteLine("Thread B: Starting import.");
             AssimpContext importer = new AssimpContext();
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
             new ConsoleLogStream("Thread B:").Attach();
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
@@ -333,8 +357,8 @@ namespace Assimp.Test
         {
             Console.WriteLine("Thread C: Starting convert.");
             AssimpContext importer = new AssimpContext();
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles\\duck.dae");
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles\\duck2.obj");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck2.obj");
 
             new ConsoleLogStream("Thread C:").Attach();
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));

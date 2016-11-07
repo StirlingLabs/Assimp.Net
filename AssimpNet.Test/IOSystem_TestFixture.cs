@@ -33,7 +33,7 @@ namespace Assimp.Test
         public void TestMultiSearchDirectoryLoad()
         {
             String fileName = "fenris.lws";
-            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles\\fenris\\scenes"), Path.Combine(TestHelper.RootPath, "TestFiles\\fenris\\objects") };
+            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes"), Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects") };
             FileIOSystem ioSystem = new FileIOSystem(searchPaths);
 
             AssimpContext importer = new AssimpContext();
@@ -47,15 +47,15 @@ namespace Assimp.Test
         [Test]
         public void TestMultiSearchDirectoryConvert()
         {
-            String fileName = Path.Combine(TestHelper.RootPath, "TestFiles\\fenris\\scenes\\fenris.lws");
-            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles\\fenris\\objects") };
+            String fileName = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes/fenris.lws");
+            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects") };
             FileIOSystem ioSystem = new FileIOSystem(searchPaths);
 
             AssimpContext importer = new AssimpContext();
             importer.SetIOSystem(ioSystem);
 
             //Output path has to be specified fully, since we may be creating the file
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles\\fenris\\fenris2.obj");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/fenris2.obj");
             importer.ConvertFromFileToFile(fileName, PostProcessSteps.None, outputPath, "obj", PostProcessSteps.None);
         }
 

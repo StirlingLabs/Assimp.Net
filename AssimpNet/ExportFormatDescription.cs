@@ -38,7 +38,7 @@ namespace Assimp
         private String m_fileExtension;
 
         /// <summary>
-        /// Gets a short string ID to uniquely identify the export format. E.g. "dae" or "obj".
+        /// Gets a short string ID to uniquely identify the export format. E.g. "collada" or "obj".
         /// </summary>
         public String FormatId
         {
