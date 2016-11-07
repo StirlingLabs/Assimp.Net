@@ -1457,6 +1457,16 @@ namespace Assimp.Unmanaged
     #region Implementation
 
     /// <summary>
+    /// Supported platforms.
+    /// </summary>
+    internal enum Platform
+    {
+        Windows,
+        Unix,
+        Mac
+    }
+
+    /// <summary>
     /// Specifies default paths for the unmanaged library for all platforms and handles the choosing of the correct implementation platform based on
     /// the .NET runtime.
     /// </summary>
@@ -1468,22 +1478,46 @@ namespace Assimp.Unmanaged
         public const String DefaultLinux32BitPath = "Assimp32.so";
         public const String DefaultLinux64BitPath = "Assimp64.so";
 
+        public const String DefaultMac32BitPath = "libassimp32.dylib";
+        public const String DefaultMac64BitPath = "libassimp64.dylib";
+
         public static AssimpLibraryImplementation CreateRuntimeImplementation()
         {
-            if(IsLinux())
+            Platform plat = GetPlatform();
+
+            switch(plat)
             {
-                return new AssimpLibraryLinuxImplementation();
-            }
-            else
-            {
-                return new AssimpLibraryWindowsImplementation();
+                case Platform.Windows:
+                    return new AssimpLibraryWindowsImplementation();
+                case Platform.Unix:
+                    return new AssimpLibraryLinuxImplementation();
+                case Platform.Mac:
+                    return new AssimpLibraryMacImplementation();
+                default:
+                    System.Diagnostics.Debug.Assert(false, "Unknown platform");
+                    return null;
             }
         }
 
-        private static bool IsLinux()
+        private static Platform GetPlatform()
         {
-            int platform = (int) Environment.OSVersion.Platform;
-            return (platform == 4) || (platform == 6) || (platform == 128);
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Unix:
+                    if (Directory.Exists("/Applications")
+                        && Directory.Exists("/System")
+                        && Directory.Exists("/Users")
+                        && Directory.Exists("/Volumes"))
+                        return Platform.Mac;
+                    else
+                        return Platform.Unix;
+
+                case PlatformID.MacOSX:
+                    return Platform.Mac;
+
+                default:
+                    return Platform.Windows;
+            }
         }
     }
 
@@ -1736,6 +1770,73 @@ namespace Assimp.Unmanaged
 
         [DllImport("libdl.so")]
         private static extern IntPtr dlerror();
+
+        private const int RTLD_NOW = 2;
+
+        protected override IntPtr NativeLoadLibrary(String path)
+        {
+            IntPtr libraryHandle = dlopen(path, RTLD_NOW);
+
+            if(libraryHandle == IntPtr.Zero)
+            {
+                IntPtr errPtr = dlerror();
+                String msg = Marshal.PtrToStringAnsi(errPtr);
+                if(!String.IsNullOrEmpty(msg))
+                    throw new AssimpException("Error loading unmanaged library from path: " + path + ", error detail:\n" + msg);
+                else
+                    throw new AssimpException("Error loading unmanaged library from path: " + path);
+            }
+
+            return libraryHandle;
+        }
+
+        protected override void NativeFreeLibrary(IntPtr handle)
+        {
+            dlclose(handle);
+        }
+
+        protected override IntPtr NativeGetProcAddress(IntPtr handle, string functionName)
+        {
+            return dlsym(handle, functionName);
+        }
+    }
+
+    #endregion
+
+    #region Mac Implementation
+
+    /// <summary>
+    /// Mac OSX implementation for loading the unmanaged assimp library.
+    /// </summary>
+    internal sealed class AssimpLibraryMacImplementation : AssimpLibraryImplementation
+    {
+        public override string DefaultLibraryPath32Bit
+        {
+            get
+            {
+                return AssimpDefaultLibraryPath.DefaultMac32BitPath;
+            }
+        }
+
+        public override string DefaultLibraryPath64Bit
+        {
+            get
+            {
+                return AssimpDefaultLibraryPath.DefaultMac64BitPath;
+            }
+        }
+
+        [DllImport("libSystem.B.dylib")]
+        private static extern IntPtr dlopen(String fileName, int flags);
+
+        [DllImport("libSystem.B.dylib")]
+        private static extern IntPtr dlsym(IntPtr handle, String functionName);
+
+        [DllImport("libSystem.B.dylib")]
+        private static extern int dlclose(IntPtr handle);
+
+        [DllImport("libSystem.B.dylib")]
+       private static extern IntPtr dlerror();
 
         private const int RTLD_NOW = 2;
 
