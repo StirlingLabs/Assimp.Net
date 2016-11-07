@@ -66,6 +66,7 @@
     <Compile Include="IOSystem_TestFixture.cs" />
     <Compile Include="Matrix3x3TestFixture.cs" />
     <Compile Include="Matrix4x4TestFixture.cs" />
+    <Compile Include="MiscDefectTests.cs" />
     <Compile Include="ObjSameFolderMtl_TestFixture.cs" />
     <Compile Include="QuaternionTestFixture.cs" />
     <Compile Include="TestHelper.cs" />

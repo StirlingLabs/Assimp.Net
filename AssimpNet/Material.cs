@@ -1101,7 +1101,7 @@ namespace Assimp
         /// <returns>True if the property was successfully added, false otherwise (e.g. null or key already present).</returns>
         public bool AddProperty(MaterialProperty matProp)
         {
-            if(matProp == null)
+            if(matProp == null || String.IsNullOrEmpty(matProp.FullyQualifiedName))
                 return false;
 
             if(m_properties.ContainsKey(matProp.FullyQualifiedName))

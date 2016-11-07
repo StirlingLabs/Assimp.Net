@@ -41,7 +41,7 @@ namespace Assimp.Test
             if (!Directory.Exists(outputPath))
                 Directory.CreateDirectory(outputPath);
 
-            IEnumerable<String> filePaths = Directory.EnumerateFiles(outputPath);
+            IEnumerable<String> filePaths = Directory.GetFiles(outputPath);
 
             foreach(String filePath in filePaths)
             {
