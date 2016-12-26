@@ -42,7 +42,7 @@ namespace Assimp.Test
 
             bool success = mat.AddProperty(prop);
             Assert.IsFalse(success);
-            Assert.IsNullOrEmpty(prop.FullyQualifiedName);
+            Assert.IsTrue(String.IsNullOrEmpty(prop.FullyQualifiedName));
         }
     }
 }

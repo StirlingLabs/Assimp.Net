@@ -701,6 +701,9 @@ namespace Assimp
         [Conditional("DEBUG")]
         private void AssertIsBaseName()
         {
+            if (m_name == null)
+                return;
+
             Debug.Assert(!m_name.Contains(","));
         }
 

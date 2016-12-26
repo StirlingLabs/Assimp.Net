@@ -33,7 +33,7 @@ namespace Assimp.Test
     [TestFixture]
     public class AssimpContextTestFixture
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output");

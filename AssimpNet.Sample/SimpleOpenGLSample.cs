@@ -79,7 +79,7 @@ namespace Assimp.Sample
                     for(int i = 0; i < mesh.VertexCount; i++)
                     {
                         Vector3 tmp = FromVector(mesh.Vertices[i]);
-                        Vector3.Transform(ref tmp, ref trafo, out tmp);
+                        Vector3.TransformPosition(ref tmp, ref trafo, out tmp);
 
                         min.X = Math.Min(min.X, tmp.X);
                         min.Y = Math.Min(min.Y, tmp.Y);
