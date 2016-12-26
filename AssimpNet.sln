@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssimpNet", "AssimpNet\AssimpNet.csproj", "{3415FF29-C0BE-44FC-AD34-94796118E690}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EA4EF0BE-B8A9-4149-8B5A-7E353AD628C0} = {EA4EF0BE-B8A9-4149-8B5A-7E353AD628C0}
@@ -16,10 +18,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssimpNet.Interop.Generator", "AssimpNet.Interop.Generator\AssimpNet.Interop.Generator.csproj", "{EA4EF0BE-B8A9-4149-8B5A-7E353AD628C0}"
 EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Net20-Debug|Any CPU = Net20-Debug|Any CPU
 		Net20-Release|Any CPU = Net20-Release|Any CPU
@@ -37,7 +35,7 @@ Global
 		{3415FF29-C0BE-44FC-AD34-94796118E690}.Net45-Release|Any CPU.Build.0 = Net45-Release|Any CPU
 		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net20-Debug|Any CPU.ActiveCfg = Net20-Debug|Any CPU
 		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net20-Debug|Any CPU.Build.0 = Net20-Debug|Any CPU
-		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net20-Release|Any CPU.ActiveCfg = Net20-Debug|Any CPU
+		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net20-Release|Any CPU.ActiveCfg = Net20-Release|Any CPU
 		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net45-Debug|Any CPU.ActiveCfg = Net45-Debug|Any CPU
 		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net45-Debug|Any CPU.Build.0 = Net45-Debug|Any CPU
 		{72D6BF28-1217-405E-BE22-DFDFC37BC805}.Net45-Release|Any CPU.ActiveCfg = Net45-Release|Any CPU
@@ -61,5 +59,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal

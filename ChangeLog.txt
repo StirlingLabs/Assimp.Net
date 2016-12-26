@@ -2,7 +2,7 @@
 CHANGELOG
 ----------------------------------------------------------------------
 
-3.3.2 (12-25-2016)
+3.3.2 (12-26-2016)
 
   - Fixed up nuget package build targets.
   - Added donated mac library implementation (haven't personally tested)
