@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>AssimpNet</id>
+        <version>3.3.2</version>
+        <title>AssimpNet</title>
+        <authors>Nicholas Woodfield</authors>
+        <owners>Nicholas Woodfield</owners>
+        <licenseUrl>http://opensource.org/licenses/mit-license.php</licenseUrl>
+        <projectUrl>https://bitbucket.org/Starnick/assimpnet</projectUrl>
+        <iconUrl>https://storage.googleapis.com/google-code-archive/v2/code.google.com/assimp-net/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>A .NET Wrapper for the Open Asset Import (Assimp) library.</summary>
+        <description>A .NET Wrapper for the Open Asset Import (Assimp) library. The library is able to import dozens of different 3D model formats (e.g. OBJ, FBX, Collada) and export to several formats (e.g. OBJ, Collada). This release targets version 3.1.1 of the native library.</description>
+        <copyright>Copyright (c) 2012-2016 AssimpNet - Nicholas Woodfield</copyright>
+        <language>en-US</language>
+        <tags>Model 3D Assimp Mesh Importers Content Assets FBX Collada</tags>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework="" />
+        </frameworkAssemblies>
+    </metadata>
+    <files>
+        <file src="libs\Assimp\Assimp64.dll" target="build\native\win-x64\Assimp64.dll" />
+        <file src="libs\Assimp\Assimp32.dll" target="build\native\win-x86\Assimp32.dll" />
+        <file src="AssimpNet.targets" target="build\AssimpNet.targets" />
+        <file src="AssimpNet\bin\Net20-Release\AssimpNet.dll" target="lib\net20\AssimpNet.dll" />
+        <file src="AssimpNet\bin\Net20-Release\AssimpNet.XML" target="lib\net20\AssimpNet.XML" />
+        <file src="AssimpNet\bin\Net45-Release\AssimpNet.dll" target="lib\net45\AssimpNet.dll" />
+        <file src="AssimpNet\bin\Net45-Release\AssimpNet.XML" target="lib\net45\AssimpNet.XML" />
+        <file src="AssimpNet\AssimpLicense.txt" target="AssimpLicense.txt" />
+        <file src="Docs\AssimpNet Documentation (July 2014).chm" target="AssimpNet Documentation (July 2014).chm" />
+        <file src="ChangeLog.txt" target="ChangeLog.txt" />
+    </files>
+</package>
