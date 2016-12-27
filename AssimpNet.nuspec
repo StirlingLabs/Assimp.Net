@@ -8,7 +8,7 @@
         <owners>Nicholas Woodfield</owners>
         <licenseUrl>http://opensource.org/licenses/mit-license.php</licenseUrl>
         <projectUrl>https://bitbucket.org/Starnick/assimpnet</projectUrl>
-        <iconUrl>https://bytebucket.org/Starnick/assimpnet/raw/b39e6e585d08b02bf047189f9ff265272ac41080/logo.png</iconUrl>
+        <iconUrl>https://bytebucket.org/Starnick/assimpnet/raw/18e2bc4dbf261221bac39741247287c4f5f373bb/logo.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<summary>A .NET Wrapper for the Open Asset Import (Assimp) library.</summary>
         <description>A .NET Wrapper for the Open Asset Import (Assimp) library. The library is able to import dozens of different 3D model formats (e.g. OBJ, FBX, Collada) and export to several formats (e.g. OBJ, Collada). This release targets version 3.1.1 of the native library.</description>
