@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AssimpNet Samples")]
+[assembly: AssemblyTitle("AssimpNet.Sample")]
 [assembly: AssemblyDescription("Simple example to show how to use the AssimpNet wrapper.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nicholas Woodfield")]

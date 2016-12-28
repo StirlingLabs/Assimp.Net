@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nicholas Woodfield")]
-[assembly: AssemblyProduct("AssimpNetInterop.Generator")]
+[assembly: AssemblyProduct("AssimpNet")]
 [assembly: AssemblyCopyright("Copyright © 2012-2017 AssimpNet - Nicholas Woodfield")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
