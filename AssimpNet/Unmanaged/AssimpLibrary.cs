@@ -35,6 +35,7 @@ namespace Assimp.Unmanaged
     [CLSCompliant(false)]
     public sealed class AssimpLibrary
     {
+        private static Object s_sync = new Object();
         private static AssimpLibrary s_instance;
         private AssimpLibraryImplementation m_impl;
         private String m_libraryPath = "";
@@ -58,10 +59,13 @@ namespace Assimp.Unmanaged
         {
             get
             {
-                if(s_instance == null)
-                    s_instance = new AssimpLibrary();
+                lock (s_sync)
+                {
+                    if (s_instance == null)
+                        s_instance = new AssimpLibrary();
 
-                return s_instance;
+                    return s_instance;
+                }
             }
         }
 
@@ -195,8 +199,11 @@ namespace Assimp.Unmanaged
 
         private void LoadIfNotLoaded()
         {
-            if(!IsLibraryLoaded)
-                LoadLibrary();
+            lock (s_sync)
+            {
+                if (!IsLibraryLoaded)
+                    LoadLibrary();
+            }
         }
 
         private void OnLibraryLoaded()
