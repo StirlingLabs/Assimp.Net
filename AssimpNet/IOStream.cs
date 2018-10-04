@@ -239,7 +239,7 @@ namespace Assimp
             }
             catch(Exception) { /*Assimp will report an IO error*/ }
 
-            return new UIntPtr((ulong) actualCount);
+            return new UIntPtr((ulong) actualCount / (ulong) longSize);
         }
 
         private UIntPtr OnAiFileReadProc(IntPtr file, IntPtr dataRead, UIntPtr sizeOfElemInBytes, UIntPtr numElements)
@@ -262,7 +262,7 @@ namespace Assimp
             }
             catch(Exception) { /*Assimp will report an IO error*/ }
 
-            return new UIntPtr((ulong) actualCount);
+            return new UIntPtr((ulong) actualCount / (ulong) longSize);
         }
 
         private UIntPtr OnAiFileTellProc(IntPtr file)
