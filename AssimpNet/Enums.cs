@@ -37,7 +37,7 @@ namespace Assimp
         /// <summary>
         /// Metadata is an integer.
         /// </summary>
-        Int = 1,
+        Int32 = 1,
 
         /// <summary>
         /// Metadata is an unsigned 64-bit integer.
@@ -50,14 +50,19 @@ namespace Assimp
         Float = 3,
 
         /// <summary>
+        /// Metadata is a double.
+        /// </summary>
+        Double = 4,
+
+        /// <summary>
         /// Metadata is a string.
         /// </summary>
-        String = 4,
+        String = 5,
 
         /// <summary>
         /// Metadata is a <see cref="Vector3D"/>.
         /// </summary>
-        Vector3D = 5
+        Vector3D = 6
     }
 
     /// <summary>
