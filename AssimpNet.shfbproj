@@ -8,27 +8,26 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{e3628c05-bc8a-4e5b-ac81-4b4342ffa8ad}</ProjectGuid>
-    <SHFBSchemaVersion>2015.6.5.0</SHFBSchemaVersion>
+    <SHFBSchemaVersion>2017.9.26.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>Documentation</AssemblyName>
     <RootNamespace>Documentation</RootNamespace>
     <Name>Documentation</Name>
     <!-- SHFB properties -->
-    <OutputPath>C:\Users\Nicholas.Woodfield\Documents\Visual Studio 2015\Projects\AssimpNet\Docs\</OutputPath>
-    <HtmlHelpName>AssimpNet Documentation %28January 2017%29</HtmlHelpName>
+    <OutputPath>C:\Users\Nicholas\Documents\Visual Studio 2017\Projects\AssimpNet-Next\Docs\</OutputPath>
+    <HtmlHelpName>AssimpNet Documentation %28October 2018%29</HtmlHelpName>
     <Language>en-US</Language>
     <PresentationStyle>VS2013</PresentationStyle>
-    <HelpFileVersion>3.3.2</HelpFileVersion>
+    <HelpFileVersion>4.1.0</HelpFileVersion>
     <ProductTitle>AssimpNet</ProductTitle>
     <VendorName>
     </VendorName>
     <DocumentationSources>
-      <DocumentationSource sourceFile="AssimpNet\bin\Net45-Release\AssimpNet.dll" />
-      <DocumentationSource sourceFile="AssimpNet\bin\Net45-Release\AssimpNet.XML" />
-    </DocumentationSources>
-    <HelpTitle>AssimpNet Documentation %28January 2017%29</HelpTitle>
-    <CopyrightText>Copyright &amp;#169%3b 2012-2017 AssimpNet - Nicholas Woodfield. All rights reserved.</CopyrightText>
+      <DocumentationSource sourceFile="AssimpNet\bin\Release\netstandard1.3\AssimpNet.dll" />
+<DocumentationSource sourceFile="AssimpNet\bin\Release\netstandard1.3\AssimpNet.xml" /></DocumentationSources>
+    <HelpTitle>AssimpNet Documentation %28October 2018%29</HelpTitle>
+    <CopyrightText>Copyright &amp;#169%3b 2012-2018 AssimpNet - Nicholas Woodfield. All rights reserved.</CopyrightText>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="False" />
       <NamespaceSummaryItem name="Assimp" isDocumented="True">Main namespace - contains high level AssimpNet objects.</NamespaceSummaryItem>
@@ -40,7 +39,7 @@
     <HeaderText>
     </HeaderText>
     <RootNamespaceTitle>AssimpNet</RootNamespaceTitle>
-    <ProjectSummary>A .NET Wrapper for the Open Asset Import %28Assimp%29 library. The library is able to import dozens of different 3D model formats %28e.g. OBJ, FBX, Collada%29 and export to several formats %28e.g. OBJ, Collada%29. This release targets version 3.1.1 of the native library.</ProjectSummary>
+    <ProjectSummary>A .NET Wrapper for the Open Asset Import %28Assimp%29 library. The library is able to import dozens of different 3D model formats %28e.g. OBJ, FBX, Collada%29 and export to several formats %28e.g. OBJ, Collada%29. This release targets version 4.1.0 of the native library.</ProjectSummary>
     <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, Namespace, TypeParameter, AutoDocumentDispose</MissingTags>
     <IncludeStopWordList>False</IncludeStopWordList>
     <HelpFileFormat>HtmlHelp1</HelpFileFormat>
@@ -58,12 +57,12 @@
     <NamespaceGrouping>False</NamespaceGrouping>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <IndentHtml>False</IndentHtml>
-    <FrameworkVersion>.NET Framework 4.5</FrameworkVersion>
+    <FrameworkVersion>Cross-platform (.NET Core/.NET Standard)</FrameworkVersion>
     <KeepLogFile>True</KeepLogFile>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
     <CppCommentsFixup>False</CppCommentsFixup>
     <CleanIntermediates>True</CleanIntermediates>
-    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected</VisibleItems>
+    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, EditorBrowsableNever, NonBrowsable</VisibleItems>
     <TocParentId>-1</TocParentId>
     <TocParentVersion>100</TocParentVersion>
     <TopicVersion>100</TopicVersion>

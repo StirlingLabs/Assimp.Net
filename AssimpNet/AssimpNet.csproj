@@ -30,7 +30,7 @@
   <ItemGroup>
     <Content Include="..\ChangeLog.txt" Link="build\ChangeLog.txt" PackagePath="" />
     <Content Include="..\License.txt" Link="build\License.txt" PackagePath="" />
-    <Content Include="..\Docs\AssimpNet Documentation %28January 2017%29.chm" Link="build\AssimpNet Documentation %28January 2017%29.chm" PackagePath="" />
+    <Content Include="..\Docs\AssimpNet Documentation %28October 2018%29.chm" Link="build\AssimpNet Documentation %28October 2018%29.chm" PackagePath="" />
     <Content Include="..\libs\Assimp\win-x64\Assimp64.dll" Link="build\native\win-x64\Assimp64.dll" PackagePath="build\native\win-x64\" />
     <Content Include="..\libs\Assimp\win-x86\Assimp32.dll" Link="build\native\win-x86\Assimp32.dll" PackagePath="build\native\win-x86\" />
     <Content Include="..\libs\Assimp\linux-x64\libAssimp64.so" Link="build\native\linux-x64\libAssimp64.so" PackagePath="build\native\linux-x64\" />

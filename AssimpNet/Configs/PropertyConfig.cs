@@ -2098,6 +2098,9 @@ namespace Assimp.Configs
     /// </summary>
     public sealed class FBXImportSearchEmbeddedTexturesConfig : BooleanPropertyConfig
     {
+        /// <summary>
+        /// Gets the string name used by FBXImportSearchEmbeddedTexturesConfig .
+        /// </summary>
         public static String FBXImportSearchEmbeddedTexturesConfigName
         {
             get

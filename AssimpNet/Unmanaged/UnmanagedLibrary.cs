@@ -237,7 +237,7 @@ namespace Assimp.Unmanaged
         /// <summary>
         /// Frees the unmanaged library that is currently loaded.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the library was sucessfully freed.</returns>
         public bool FreeLibrary()
         {
             if(IsLibraryLoaded)

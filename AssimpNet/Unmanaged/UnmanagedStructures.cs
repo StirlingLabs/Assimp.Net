@@ -359,6 +359,7 @@ namespace Assimp.Unmanaged
         /// <summary>
         /// Gets the format hint. Use this to avoid struct copy if the string was passed by read-only ref.
         /// </summary>
+        /// <param name="aiTex">AiTexture</param>
         /// <returns>The format hint</returns>
         public static String GetFormatHint(in AiTexture aiTex)
         {
@@ -779,6 +780,7 @@ namespace Assimp.Unmanaged
         /// Convienence method for getting the AiString string - if the length is not greater than zero, it returns
         /// an empty string rather than garbage. Use this to avoid struct copy if the string was passed by read-only ref.
         /// </summary>
+        /// <param name="aiStr">AiString</param>
         /// <returns>AiString string data</returns>
         public unsafe static String GetString(in AiString aiStr)
         {
