@@ -1,7 +1,11 @@
-**The latest release can be downloaded from the [Downloads](https://bitbucket.org/Starnick/assimpnet/downloads) section or via [NuGet](https://www.nuget.org/packages/AssimpNet/).**
+![alt text](https://bitbucket.org/Starnick/assimpnet/raw/64485416c27d84b2928ba375d7ae51c8ab24bdb7/logo.png "AssimpNet Logo")
+
+**The latest release can be downloaded via [NuGet](https://www.nuget.org/packages/AssimpNet/).**
 
 ## Introduction ##
-This is the official repository for **AssimpNet**, the cross-platform .NET wrapper for the Open Asset Import Library (otherwise known as [Assimp](https://github.com/assimp/assimp) - it's German). This wrapper leverages P/Invoke to communicate with the native library's C-API. Since the managed assembly is compiled as **AnyCpu** and the native DLLs are loaded dynamically, the library fully supports usage with 32 and 64 bit applications without needing to be recompiled.
+This is the official repository for **AssimpNet**, the cross-platform .NET wrapper for the Open Asset Import Library (otherwise known as [Assimp](https://github.com/assimp/assimp)), which is a 3D model import-export library. The primary motivation is for this library to power content pipelines to import and process 3D models into your game engine's internal format, although the wrapper can be used at runtime to enable your users to import custom content.
+
+P/Invoke is used to communicate with the C-API of the native library. The managed assembly is compiled as **AnyCpu** and the native DLLs are loaded dynamically for either 32 or 64 bit applications.
 
 The library is split between two parts, a low level and a high level. The intent is to give as much freedom as possible to the developer to work with the native library from managed code.
 
@@ -19,9 +23,11 @@ The library is split between two parts, a low level and a high level. The intent
 
 ## Supported Platforms ##
 
-The NuGet package is the only official release of the binaries and currently it only supports **Windows**. Both 32 and 64 bit are supported with a managed DLL compiled for .NET Framework 2.0 and 4.5. The current release (3.3.2) targets the native **Assimp 3.1.1** release. The library supports other platforms unofficially. It has a **Linux** and **Mac** implementation to load and communicate with the native library for those platforms, but you have to provide the native binary yourself. Users have also successfully used the library with Unity3D and Android, but your mileage may vary.
+AssimpNet officially targets the **.NET Standard 1.3** and supplies binaries for **32/64 bit Windows** and **64 bit Linux (tested on ubuntu)**. The library is able to support **MacOS** but native binaries are not yet bundled with the official NuGet package. To use the library on your
+preferred platform, you may have to build and supply the native binaries yourself.
 
-The library is compiled using Visual Studio 2015 and at runtime has no other external dependencies other than the native library. However, there is a compile time dependency using [Mono.Cecil](https://github.com/jbevain/cecil/). If you compile without using the VS projects/MSBuild environment, the **only** special instruction is that you need to ensure that the interop generator patches the AssimpNet.dll in a post-build process, otherwise the library won't function correctly. This is because Mono.Cecil is used to inject IL into the assembly to make interoping with the native library more efficient.
+Additionally, the NuGet package has targets for **.NET Framework 4.x** and **.NET Framework 3.5** should you need them. It was compiled with Visual Studio 2017, but it has been compiled on Ubuntu using the DotNet CLI. There is one **build-time only** dependency, an IL Patcher also distributed as a cross-platform NuGet package. As long as you're
+able to build with Visual Studio or the DotNet CLI, the library *should* compile without issue on any platform.
 
 ## Licensing ##
 
@@ -34,5 +40,7 @@ Follow project updates and more on [Twitter](https://twitter.com/Tesla3D/).
 In addition, check out these other projects from the same author:
 
 [TeximpNet](https://bitbucket.org/Starnick/teximpnet) - A wrapper for the Nvidia Texture Tools and FreeImage libraries, which is a sister library to this one.
+
+[MemoryInterop.ILPatcher](https://bitbucket.org/Starnick/memoryinterop.ilpatcher) - This is the ILPatcher that is required at build time, it uses Mono.Cecil to inject IL code to improve native interop. The ILPatcher is cross-platform, which enables building of AssimpNet on non-windows platforms.
 
 [Tesla Graphics Engine](https://bitbucket.org/Starnick/tesla3d) - A 3D rendering engine written in C# and the primary driver for developing AssimpNet.
