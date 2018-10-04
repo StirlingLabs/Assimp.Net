@@ -291,6 +291,11 @@ namespace Assimp.Unmanaged
         /// aiAnimMesh**, array of attachment meshes for vertex-based animation. NOT CURRENTLY IN USE.
         /// </summary>
         public IntPtr AnimMeshes;
+
+        /// <summary>
+        /// unsigned int, method of morphing when anim meshes are specified.
+        /// </summary>
+        public MeshMorphingMethod MorphMethod;
     }
 
     /// <summary>
@@ -959,6 +964,11 @@ namespace Assimp.Unmanaged
         /// unsigned int, number of vertices.
         /// </summary>
         public uint NumVertices;
+
+        /// <summary>
+        /// float, weight of the AnimMesh.
+        /// </summary>
+        public float Weight;
     }
 
     /// <summary>

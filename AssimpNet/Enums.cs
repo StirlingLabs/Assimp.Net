@@ -602,6 +602,32 @@ namespace Assimp
     }
 
     /// <summary>
+    /// Defines the methods of mesh morphing supported.
+    /// </summary>
+    public enum MeshMorphingMethod
+    {
+        /// <summary>
+        /// No morphing.
+        /// </summary>
+        None = 0x0,
+
+        /// <summary>
+        /// Interpolation between morph targets.
+        /// </summary>
+        VertexBlend = 0x1,
+
+        /// <summary>
+        /// Normalized morphing between morph targets.
+        /// </summary>
+        MorphNormalized = 0x2,
+
+        /// <summary>
+        /// Relative morphing between morph targets.
+        /// </summary>
+        MorphRelative = 0x3
+    }
+
+    /// <summary>
     /// Enumerates all supported light sources.
     /// </summary>
     public enum LightSourceType

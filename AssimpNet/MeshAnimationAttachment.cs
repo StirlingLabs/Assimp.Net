@@ -41,6 +41,7 @@ namespace Assimp
         private List<Vector3D> m_bitangents;
         private List<Color4D>[] m_colors;
         private List<Vector3D>[] m_texCoords;
+        private float m_weight;
 
         /// <summary>
         /// Gets the number of vertices in this mesh. This is a replacement
@@ -201,6 +202,21 @@ namespace Assimp
         }
 
         /// <summary>
+        /// Gets or sets the weight of the mesh animation.
+        /// </summary>
+        public float Weight
+        {
+            get
+            {
+                return m_weight;
+            }
+            set
+            {
+                m_weight = value;
+            }
+        }
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="MeshAnimationAttachment"/> class.
         /// </summary>
         public MeshAnimationAttachment()
@@ -209,6 +225,8 @@ namespace Assimp
             m_normals = new List<Vector3D>();
             m_tangents = new List<Vector3D>();
             m_bitangents = new List<Vector3D>();
+            m_weight = 0.0f;
+
             m_colors = new List<Color4D>[AiDefines.AI_MAX_NUMBER_OF_COLOR_SETS];
 
             for(int i = 0; i < m_colors.Length; i++)
@@ -320,6 +338,7 @@ namespace Assimp
             nativeValue.Colors = new AiMeshColorArray();
             nativeValue.TextureCoords = new AiMeshTextureCoordinateArray();
             nativeValue.NumVertices = (uint) VertexCount;
+            nativeValue.Weight = m_weight;
 
             if(VertexCount > 0)
             {
@@ -379,6 +398,7 @@ namespace Assimp
             ClearBuffers();
 
             int vertexCount = (int) nativeValue.NumVertices;
+            m_weight = nativeValue.Weight;
 
             if(vertexCount > 0)
             {

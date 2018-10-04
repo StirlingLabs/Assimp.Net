@@ -44,6 +44,7 @@ namespace Assimp
         private int[] m_texComponentCount;
         private List<Bone> m_bones;
         private List<MeshAnimationAttachment> m_meshAttachments;
+        private MeshMorphingMethod m_morphMethod;
 
         /// <summary>
         /// Gets or sets the mesh name. This tends to be used
@@ -366,6 +367,21 @@ namespace Assimp
         }
 
         /// <summary>
+        /// Gets or sets the morph method used when animation attachments are used.
+        /// </summary>
+        public MeshMorphingMethod MorphMethod
+        {
+            get
+            {
+                return m_morphMethod;
+            }
+            set
+            {
+                m_morphMethod = value;
+            }
+        }
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="Mesh"/> class.
         /// </summary>
         public Mesh() : this(String.Empty, PrimitiveType.Triangle) { }
@@ -392,6 +408,7 @@ namespace Assimp
             m_name = name;
             m_primitiveType = primType;
             m_materialIndex = 0;
+            m_morphMethod = MeshMorphingMethod.None;
 
             m_vertices = new List<Vector3D>();
             m_normals = new List<Vector3D>();
@@ -637,6 +654,7 @@ namespace Assimp
             nativeValue.NumBones = (uint) BoneCount;
             nativeValue.NumFaces = (uint) FaceCount;
             nativeValue.NumAnimMeshes = (uint) MeshAnimationAttachmentCount;
+            nativeValue.MorphMethod = m_morphMethod;
 
             if(nativeValue.NumVertices > 0)
             {
@@ -716,6 +734,7 @@ namespace Assimp
             int vertexCount = (int) nativeValue.NumVertices;
             m_name = AiString.GetString(nativeValue.Name); //Avoid struct copy
             m_materialIndex = (int) nativeValue.MaterialIndex;
+            m_morphMethod = nativeValue.MorphMethod;
 
             //Load Per-vertex components
             if(vertexCount > 0)
