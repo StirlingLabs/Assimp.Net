@@ -194,6 +194,7 @@ namespace Assimp.Unmanaged
             ExportFormatDescription[] descriptions = new ExportFormatDescription[count];
 
             Functions.aiGetExportFormatDescription func = GetFunction<Functions.aiGetExportFormatDescription>(FunctionNames.aiGetExportFormatDescription);
+            Functions.aiReleaseExportFormatDescription releaseFunc = GetFunction<Functions.aiReleaseExportFormatDescription>(FunctionNames.aiReleaseExportFormatDescription);
 
             for(int i = 0; i < count; i++)
             {
@@ -201,7 +202,9 @@ namespace Assimp.Unmanaged
                 if(formatDescPtr != IntPtr.Zero)
                 {
                     AiExportFormatDesc desc = MemoryHelper.Read<AiExportFormatDesc>(formatDescPtr);
-                    descriptions[i] = new ExportFormatDescription(ref desc);
+                    descriptions[i] = new ExportFormatDescription(desc);
+
+                    releaseFunc(formatDescPtr);
                 }
             }
 
@@ -1035,6 +1038,7 @@ namespace Assimp.Unmanaged
 
             public const String aiGetExportFormatCount = "aiGetExportFormatCount";
             public const String aiGetExportFormatDescription = "aiGetExportFormatDescription";
+            public const String aiReleaseExportFormatDescription = "aiReleaseExportFormatDescription";
             public const String aiExportSceneToBlob = "aiExportSceneToBlob";
             public const String aiReleaseExportBlob = "aiReleaseExportBlob";
             public const String aiExportScene = "aiExportScene";
@@ -1152,6 +1156,9 @@ namespace Assimp.Unmanaged
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetExportFormatDescription)]
             public delegate IntPtr aiGetExportFormatDescription(UIntPtr index);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiReleaseExportFormatDescription)]
+            public delegate void aiReleaseExportFormatDescription(IntPtr desc);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiExportSceneToBlob)]
             public delegate IntPtr aiExportSceneToBlob(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, uint preProcessing);

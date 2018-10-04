@@ -74,7 +74,7 @@ namespace Assimp
         /// Constructs a new ExportFormatDescription.
         /// </summary>
         /// <param name="formatDesc">Unmanaged structure</param>
-        internal ExportFormatDescription(ref AiExportFormatDesc formatDesc)
+        internal ExportFormatDescription(in AiExportFormatDesc formatDesc)
         {
             m_formatId = Marshal.PtrToStringAnsi(formatDesc.FormatId);
             m_description = Marshal.PtrToStringAnsi(formatDesc.Description);
