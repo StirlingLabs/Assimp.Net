@@ -644,6 +644,11 @@ namespace Assimp.Unmanaged
         public Vector3D Direction;
 
         /// <summary>
+        /// Up direction of the light source in space. Undefined for point lights.
+        /// </summary>
+        public Vector3D Up;
+
+        /// <summary>
         /// Attenuation constant value.
         /// </summary>
         public float AttenuationConstant;
@@ -682,6 +687,11 @@ namespace Assimp.Unmanaged
         /// Spot light outer angle.
         /// </summary>
         public float AngleOuterCone;
+
+        /// <summary>
+        /// Width (X) and Height (Y) of the area that represents an <see cref="LightSourceType.Area"/> light.
+        /// </summary>
+        public Vector2D AreaSize;
     }
 
     /// <summary>

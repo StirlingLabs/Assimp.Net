@@ -628,7 +628,18 @@ namespace Assimp
         /// in a certain direction that is limited by an angle, like
         /// a cone.
         /// </summary>
-        Spot = 0x3
+        Spot = 0x3,
+
+        /// <summary>
+        /// Generic light level of the world, including the bounces of all other light sources. Typically, there's at most one ambient light in a scene and
+        /// is usually just a constant color. This light does not have a valid position, direction, or other properties - just the color.
+        /// </summary>
+        Ambient = 0x4,
+
+        /// <summary>
+        /// An area light is a rectangle with a predefined size that uniformly emits light from one of its sides. The position is center of the rectangle and the direction is its normal vector.
+        /// </summary>
+        Area = 0x5
     }
 
     /// <summary>

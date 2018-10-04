@@ -45,9 +45,11 @@ namespace Assimp
         private float m_attQuadratic;
         private Vector3D m_position;
         private Vector3D m_direction;
+        private Vector3D m_up;
         private Color3D m_diffuse;
         private Color3D m_specular;
         private Color3D m_ambient;
+        private Vector2D m_areaSize;
 
         /// <summary>
         /// Gets or sets the name of the light source. This corresponds to a node present in the scenegraph.
@@ -198,6 +200,22 @@ namespace Assimp
         }
 
         /// <summary>
+        /// Gets or sets the up vector of the light source in space, relative to the transformation of the node corresponding to the light.
+        /// This is undefined for point lights.
+        /// </summary>
+        public Vector3D Up
+        {
+            get
+            {
+                return m_up;
+            }
+            set
+            {
+                m_up = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the diffuse color of the light source.  The diffuse light color is multiplied with
         /// the diffuse material color to obtain the final color that contributes to the diffuse shading term.
         /// </summary>
@@ -246,11 +264,32 @@ namespace Assimp
         }
 
         /// <summary>
+        /// Gets or sets the Width (X) and Height (Y) of the area that represents an <see cref="LightSourceType.Area"/> light.
+        /// </summary>
+        public Vector2D AreaSize
+        {
+            get
+            {
+                return m_areaSize;
+            }
+            set
+            {
+                m_areaSize = value;
+            }
+        }
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="Light"/> class.
         /// </summary>
         public Light()
         {
             m_lightType = LightSourceType.Undefined;
+            m_attConstant = 0.0f;
+            m_attLinear = 1.0f;
+            m_attQuadratic = 0.0f;
+            m_angleInnerCone = (float) Math.PI * 2.0f;
+            m_angleOuterCone = (float) Math.PI * 2.0f;
+            m_areaSize = new Vector2D(0.0f, 0.0f);
         }
 
         #region IMarshalable Implementation
@@ -278,7 +317,9 @@ namespace Assimp
             nativeValue.ColorDiffuse = m_diffuse;
             nativeValue.ColorSpecular = m_specular;
             nativeValue.Direction = m_direction;
+            nativeValue.Up = m_up;
             nativeValue.Position = m_position;
+            nativeValue.AreaSize = m_areaSize;
         }
 
         /// <summary>
@@ -296,9 +337,11 @@ namespace Assimp
             m_attQuadratic = nativeValue.AttenuationQuadratic;
             m_position = nativeValue.Position;
             m_direction = nativeValue.Direction;
+            m_up = nativeValue.Up;
             m_diffuse = nativeValue.ColorDiffuse;
             m_specular = nativeValue.ColorSpecular;
             m_ambient = nativeValue.ColorAmbient;
+            m_areaSize = nativeValue.AreaSize;
         }
 
         /// <summary>
