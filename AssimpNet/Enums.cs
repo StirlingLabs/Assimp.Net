@@ -452,7 +452,13 @@ namespace Assimp
         /// <para>Usage of the configuration AI_CONFIG_PP_DB_THRESHOLD to control the threshold and AI_CONFIG_PP_DB_ALL_OR_NONE if you want bones
         /// removed if and only if all bones within the scene qualify for removal.</para>
         /// </summary>
-        Debone = 0x4000000
+        Debone = 0x4000000,
+
+        /// <summary>
+        /// This step will perform a global scale of the model. Some importers provide a mechanism to define a scaling unit for the model, which this processing step can utilize. 
+        /// Use AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY to control this.
+        /// </summary>
+        GlobalScale = 0x8000000
     }
 
     /// <summary>

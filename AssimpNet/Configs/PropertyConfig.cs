@@ -760,6 +760,31 @@ namespace Assimp.Configs
     }
 
     /// <summary>
+    /// Configuration for the <see cref="PostProcessSteps.FindDegenerates"/> step. If true, the area of the triangles are checked
+    /// to see if they are greater than 1e-6. If so, the triangle is removed if <see cref="RemoveDegeneratePrimitivesConfig"/> is set to true.
+    /// </summary>
+    public sealed class RemoveDegeneratePrimitivesCheckAreaConfig : BooleanPropertyConfig
+    {
+        /// <summary>
+        /// Gets the string name used by RemoveDegeneratePrimitivesCheckAreaConfig.
+        /// </summary>
+        public static String RemoveDegeneratePrimitivesCheckAreaConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_PP_FD_CHECKAREA;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new RemoveDegeneratePrimitivesCheckAreaConfig.
+        /// </summary>
+        /// <param name="checkArea">True if the post process step should check the area of triangles when finding degenerate primitives, false otherwise.</param>
+        public RemoveDegeneratePrimitivesCheckAreaConfig(bool checkArea)
+            : base(RemoveDegeneratePrimitivesCheckAreaConfigName, checkArea, false) { }
+    }
+
+    /// <summary>
     /// Configuration for the <see cref="PostProcessSteps.OptimizeGraph"/> step
     /// to preserve nodes matching a name in the given list. Nodes that match the names in the list
     /// will not be modified or removed. Identifiers containing whitespaces
@@ -1219,6 +1244,32 @@ namespace Assimp.Configs
                 AssimpLibrary.Instance.SetImportPropertyMatrix(propStore, RootTransformationConfigName, Value);
             }
         }
+    }
+
+    /// <summary>
+    /// Configures the <see cref="PostProcessSteps.GlobalScale"/> step to scale the entire scene by a certain amount. Some importers provide a mechanism to define a scaling unit for the model,
+    /// which this processing step can utilize.
+    /// </summary>
+    /// <seealso cref="Assimp.Configs.FloatPropertyConfig" />
+    public sealed class GlobalScaleConfig : FloatPropertyConfig
+    {
+        /// <summary>
+        /// Gets the string name used by GlobalScaleConfig.
+        /// </summary>
+        public static String GlobalScaleConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new GlobalScaleConfig.
+        /// </summary>
+        /// <param name="globalScale">Value to scale the entire scene by.</param>
+        public GlobalScaleConfig(float globalScale)
+            : base(GlobalScaleConfigName, globalScale, 1.0f) { }
     }
 
     #endregion
@@ -1820,29 +1871,28 @@ namespace Assimp.Configs
     }
 
     /// <summary>
-    /// Specifies whether the IFC loader skips over shape representations of type 'Curve2D'. A lot of files contain both a faceted mesh representation and a outline 
-    /// with a presentation type of 'Curve2D'. Currently Assimp does not convert those, so turning this option off just clutters the log with errors.
+    /// Specifies whether the IFC loader skips over IfcSpace elements. IfcSpace elements (and their geometric representations) are used to represent free space in a building story.
     /// </summary>
-    public sealed class IFCSkipCurveShapesConfig : BooleanPropertyConfig
+    public sealed class IFCSkipSpaceRepresentationsConfig : BooleanPropertyConfig
     {
 
         /// <summary>
-        /// Gets the string name used by IFCSkipCurveShapesConfig.
+        /// Gets the string name used by IFCSkipSpaceRepresentationsConfig.
         /// </summary>
-        public static String IFCSkipCurveShapesConfigName
+        public static String IFCSkipSpaceRepresentationsConfigName
         {
             get
             {
-                return AiConfigs.AI_CONFIG_IMPORT_IFC_SKIP_CURVE_REPRESENTATIONS;
+                return AiConfigs.AI_CONFIG_IMPORT_IFC_SKIP_SPACE_REPRESENTATIONS;
             }
         }
 
         /// <summary>
-        /// Constructs a new IFCSkipCurveShapesConfig.
+        /// Constructs a new IFCSkipSpaceRepresentationsConfig.
         /// </summary>
-        /// <param name="skipCurveShapes">True if the Curve2D shapes are skipped during import, false otherwise.</param>
-        public IFCSkipCurveShapesConfig(bool skipCurveShapes)
-            : base(IFCSkipCurveShapesConfigName, skipCurveShapes, true) { }
+        /// <param name="skipSpaceRepresentations">True if the IfcSpace elements are skipped, false if otherwise.</param>
+        public IFCSkipSpaceRepresentationsConfig(bool skipSpaceRepresentations)
+            : base(IFCSkipSpaceRepresentationsConfigName, skipSpaceRepresentations, true) { }
     }
 
     /// <summary>
@@ -1871,6 +1921,54 @@ namespace Assimp.Configs
         /// <param name="useCustomTriangulation">True if the loader should use its own triangulation routine for walls/floors, false otherwise.</param>
         public IFCUseCustomTriangulationConfig(bool useCustomTriangulation)
             : base(IFCUseCustomTriangulationConfigName, useCustomTriangulation, true) { }
+    }
+
+    /// <summary>
+    /// Specifies the tessellation conic angle for IFC smoothing curves. Accepted range of values is between [5, 120]
+    /// </summary>
+    public sealed class IFCSmoothingAngleConfig : FloatPropertyConfig
+    {
+        /// <summary>
+        /// Gets the string name used by IFCSmoothingAngleConfig.
+        /// </summary>
+        public static String IFCSmoothingAngleConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_IMPORT_IFC_SMOOTHING_ANGLE;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new IFCSmoothingAngleConfig.
+        /// </summary>
+        /// <param name="angle">Smoothing angle when tessellating curves. Needs to be in the range of [5, 120].</param>
+        public IFCSmoothingAngleConfig(float angle)
+            : base(IFCSmoothingAngleConfigName, angle, 10.0f) { }
+    }
+
+    /// <summary>
+    /// Specifies the tessellation for IFC cylindrical shapes. E.g. the number of segments used to approximate a circle. Accepted range of values is between [3, 180].
+    /// </summary>
+    public sealed class IFCCylindricalTessellationConfig : IntegerPropertyConfig
+    {
+        /// <summary>
+        /// Gets the string name used by IFCCylindricalTessellationConfig.
+        /// </summary>
+        public static String IFCCylindricalTessellationConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_IMPORT_IFC_CYLINDRICAL_TESSELLATION;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new IFCCylindricalTessellationConfig.
+        /// </summary>
+        /// <param name="tessellation">Tessellation of cylindrical shapes (e.g. the number of segments used to approximate a circle). Needs to be in the range of [3, 180].</param>
+        public IFCCylindricalTessellationConfig(int tessellation)
+            : base(IFCCylindricalTessellationConfigName, tessellation, 32) { }
     }
 
     /// <summary>
@@ -1968,6 +2066,52 @@ namespace Assimp.Configs
         /// <param name="importMaterials">True if the FBX importer should import materials, false otherwise.</param>
         public FBXImportMaterialsConfig(bool importMaterials)
             : base(FBXImportMaterialsConfigName, importMaterials, true) { }
+    }
+
+    /// <summary>
+    /// Specifies whether the FBX importer will import embedded textures. Default is true.
+    /// </summary>
+    /// <seealso cref="Assimp.Configs.BooleanPropertyConfig" />
+    public sealed class FBXImportEmbeddedTexturesConfig : BooleanPropertyConfig
+    {
+        /// <summary>
+        /// Gets the string name used by FBXImportEmbeddedTexturesConfig.
+        /// </summary>
+        public static String FBXImportEmbeddedTexturesConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_IMPORT_FBX_READ_TEXTURES;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new FBXImportEmbeddedTexturesConfig.
+        /// </summary>
+        /// <param name="importTextures">True if the FBX importer should import embedded textures, false otherwise.</param>
+        public FBXImportEmbeddedTexturesConfig(bool importTextures)
+            : base(FBXImportEmbeddedTexturesConfigName, importTextures, true) { }
+    }
+
+    /// <summary>
+    /// Specifies if the FBX importer should search for embedded loaded textures, where no embedded texture data is provided. Default is false.
+    /// </summary>
+    public sealed class FBXImportSearchEmbeddedTexturesConfig : BooleanPropertyConfig
+    {
+        public static String FBXImportSearchEmbeddedTexturesConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_IMPORT_FBX_SEARCH_EMBEDDED_TEXTURES;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new FBXImportSearchEmbeddedTexturesConfig.
+        /// </summary>
+        /// <param name="searchEmbeddedTextures">True if the FBX importer should search for embedded loaded textures, where no embedded texture data is provided.</param>
+        public FBXImportSearchEmbeddedTexturesConfig(bool searchEmbeddedTextures)
+            : base(FBXImportSearchEmbeddedTexturesConfigName, searchEmbeddedTextures, false) { }
     }
 
     /// <summary>
@@ -2116,6 +2260,34 @@ namespace Assimp.Configs
         /// <param name="optimizeEmptyAnimations">True if empty animation curves should be dropped, false otherwise.</param>
         public FBXOptimizeEmptyAnimationCurvesConfig(bool optimizeEmptyAnimations)
             : base(FBXOptimizeEmptyAnimationCurvesConfigName, optimizeEmptyAnimations, true) { }
+    }
+
+    #endregion
+
+    #region Exporter Settings
+
+    /// <summary>
+    /// Specifies if the X-file exporter should use 64-bit doubles rather than 32-bit floats.
+    /// </summary>
+    public sealed class XFileUseDoublesConfig : BooleanPropertyConfig
+    {
+        /// <summary>
+        /// Gets the string name used by XFileUseDoublesConfig.
+        /// </summary>
+        public static String XFileUseDoublesConfigName
+        {
+            get
+            {
+                return AiConfigs.AI_CONFIG_EXPORT_XFILE_64BIT;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new XFileUseDoublesConfig.
+        /// </summary>
+        /// <param name="useDoubles">True if the x file uses 64-bit double values rather than 32-bit float values.</param>
+        public XFileUseDoublesConfig(bool useDoubles)
+            : base(XFileUseDoublesConfigName, useDoubles, false) { }
     }
 
     #endregion

@@ -131,6 +131,13 @@ namespace Assimp.Unmanaged
         public const String AI_CONFIG_PP_FD_REMOVE = "PP_FD_REMOVE";
 
         /// <summary>
+        /// Configures the <see cref="PostProcessSteps.FindDegenerates"/> step
+        /// to check the area of a triangle to be greater than 1e-6. If this is not the case, the triangle will be removed if <see cref="AI_CONFIG_PP_FD_REMOVE"/> is set to true.
+        /// <para>Type: bool. Default: false</para>
+        /// </summary>
+        public const String AI_CONFIG_PP_FD_CHECKAREA = "PP_FD_CHECKAREA";
+
+        /// <summary>
         /// Configures the <see cref="PostProcessSteps.OptimizeGraph"/> step
         /// to preserve nodes matching a name in a given list. This is a list of 1 to n strings, whitespace ' ' serves as a delimter character.
         /// Identifiers containing whitespaces must be enclosed in *single* quotation marks. Carriage returns
@@ -258,6 +265,13 @@ namespace Assimp.Unmanaged
         /// <para>Type: Matrix4x4. Default: Identity Matrix</para>
         /// </summary>
         public const String AI_CONFIG_PP_PTV_ROOT_TRANSFORMATION = "PP_PTV_ROOT_TRANSFORMATION";
+
+        /// <summary>
+        /// Configures the <see cref="PostProcessSteps.GlobalScale"/> step to scale the entire scene by a certain amount. Some importers provide a mechanism to define a scaling unit for the model,
+        /// which this processing step can utilize.
+        /// <para>Type: Float. Default: 1.0f.</para>
+        /// </summary>
+        public const String AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY = "GLOBAL_SCALE_FACTOR";
 
         #endregion
 
@@ -447,11 +461,10 @@ namespace Assimp.Unmanaged
         public const String AI_CONFIG_IMPORT_OGRE_TEXTURETYPE_FROM_FILENAME = "IMPORT_OGRE_TEXTURETYPE_FROM_FILENAME";
 
         /// <summary>
-        /// Specifies whether the IFC loader skips over shape representations of type 'Curve2D'. A lot of files contain both a faceted mesh representation and a outline 
-        /// with a presentation type of 'Curve2D'. Currently Assimp does not convert those, so turning this option off just clutters the log with errors.
+        /// Specifies whether the IFC loader skips over IfcSpace elements. IfcSpace elements (and their geometric representations) are used to represent free space in a building story.
         /// <para>Type: Bool. Default: true.</para>
         /// </summary>
-        public const String AI_CONFIG_IMPORT_IFC_SKIP_CURVE_REPRESENTATIONS = "IMPORT_IFC_SKIP_CURVE_REPRESENTATIONS";
+        public const String AI_CONFIG_IMPORT_IFC_SKIP_SPACE_REPRESENTATIONS = "IMPORT_IFC_SKIP_SPACE_REPRESENTATIONS";
 
         /// <summary>
         /// Specifies whether the IFC loader will use its own, custom triangulation algorithm to triangulate wall and floor meshes. If this is set to false,
@@ -461,6 +474,18 @@ namespace Assimp.Unmanaged
         /// <para>Type: Bool. Default: true.</para>
         /// </summary>
         public const String AI_CONFIG_IMPORT_IFC_CUSTOM_TRIANGULATION = "IMPORT_IFC_CUSTOM_TRIANGULATION";
+
+        /// <summary>
+        /// Specifies the tessellation conic angle for IFC smoothing curves. Accepted range of values is between [5, 120]
+        /// <para>Type: Float. Default: 10.0f</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_IFC_SMOOTHING_ANGLE = "IMPORT_IFC_SMOOTHING_ANGLE";
+
+        /// <summary>
+        /// Specifies the tessellation for IFC cylindrical shapes. E.g. the number of segments used to approximate a circle. Accepted range of values is between [3, 180].
+        /// <para>Type: Integer. Default: 32</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_IFC_CYLINDRICAL_TESSELLATION = "IMPORT_IFC_CYLINDRICAL_TESSELLATION";
 
         /// <summary>
         /// Specifies whether the collada loader will ignore the up direction.
@@ -486,6 +511,18 @@ namespace Assimp.Unmanaged
         /// <para>Type: Bool. Default: true.</para>
         /// </summary>
         public const String AI_CONFIG_IMPORT_FBX_READ_MATERIALS = "IMPORT_FBX_READ_MATERIALS";
+
+        /// <summary>
+        /// Specifies whether the FBX importer will read embedded textures.
+        /// <para>Type: Bool. Default: true.</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_FBX_READ_TEXTURES = "IMPORT_FBX_READ_TEXTURES";
+
+        /// <summary>
+        /// Specifies whether the FBX importer will search for embedded loaded textures, where no embedded texture data is provided.
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_FBX_SEARCH_EMBEDDED_TEXTURES = "IMPORT_FBX_SEARCH_EMBEDDED_TEXTURES";
 
         /// <summary>
         /// Specifies whether the FBX importer will read cameras.
@@ -526,6 +563,16 @@ namespace Assimp.Unmanaged
         /// <para>Type: Bool. Default: true.</para>
         /// </summary>
         public const String AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES = "IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES";
+
+        #endregion
+
+        #region Exporter Settings
+
+        /// <summary>
+        /// Specifies if the X-file exporter should use 64-bit doubles rather than 32-bit floats.
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
+        public const String AI_CONFIG_EXPORT_XFILE_64BIT = "EXPORT_XFILE_64BIT";
 
         #endregion
     }
