@@ -1093,6 +1093,11 @@ namespace Assimp
         Float = 0x1,
 
         /// <summary>
+        /// Array of double-precision (64 bit) floats.
+        /// </summary>
+        Double = 0x2,
+
+        /// <summary>
         /// Property is a string.
         /// </summary>
         String = 0x3,

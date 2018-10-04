@@ -366,6 +366,31 @@ namespace Assimp
         }
 
         /// <summary>
+        /// Gets the property raw data as a double.
+        /// </summary>
+        /// <returns>Double</returns>
+        public double GetDoubleValue()
+        {
+            if(m_type == PropertyType.Double)
+                return GetValueAs<double>();
+            
+            return 0;
+        }
+
+        /// <summary>
+        /// Sets the property raw data with a double.
+        /// </summary>
+        /// <param name="value">Double.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public bool SetDoubleValue(double value)
+        {
+            if(m_type != PropertyType.Double)
+                return false;
+
+            return SetValueAs<double>(value);
+        }
+
+        /// <summary>
         /// Gets the property raw data as an integer.
         /// </summary>
         /// <returns>Integer</returns>
@@ -455,6 +480,34 @@ namespace Assimp
                 return false;
 
             return SetValueArrayAs<float>(values);
+        }
+
+        /// <summary>
+        /// Gets the property raw data as a double array.
+        /// </summary>
+        /// <returns>Double array</returns>
+        public double[] GetDoubleArrayValue()
+        {
+            if(m_type == PropertyType.Double)
+            {
+                int count = ByteCount / sizeof(double);
+                return GetValueArrayAs<double>(count);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Sets the property raw data as a double array.
+        /// </summary>
+        /// <param name="values">Values to set</param>
+        /// <returns>True if successful, otherwise false</returns>
+        public bool SetDoubleArrayValue(double[] values)
+        {
+            if(m_type != PropertyType.Double)
+                return false;
+
+            return SetValueArrayAs<double>(values);
         }
 
         /// <summary>
