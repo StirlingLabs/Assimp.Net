@@ -301,7 +301,7 @@ namespace Assimp.Unmanaged
     public unsafe struct AiTexture
     {
         //Internal use only
-        private static readonly char[] s_nullFormat = new char[] { '\0', '\0', '\0', '\0' };
+        private static readonly char[] s_nullFormat = new char[] { '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0' };
 
         /// <summary>
         /// Width of the texture.
@@ -314,10 +314,10 @@ namespace Assimp.Unmanaged
         public uint Height;
 
         /// <summary>
-        /// sbyte[4], format extension hint. Fixed size char is two bytes regardless of encoding. Unmanaged assimp uses a char that
-        /// maps to one byte.
+        /// sbyte[9], format extension hint. Fixed size char is two bytes regardless of encoding. Unmanaged assimp uses a char that
+        /// maps to one byte. 8 for string + 1 for terminator.
         /// </summary>
-        public fixed sbyte FormatHint[4];
+        public fixed sbyte FormatHint[9];
 
         /// <summary>
         /// aiTexel*, array of texel data.
@@ -330,16 +330,15 @@ namespace Assimp.Unmanaged
         /// <param name="formatHint">Format hint - must be 3 characters or less</param>
         public void SetFormatHint(String formatHint)
         {
+            int maxLen = s_nullFormat.Length;
             char[] hintChars = (String.IsNullOrEmpty(formatHint)) ? s_nullFormat : formatHint.ToLowerInvariant().ToCharArray();
 
             int count = hintChars.Length;
 
             fixed(sbyte* charPtr = FormatHint)
             {
-                charPtr[0] = (sbyte) ((count > 0) ? hintChars[0] : '\0');
-                charPtr[1] = (sbyte) ((count > 1) ? hintChars[1] : '\0');
-                charPtr[2] = (sbyte) ((count > 2) ? hintChars[2] : '\0');
-                charPtr[3] = (sbyte) '\0';
+                for(int i = 0; i < maxLen; i++)
+                    charPtr[i] = (sbyte) ((count > i) ? hintChars[i] : '\0');
             }
         }
 
@@ -363,7 +362,21 @@ namespace Assimp.Unmanaged
 #if !NETSTANDARD1_3
                 return new String(charPtr);
 #else
-                return Encoding.ASCII.GetString((byte*) charPtr, 4);
+                //Determine how many actual characters there are...
+                int maxLen = s_nullFormat.Length;
+                int nonTerminatorCount = 0;
+                for(int i = 0; i < maxLen; i++)
+                {
+                    if(aiTex.FormatHint[i] == '\0')
+                        break;
+
+                    nonTerminatorCount++;
+                }
+
+                if(nonTerminatorCount == 0)
+                    return String.Empty;
+
+                return Encoding.ASCII.GetString((byte*) charPtr, nonTerminatorCount);
 #endif
             }
         }
