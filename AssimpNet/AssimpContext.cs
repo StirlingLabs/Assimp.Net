@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -1004,7 +1004,7 @@ namespace Assimp
                     matrix = matrix * m_scaleRot; //Transform
 
                     //Write back to unmanaged mem
-                    MemoryHelper.Write<Matrix4x4>(matrixPtr, ref matrix);
+                    MemoryHelper.Write<Matrix4x4>(matrixPtr, matrix);
 
                     return true;
                 }
@@ -1061,7 +1061,7 @@ namespace Assimp
 
             foreach(ExportFormatDescription descr in m_exportFormats)
             {
-                if (descr.FormatId.Equals(exportFormatId, StringComparison.InvariantCulture))
+                if (descr.FormatId.Equals(exportFormatId, StringComparison.Ordinal))
                     return true;
             }
 

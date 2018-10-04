@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 
 namespace Assimp.Unmanaged
@@ -33,24 +32,23 @@ namespace Assimp.Unmanaged
     /// Singleton that governs access to the unmanaged Assimp library functions.
     /// </summary>
     [CLSCompliant(false)]
-    public sealed class AssimpLibrary
+    public sealed class AssimpLibrary : UnmanagedLibrary
     {
-        private static Object s_sync = new Object();
+        private static readonly Object s_sync = new Object();
+
+        /// <summary>
+        /// Default name of the 32-bit unmanaged library. Based on runtime implementation the prefix ("lib" on non-windows) and extension (.dll, .so, .dylib) will be appended automatically.
+        /// </summary>
+        private const String Default32BitName = "Assimp32";
+
+        /// <summary>
+        /// Default name of the 64-bit unmanaged library. Based on runtime implementation the prefix ("lib" on non-windows) and extension (.dll, .so, .dylib) will be appended automatically.
+        /// </summary>
+        private const String Default64BitName = "Assimp64";
+
         private static AssimpLibrary s_instance;
-        private AssimpLibraryImplementation m_impl;
-        private String m_libraryPath = "";
 
         private bool m_enableVerboseLogging = false;
-
-        /// <summary>
-        /// Event that is triggered when the assimp library is loaded.
-        /// </summary>
-        public event EventHandler LibraryLoaded;
-
-        /// <summary>
-        /// Event that is triggered when the assimp library is -about to be freed-.
-        /// </summary>
-        public event EventHandler LibraryFreed;
 
         /// <summary>
         /// Gets the AssimpLibrary instance.
@@ -59,57 +57,13 @@ namespace Assimp.Unmanaged
         {
             get
             {
-                lock (s_sync)
+                lock(s_sync)
                 {
-                    if (s_instance == null)
-                        s_instance = new AssimpLibrary();
+                    if(s_instance == null)
+                        s_instance = CreateInstance();
 
                     return s_instance;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets the default path used for loading the 32-bit version of the unmanaged Assimp DLL.
-        /// </summary>
-        public String DefaultLibraryPath32Bit
-        {
-            get
-            {
-                return m_impl.DefaultLibraryPath32Bit;
-            }
-        }
-
-        /// <summary>
-        /// Gets the default path used for loading the 64-bit version of the unmanaged Assimp DLL.
-        /// </summary>
-        public String DefaultLibraryPath64Bit
-        {
-            get
-            {
-                return m_impl.DefaultLibraryPath64Bit;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current path to the unmanaged Assimp DLL that is loaded.
-        /// </summary>
-        public String LibraryPath
-        {
-            get
-            {
-                return m_libraryPath;
-            }
-        }
-
-        /// <summary>
-        /// Gets if the Assimp unmanaged library has been loaded or not.
-        /// </summary>
-        public bool IsLibraryLoaded
-        {
-            get
-            {
-                return m_impl != null && m_impl.LibraryLoaded;
             }
         }
 
@@ -125,101 +79,12 @@ namespace Assimp.Unmanaged
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        private AssimpLibrary() { }
+        private AssimpLibrary(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
+            : base(default32BitName, default64BitName, unmanagedFunctionDelegateTypes) { }
 
-        /// <summary>
-        /// Loads the library using the default 32-bit or 64-bit DLL path, depending on the OS AssimpNet is running on.
-        /// </summary>
-        /// <exception cref="Assimp.AssimpException">Thrown if the library is already loaded or if there was an error in loading the library.</exception>
-        public void LoadLibrary()
+        private static AssimpLibrary CreateInstance()
         {
-            if(IsLibraryLoaded)
-                throw new AssimpException("Assimp library already loaded.");
-
-            AssimpLibraryImplementation impl = AssimpDefaultLibraryPath.CreateRuntimeImplementation();
-            String libPath = (IntPtr.Size == 8) ? impl.DefaultLibraryPath64Bit : impl.DefaultLibraryPath32Bit;
-
-            impl.LoadAssimpLibrary(libPath);
-
-            m_impl = impl;
-            m_libraryPath = libPath;
-
-            OnLibraryLoaded();
-        }
-
-        /// <summary>
-        /// Loads the Assimp unmanaged library using the DLL path specified in LibraryPath. If the library is already loaded, or there was an error
-        /// in loading the library, an AssimpException is thrown.
-        /// </summary>
-        /// <param name="libPath">Path to the Assimp DLL.</param>
-        /// <exception cref="Assimp.AssimpException">Thrown if the library is already loaded or if there was an error in loading the library.</exception>
-        public void LoadLibrary(String libPath)
-        {
-            if(IsLibraryLoaded)
-                throw new AssimpException("Assimp library already loaded.");
-
-            AssimpLibraryImplementation impl = AssimpDefaultLibraryPath.CreateRuntimeImplementation();
-            impl.LoadAssimpLibrary(libPath);
-
-            m_impl = impl;
-            m_libraryPath = libPath;
-
-            OnLibraryLoaded();
-        }
-
-        /// <summary>
-        /// Convienence method that gives the AssimpLibrary paths to both a 32-bit and 64-bit path, letting the runtime choose between the two depending on the
-        /// bitness of the process.
-        /// </summary>
-        /// <param name="lib32Path">Path to the 32 bit Assimp DLL</param>
-        /// <param name="lib64Path">Path to the 64 bit Assimp DLL</param>
-        public void LoadLibrary(String lib32Path, String lib64Path)
-        {
-            String libPath = (IntPtr.Size == 8) ? lib64Path : lib32Path;
-            LoadLibrary(libPath);
-        }
-
-        /// <summary>
-        /// Frees the Assimp unmanaged library.
-        /// </summary>
-        public void FreeLibrary()
-        {
-            if(m_impl != null)
-            {
-                OnLibraryFreed();
-
-                m_impl.FreeAssimpLibrary();
-                m_impl = null;
-                m_libraryPath = String.Empty;
-            }
-        }
-
-        private void LoadIfNotLoaded()
-        {
-            lock (s_sync)
-            {
-                if (!IsLibraryLoaded)
-                    LoadLibrary();
-            }
-        }
-
-        private void OnLibraryLoaded()
-        {
-            EventHandler temp = LibraryLoaded;
-
-            if(temp != null)
-                temp(this, EventArgs.Empty);
-        }
-
-        private void OnLibraryFreed()
-        {
-            EventHandler temp = LibraryFreed;
-
-            if(temp != null)
-                temp(this, EventArgs.Empty);
+            return new AssimpLibrary(Default32BitName, Default64BitName, PlatformHelper.GetNestedTypes(typeof(Functions)));
         }
 
         #region Import Methods
@@ -249,7 +114,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiImportFileExWithProperties func = m_impl.GetFunction<AssimpDelegates.aiImportFileExWithProperties>(AssimpFunctionNames.aiImportFileExWithProperties);
+            Functions.aiImportFileExWithProperties func = GetFunction<Functions.aiImportFileExWithProperties>(FunctionNames.aiImportFileExWithProperties);
 
             return func(file, (uint) flags, fileIO, propStore);
         }
@@ -267,7 +132,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiImportFileFromMemoryWithProperties func = m_impl.GetFunction<AssimpDelegates.aiImportFileFromMemoryWithProperties>(AssimpFunctionNames.aiImportFileFromMemoryWithProperties);
+            Functions.aiImportFileFromMemoryWithProperties func = GetFunction<Functions.aiImportFileFromMemoryWithProperties>(FunctionNames.aiImportFileFromMemoryWithProperties);
 
             byte[] buffer = MemoryHelper.ReadStreamFully(stream, 0);
 
@@ -286,7 +151,7 @@ namespace Assimp.Unmanaged
             if(scene == IntPtr.Zero)
                 return;
 
-            AssimpDelegates.aiReleaseImport func = m_impl.GetFunction<AssimpDelegates.aiReleaseImport>(AssimpFunctionNames.aiReleaseImport);
+            Functions.aiReleaseImport func = GetFunction<Functions.aiReleaseImport>(FunctionNames.aiReleaseImport);
 
             func(scene);
         }
@@ -304,7 +169,7 @@ namespace Assimp.Unmanaged
             if(scene == IntPtr.Zero)
                 return IntPtr.Zero;
 
-            AssimpDelegates.aiApplyPostProcessing func = m_impl.GetFunction<AssimpDelegates.aiApplyPostProcessing>(AssimpFunctionNames.aiApplyPostProcessing);
+            Functions.aiApplyPostProcessing func = GetFunction<Functions.aiApplyPostProcessing>(FunctionNames.aiApplyPostProcessing);
 
             return func(scene, (uint) flags);
         }
@@ -321,18 +186,18 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            int count = (int) m_impl.GetFunction<AssimpDelegates.aiGetExportFormatCount>(AssimpFunctionNames.aiGetExportFormatCount)().ToUInt32();
+            int count = (int) GetFunction<Functions.aiGetExportFormatCount>(FunctionNames.aiGetExportFormatCount)().ToUInt32();
 
             if(count == 0)
                 return new ExportFormatDescription[0];
 
             ExportFormatDescription[] descriptions = new ExportFormatDescription[count];
 
-            AssimpDelegates.aiGetExportFormatDescription func = m_impl.GetFunction<AssimpDelegates.aiGetExportFormatDescription>(AssimpFunctionNames.aiGetExportFormatDescription);
+            Functions.aiGetExportFormatDescription func = GetFunction<Functions.aiGetExportFormatDescription>(FunctionNames.aiGetExportFormatDescription);
 
             for(int i = 0; i < count; i++)
             {
-                IntPtr formatDescPtr = func(new UIntPtr((uint)i));
+                IntPtr formatDescPtr = func(new UIntPtr((uint) i));
                 if(formatDescPtr != IntPtr.Zero)
                 {
                     AiExportFormatDesc desc = MemoryHelper.Read<AiExportFormatDesc>(formatDescPtr);
@@ -358,8 +223,8 @@ namespace Assimp.Unmanaged
             if(String.IsNullOrEmpty(formatId) || scene == IntPtr.Zero)
                 return null;
 
-            AssimpDelegates.aiExportSceneToBlob exportBlobFunc = m_impl.GetFunction<AssimpDelegates.aiExportSceneToBlob>(AssimpFunctionNames.aiExportSceneToBlob);
-            AssimpDelegates.aiReleaseExportBlob releaseExportBlobFunc = m_impl.GetFunction<AssimpDelegates.aiReleaseExportBlob>(AssimpFunctionNames.aiReleaseExportBlob);
+            Functions.aiExportSceneToBlob exportBlobFunc = GetFunction<Functions.aiExportSceneToBlob>(FunctionNames.aiExportSceneToBlob);
+            Functions.aiReleaseExportBlob releaseExportBlobFunc = GetFunction<Functions.aiReleaseExportBlob>(FunctionNames.aiReleaseExportBlob);
 
             IntPtr blobPtr = exportBlobFunc(scene, formatId, (uint) preProcessing);
 
@@ -407,7 +272,7 @@ namespace Assimp.Unmanaged
             if(String.IsNullOrEmpty(formatId) || scene == IntPtr.Zero)
                 return ReturnCode.Failure;
 
-            AssimpDelegates.aiExportSceneEx exportFunc = m_impl.GetFunction<AssimpDelegates.aiExportSceneEx>(AssimpFunctionNames.aiExportSceneEx);
+            Functions.aiExportSceneEx exportFunc = GetFunction<Functions.aiExportSceneEx>(FunctionNames.aiExportSceneEx);
 
             return exportFunc(scene, formatId, fileName, fileIO, (uint) preProcessing);
         }
@@ -425,7 +290,7 @@ namespace Assimp.Unmanaged
 
             IntPtr copiedScene;
 
-            AssimpDelegates.aiCopyScene func = m_impl.GetFunction<AssimpDelegates.aiCopyScene>(AssimpFunctionNames.aiCopyScene);
+            Functions.aiCopyScene func = GetFunction<Functions.aiCopyScene>(FunctionNames.aiCopyScene);
 
             func(sceneToCopy, out copiedScene);
 
@@ -444,7 +309,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiAttachLogStream func = m_impl.GetFunction<AssimpDelegates.aiAttachLogStream>(AssimpFunctionNames.aiAttachLogStream);
+            Functions.aiAttachLogStream func = GetFunction<Functions.aiAttachLogStream>(FunctionNames.aiAttachLogStream);
 
             func(logStreamPtr);
         }
@@ -457,7 +322,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiEnableVerboseLogging func = m_impl.GetFunction<AssimpDelegates.aiEnableVerboseLogging>(AssimpFunctionNames.aiEnableVerboseLogging);
+            Functions.aiEnableVerboseLogging func = GetFunction<Functions.aiEnableVerboseLogging>(FunctionNames.aiEnableVerboseLogging);
 
             func(enable);
 
@@ -482,7 +347,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiDetachLogStream func = m_impl.GetFunction<AssimpDelegates.aiDetachLogStream>(AssimpFunctionNames.aiDetachLogStream);
+            Functions.aiDetachLogStream func = GetFunction<Functions.aiDetachLogStream>(FunctionNames.aiDetachLogStream);
 
             return func(logStreamPtr);
         }
@@ -494,7 +359,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiDetachAllLogStreams func = m_impl.GetFunction<AssimpDelegates.aiDetachAllLogStreams>(AssimpFunctionNames.aiDetachAllLogStreams);
+            Functions.aiDetachAllLogStreams func = GetFunction<Functions.aiDetachAllLogStreams>(FunctionNames.aiDetachAllLogStreams);
 
             func();
         }
@@ -511,7 +376,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiCreatePropertyStore func = m_impl.GetFunction<AssimpDelegates.aiCreatePropertyStore>(AssimpFunctionNames.aiCreatePropertyStore);
+            Functions.aiCreatePropertyStore func = GetFunction<Functions.aiCreatePropertyStore>(FunctionNames.aiCreatePropertyStore);
 
             return func();
         }
@@ -527,7 +392,7 @@ namespace Assimp.Unmanaged
             if(propertyStore == IntPtr.Zero)
                 return;
 
-            AssimpDelegates.aiReleasePropertyStore func = m_impl.GetFunction<AssimpDelegates.aiReleasePropertyStore>(AssimpFunctionNames.aiReleasePropertyStore);
+            Functions.aiReleasePropertyStore func = GetFunction<Functions.aiReleasePropertyStore>(FunctionNames.aiReleasePropertyStore);
 
             func(propertyStore);
         }
@@ -545,7 +410,7 @@ namespace Assimp.Unmanaged
             if(propertyStore == IntPtr.Zero || String.IsNullOrEmpty(name))
                 return;
 
-            AssimpDelegates.aiSetImportPropertyInteger func = m_impl.GetFunction<AssimpDelegates.aiSetImportPropertyInteger>(AssimpFunctionNames.aiSetImportPropertyInteger);
+            Functions.aiSetImportPropertyInteger func = GetFunction<Functions.aiSetImportPropertyInteger>(FunctionNames.aiSetImportPropertyInteger);
 
             func(propertyStore, name, value);
         }
@@ -563,7 +428,7 @@ namespace Assimp.Unmanaged
             if(propertyStore == IntPtr.Zero || String.IsNullOrEmpty(name))
                 return;
 
-            AssimpDelegates.aiSetImportPropertyFloat func = m_impl.GetFunction<AssimpDelegates.aiSetImportPropertyFloat>(AssimpFunctionNames.aiSetImportPropertyFloat);
+            Functions.aiSetImportPropertyFloat func = GetFunction<Functions.aiSetImportPropertyFloat>(FunctionNames.aiSetImportPropertyFloat);
 
             func(propertyStore, name, value);
         }
@@ -581,7 +446,7 @@ namespace Assimp.Unmanaged
             if(propertyStore == IntPtr.Zero || String.IsNullOrEmpty(name))
                 return;
 
-            AssimpDelegates.aiSetImportPropertyString func = m_impl.GetFunction<AssimpDelegates.aiSetImportPropertyString>(AssimpFunctionNames.aiSetImportPropertyString);
+            Functions.aiSetImportPropertyString func = GetFunction<Functions.aiSetImportPropertyString>(FunctionNames.aiSetImportPropertyString);
 
             AiString str = new AiString();
             if(str.SetString(value))
@@ -601,7 +466,7 @@ namespace Assimp.Unmanaged
             if(propertyStore == IntPtr.Zero || String.IsNullOrEmpty(name))
                 return;
 
-            AssimpDelegates.aiSetImportPropertyMatrix func = m_impl.GetFunction<AssimpDelegates.aiSetImportPropertyMatrix>(AssimpFunctionNames.aiSetImportPropertyMatrix);
+            Functions.aiSetImportPropertyMatrix func = GetFunction<Functions.aiSetImportPropertyMatrix>(FunctionNames.aiSetImportPropertyMatrix);
             func(propertyStore, name, ref value);
         }
 
@@ -621,7 +486,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialColor func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialColor>(AssimpFunctionNames.aiGetMaterialColor);
+            Functions.aiGetMaterialColor func = GetFunction<Functions.aiGetMaterialColor>(FunctionNames.aiGetMaterialColor);
 
             IntPtr ptr = IntPtr.Zero;
             try
@@ -631,7 +496,7 @@ namespace Assimp.Unmanaged
                 Color4D color = new Color4D();
                 if(code == ReturnCode.Success && ptr != IntPtr.Zero)
                     color = MemoryHelper.Read<Color4D>(ptr);
-                
+
                 return color;
             }
             finally
@@ -655,7 +520,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialFloatArray func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialFloatArray>(AssimpFunctionNames.aiGetMaterialFloatArray);
+            Functions.aiGetMaterialFloatArray func = GetFunction<Functions.aiGetMaterialFloatArray>(FunctionNames.aiGetMaterialFloatArray);
 
             IntPtr ptr = IntPtr.Zero;
             try
@@ -693,7 +558,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialIntegerArray func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialIntegerArray>(AssimpFunctionNames.aiGetMaterialIntegerArray);
+            Functions.aiGetMaterialIntegerArray func = GetFunction<Functions.aiGetMaterialIntegerArray>(FunctionNames.aiGetMaterialIntegerArray);
 
             IntPtr ptr = IntPtr.Zero;
             try
@@ -729,14 +594,14 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialProperty func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialProperty>(AssimpFunctionNames.aiGetMaterialProperty);
+            Functions.aiGetMaterialProperty func = GetFunction<Functions.aiGetMaterialProperty>(FunctionNames.aiGetMaterialProperty);
 
             IntPtr ptr;
             ReturnCode code = func(ref mat, key, (uint) texType, texIndex, out ptr);
             AiMaterialProperty prop = new AiMaterialProperty();
             if(code == ReturnCode.Success && ptr != IntPtr.Zero)
                 prop = MemoryHelper.Read<AiMaterialProperty>(ptr);
-                
+
             return prop;
         }
 
@@ -752,7 +617,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialString func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialString>(AssimpFunctionNames.aiGetMaterialString);
+            Functions.aiGetMaterialString func = GetFunction<Functions.aiGetMaterialString>(FunctionNames.aiGetMaterialString);
 
             AiString str;
             ReturnCode code = func(ref mat, key, (uint) texType, texIndex, out str);
@@ -772,7 +637,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialTextureCount func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialTextureCount>(AssimpFunctionNames.aiGetMaterialTextureCount);
+            Functions.aiGetMaterialTextureCount func = GetFunction<Functions.aiGetMaterialTextureCount>(FunctionNames.aiGetMaterialTextureCount);
 
             return func(ref mat, type);
         }
@@ -788,7 +653,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialTexture func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialTexture>(AssimpFunctionNames.aiGetMaterialTexture);
+            Functions.aiGetMaterialTexture func = GetFunction<Functions.aiGetMaterialTexture>(FunctionNames.aiGetMaterialTexture);
 
             AiString str;
             TextureMapping mapping;
@@ -819,7 +684,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMaterialTexture func = m_impl.GetFunction<AssimpDelegates.aiGetMaterialTexture>(AssimpFunctionNames.aiGetMaterialTexture);
+            Functions.aiGetMaterialTexture func = GetFunction<Functions.aiGetMaterialTexture>(FunctionNames.aiGetMaterialTexture);
 
             AiString str;
             TextureMapping mapping;
@@ -846,7 +711,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetErrorString func = m_impl.GetFunction<AssimpDelegates.aiGetErrorString>(AssimpFunctionNames.aiGetErrorString);
+            Functions.aiGetErrorString func = GetFunction<Functions.aiGetErrorString>(FunctionNames.aiGetErrorString);
 
             IntPtr ptr = func();
 
@@ -865,7 +730,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiIsExtensionSupported func = m_impl.GetFunction<AssimpDelegates.aiIsExtensionSupported>(AssimpFunctionNames.aiIsExtensionSupported);
+            Functions.aiIsExtensionSupported func = GetFunction<Functions.aiIsExtensionSupported>(FunctionNames.aiIsExtensionSupported);
 
             return func(extension);
         }
@@ -878,7 +743,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetExtensionList func = m_impl.GetFunction<AssimpDelegates.aiGetExtensionList>(AssimpFunctionNames.aiGetExtensionList);
+            Functions.aiGetExtensionList func = GetFunction<Functions.aiGetExtensionList>(FunctionNames.aiGetExtensionList);
 
             AiString aiString = new AiString();
             func(ref aiString);
@@ -894,7 +759,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetMemoryRequirements func = m_impl.GetFunction<AssimpDelegates.aiGetMemoryRequirements>(AssimpFunctionNames.aiGetMemoryRequirements);
+            Functions.aiGetMemoryRequirements func = GetFunction<Functions.aiGetMemoryRequirements>(FunctionNames.aiGetMemoryRequirements);
 
             AiMemoryInfo info = new AiMemoryInfo();
             if(scene != IntPtr.Zero)
@@ -918,7 +783,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiCreateQuaternionFromMatrix func = m_impl.GetFunction<AssimpDelegates.aiCreateQuaternionFromMatrix>(AssimpFunctionNames.aiCreateQuaternionFromMatrix);
+            Functions.aiCreateQuaternionFromMatrix func = GetFunction<Functions.aiCreateQuaternionFromMatrix>(FunctionNames.aiCreateQuaternionFromMatrix);
 
             func(out quat, ref mat);
         }
@@ -934,7 +799,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiDecomposeMatrix func = m_impl.GetFunction<AssimpDelegates.aiDecomposeMatrix>(AssimpFunctionNames.aiDecomposeMatrix);
+            Functions.aiDecomposeMatrix func = GetFunction<Functions.aiDecomposeMatrix>(FunctionNames.aiDecomposeMatrix);
 
             func(ref mat, out scaling, out rotation, out position);
         }
@@ -947,7 +812,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiTransposeMatrix4 func = m_impl.GetFunction<AssimpDelegates.aiTransposeMatrix4>(AssimpFunctionNames.aiTransposeMatrix4);
+            Functions.aiTransposeMatrix4 func = GetFunction<Functions.aiTransposeMatrix4>(FunctionNames.aiTransposeMatrix4);
 
             func(ref mat);
         }
@@ -960,7 +825,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiTransposeMatrix3 func = m_impl.GetFunction<AssimpDelegates.aiTransposeMatrix3>(AssimpFunctionNames.aiTransposeMatrix3);
+            Functions.aiTransposeMatrix3 func = GetFunction<Functions.aiTransposeMatrix3>(FunctionNames.aiTransposeMatrix3);
 
             func(ref mat);
         }
@@ -974,7 +839,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiTransformVecByMatrix3 func = m_impl.GetFunction<AssimpDelegates.aiTransformVecByMatrix3>(AssimpFunctionNames.aiTransformVecByMatrix3);
+            Functions.aiTransformVecByMatrix3 func = GetFunction<Functions.aiTransformVecByMatrix3>(FunctionNames.aiTransformVecByMatrix3);
 
             func(ref vec, ref mat);
         }
@@ -988,7 +853,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiTransformVecByMatrix4 func = m_impl.GetFunction<AssimpDelegates.aiTransformVecByMatrix4>(AssimpFunctionNames.aiTransformVecByMatrix4);
+            Functions.aiTransformVecByMatrix4 func = GetFunction<Functions.aiTransformVecByMatrix4>(FunctionNames.aiTransformVecByMatrix4);
 
             func(ref vec, ref mat);
         }
@@ -1002,7 +867,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiMultiplyMatrix4 func = m_impl.GetFunction<AssimpDelegates.aiMultiplyMatrix4>(AssimpFunctionNames.aiMultiplyMatrix4);
+            Functions.aiMultiplyMatrix4 func = GetFunction<Functions.aiMultiplyMatrix4>(FunctionNames.aiMultiplyMatrix4);
 
             func(ref dst, ref src);
         }
@@ -1016,7 +881,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiMultiplyMatrix3 func = m_impl.GetFunction<AssimpDelegates.aiMultiplyMatrix3>(AssimpFunctionNames.aiMultiplyMatrix3);
+            Functions.aiMultiplyMatrix3 func = GetFunction<Functions.aiMultiplyMatrix3>(FunctionNames.aiMultiplyMatrix3);
 
             func(ref dst, ref src);
         }
@@ -1029,7 +894,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiIdentityMatrix3 func = m_impl.GetFunction<AssimpDelegates.aiIdentityMatrix3>(AssimpFunctionNames.aiIdentityMatrix3);
+            Functions.aiIdentityMatrix3 func = GetFunction<Functions.aiIdentityMatrix3>(FunctionNames.aiIdentityMatrix3);
 
             func(out mat);
         }
@@ -1042,7 +907,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiIdentityMatrix4 func = m_impl.GetFunction<AssimpDelegates.aiIdentityMatrix4>(AssimpFunctionNames.aiIdentityMatrix4);
+            Functions.aiIdentityMatrix4 func = GetFunction<Functions.aiIdentityMatrix4>(FunctionNames.aiIdentityMatrix4);
 
             func(out mat);
         }
@@ -1059,7 +924,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetLegalString func = m_impl.GetFunction<AssimpDelegates.aiGetLegalString>(AssimpFunctionNames.aiGetLegalString);
+            Functions.aiGetLegalString func = GetFunction<Functions.aiGetLegalString>(FunctionNames.aiGetLegalString);
 
             IntPtr ptr = func();
 
@@ -1077,7 +942,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetVersionMinor func = m_impl.GetFunction<AssimpDelegates.aiGetVersionMinor>(AssimpFunctionNames.aiGetVersionMinor);
+            Functions.aiGetVersionMinor func = GetFunction<Functions.aiGetVersionMinor>(FunctionNames.aiGetVersionMinor);
 
             return func();
         }
@@ -1090,7 +955,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetVersionMajor func = m_impl.GetFunction<AssimpDelegates.aiGetVersionMajor>(AssimpFunctionNames.aiGetVersionMajor);
+            Functions.aiGetVersionMajor func = GetFunction<Functions.aiGetVersionMajor>(FunctionNames.aiGetVersionMajor);
 
             return func();
         }
@@ -1103,7 +968,7 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetVersionRevision func = m_impl.GetFunction<AssimpDelegates.aiGetVersionRevision>(AssimpFunctionNames.aiGetVersionRevision);
+            Functions.aiGetVersionRevision func = GetFunction<Functions.aiGetVersionRevision>(FunctionNames.aiGetVersionRevision);
 
             return func();
         }
@@ -1139,743 +1004,306 @@ namespace Assimp.Unmanaged
         {
             LoadIfNotLoaded();
 
-            AssimpDelegates.aiGetCompileFlags func = m_impl.GetFunction<AssimpDelegates.aiGetCompileFlags>(AssimpFunctionNames.aiGetCompileFlags);
+            Functions.aiGetCompileFlags func = GetFunction<Functions.aiGetCompileFlags>(FunctionNames.aiGetCompileFlags);
 
             return (CompileFlags) func();
         }
 
         #endregion
-    }
 
-    #region Assimp Functions
+        #region Function names 
 
-    /// <summary>
-    /// A special attribute for assimp function delegates that specifies the actual unmanaged C-function name. Generally the delegates
-    /// are named the same way as the actual function name, but this is for future proofing.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Delegate)]
-    internal class AssimpFunctionNameAttribute : Attribute
-    {
-        private String m_unmanagedFunctionName;
-
-        public String UnmanagedFunctionName
+        /// <summary>
+        /// Defines all the unmanaged assimp C-function names.
+        /// </summary>
+        internal static class FunctionNames
         {
-            get
-            {
-                return m_unmanagedFunctionName;
-            }
+
+            #region Import Function Names
+
+            public const String aiImportFile = "aiImportFile";
+            public const String aiImportFileEx = "aiImportFileEx";
+            public const String aiImportFileExWithProperties = "aiImportFileExWithProperties";
+            public const String aiImportFileFromMemory = "aiImportFileFromMemory";
+            public const String aiImportFileFromMemoryWithProperties = "aiImportFileFromMemoryWithProperties";
+            public const String aiReleaseImport = "aiReleaseImport";
+            public const String aiApplyPostProcessing = "aiApplyPostProcessing";
+
+            #endregion
+
+            #region Export Function Names
+
+            public const String aiGetExportFormatCount = "aiGetExportFormatCount";
+            public const String aiGetExportFormatDescription = "aiGetExportFormatDescription";
+            public const String aiExportSceneToBlob = "aiExportSceneToBlob";
+            public const String aiReleaseExportBlob = "aiReleaseExportBlob";
+            public const String aiExportScene = "aiExportScene";
+            public const String aiExportSceneEx = "aiExportSceneEx";
+            public const String aiCopyScene = "aiCopyScene";
+
+            #endregion
+
+            #region Logging Function Names
+
+            public const String aiAttachLogStream = "aiAttachLogStream";
+            public const String aiEnableVerboseLogging = "aiEnableVerboseLogging";
+            public const String aiDetachLogStream = "aiDetachLogStream";
+            public const String aiDetachAllLogStreams = "aiDetachAllLogStreams";
+
+            #endregion
+
+            #region Import Properties Function Names
+
+            public const String aiCreatePropertyStore = "aiCreatePropertyStore";
+            public const String aiReleasePropertyStore = "aiReleasePropertyStore";
+            public const String aiSetImportPropertyInteger = "aiSetImportPropertyInteger";
+            public const String aiSetImportPropertyFloat = "aiSetImportPropertyFloat";
+            public const String aiSetImportPropertyString = "aiSetImportPropertyString";
+            public const String aiSetImportPropertyMatrix = "aiSetImportPropertyMatrix";
+
+            #endregion
+
+            #region Material Getters Function Names
+
+            public const String aiGetMaterialColor = "aiGetMaterialColor";
+            public const String aiGetMaterialFloatArray = "aiGetMaterialFloatArray";
+            public const String aiGetMaterialIntegerArray = "aiGetMaterialIntegerArray";
+            public const String aiGetMaterialProperty = "aiGetMaterialProperty";
+            public const String aiGetMaterialString = "aiGetMaterialString";
+            public const String aiGetMaterialTextureCount = "aiGetMaterialTextureCount";
+            public const String aiGetMaterialTexture = "aiGetMaterialTexture";
+
+            #endregion
+
+            #region Error and Info Function Names
+
+            public const String aiGetErrorString = "aiGetErrorString";
+            public const String aiIsExtensionSupported = "aiIsExtensionSupported";
+            public const String aiGetExtensionList = "aiGetExtensionList";
+            public const String aiGetMemoryRequirements = "aiGetMemoryRequirements";
+
+            #endregion
+
+            #region Math Function Names
+
+            public const String aiCreateQuaternionFromMatrix = "aiCreateQuaternionFromMatrix";
+            public const String aiDecomposeMatrix = "aiDecomposeMatrix";
+            public const String aiTransposeMatrix4 = "aiTransposeMatrix4";
+            public const String aiTransposeMatrix3 = "aiTransposeMatrix3";
+            public const String aiTransformVecByMatrix3 = "aiTransformVecByMatrix3";
+            public const String aiTransformVecByMatrix4 = "aiTransformVecByMatrix4";
+            public const String aiMultiplyMatrix4 = "aiMultiplyMatrix4";
+            public const String aiMultiplyMatrix3 = "aiMultiplyMatrix3";
+            public const String aiIdentityMatrix3 = "aiIdentityMatrix3";
+            public const String aiIdentityMatrix4 = "aiIdentityMatrix4";
+
+            #endregion
+
+            #region Version Info Function Names
+
+            public const String aiGetLegalString = "aiGetLegalString";
+            public const String aiGetVersionMinor = "aiGetVersionMinor";
+            public const String aiGetVersionMajor = "aiGetVersionMajor";
+            public const String aiGetVersionRevision = "aiGetVersionRevision";
+            public const String aiGetCompileFlags = "aiGetCompileFlags";
+
+            #endregion
         }
 
-        public AssimpFunctionNameAttribute(String unmanagedFunctionName)
+        #endregion
+
+        #region Function delegates
+
+        /// <summary>
+        /// Defines all of the delegates that represent the unmanaged assimp functions.
+        /// </summary>
+        internal static class Functions
         {
-            m_unmanagedFunctionName = unmanagedFunctionName;
+
+            #region Import Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiImportFile)]
+            public delegate IntPtr aiImportFile([In, MarshalAs(UnmanagedType.LPStr)] String file, uint flags);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiImportFileEx)]
+            public delegate IntPtr aiImportFileEx([In, MarshalAs(UnmanagedType.LPStr)] String file, uint flags, IntPtr fileIO);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiImportFileExWithProperties)]
+            public delegate IntPtr aiImportFileExWithProperties([In, MarshalAs(UnmanagedType.LPStr)] String file, uint flag, IntPtr fileIO, IntPtr propStore);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiImportFileFromMemory)]
+            public delegate IntPtr aiImportFileFromMemory(byte[] buffer, uint bufferLength, uint flags, [In, MarshalAs(UnmanagedType.LPStr)] String formatHint);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiImportFileFromMemoryWithProperties)]
+            public delegate IntPtr aiImportFileFromMemoryWithProperties(byte[] buffer, uint bufferLength, uint flags, [In, MarshalAs(UnmanagedType.LPStr)] String formatHint, IntPtr propStore);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiReleaseImport)]
+            public delegate void aiReleaseImport(IntPtr scene);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiApplyPostProcessing)]
+            public delegate IntPtr aiApplyPostProcessing(IntPtr scene, uint Flags);
+
+            #endregion
+
+            #region Export Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetExportFormatCount)]
+            public delegate UIntPtr aiGetExportFormatCount();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetExportFormatDescription)]
+            public delegate IntPtr aiGetExportFormatDescription(UIntPtr index);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiExportSceneToBlob)]
+            public delegate IntPtr aiExportSceneToBlob(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, uint preProcessing);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiReleaseExportBlob)]
+            public delegate void aiReleaseExportBlob(IntPtr blobData);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiExportScene)]
+            public delegate ReturnCode aiExportScene(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, [In, MarshalAs(UnmanagedType.LPStr)] String fileName, uint preProcessing);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiExportSceneEx)]
+            public delegate ReturnCode aiExportSceneEx(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, [In, MarshalAs(UnmanagedType.LPStr)] String fileName, IntPtr fileIO, uint preProcessing);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiCopyScene)]
+            public delegate void aiCopyScene(IntPtr sceneIn, out IntPtr sceneOut);
+
+            #endregion
+
+            #region Logging Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiAttachLogStream)]
+            public delegate void aiAttachLogStream(IntPtr logStreamPtr);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiEnableVerboseLogging)]
+            public delegate void aiEnableVerboseLogging([In, MarshalAs(UnmanagedType.Bool)] bool enable);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiDetachLogStream)]
+            public delegate ReturnCode aiDetachLogStream(IntPtr logStreamPtr);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiDetachAllLogStreams)]
+            public delegate void aiDetachAllLogStreams();
+
+            #endregion
+
+            #region Property Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiCreatePropertyStore)]
+            public delegate IntPtr aiCreatePropertyStore();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiReleasePropertyStore)]
+            public delegate void aiReleasePropertyStore(IntPtr propertyStore);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiSetImportPropertyInteger)]
+            public delegate void aiSetImportPropertyInteger(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, int value);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiSetImportPropertyFloat)]
+            public delegate void aiSetImportPropertyFloat(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, float value);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiSetImportPropertyString)]
+            public delegate void aiSetImportPropertyString(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, ref AiString value);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiSetImportPropertyMatrix)]
+            public delegate void aiSetImportPropertyMatrix(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, ref Matrix4x4 value);
+
+            #endregion
+
+            #region Material Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialColor)]
+            public delegate ReturnCode aiGetMaterialColor(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, IntPtr colorOut);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialFloatArray)]
+            public delegate ReturnCode aiGetMaterialFloatArray(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, IntPtr ptrOut, ref uint valueCount);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialIntegerArray)]
+            public delegate ReturnCode aiGetMaterialIntegerArray(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, IntPtr ptrOut, ref uint valueCount);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialProperty)]
+            public delegate ReturnCode aiGetMaterialProperty(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, out IntPtr propertyOut);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialString)]
+            public delegate ReturnCode aiGetMaterialString(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, out AiString str);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialTexture)]
+            public delegate ReturnCode aiGetMaterialTexture(ref AiMaterial mat, TextureType type, uint index, out AiString path, out TextureMapping mapping, out uint uvIndex, out float blendFactor, out TextureOperation textureOp, [In, Out] TextureWrapMode[] wrapModes, out uint flags);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMaterialTextureCount)]
+            public delegate uint aiGetMaterialTextureCount(ref AiMaterial mat, TextureType type);
+
+            #endregion
+
+            #region Math Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiCreateQuaternionFromMatrix)]
+            public delegate void aiCreateQuaternionFromMatrix(out Quaternion quat, ref Matrix3x3 mat);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiDecomposeMatrix)]
+            public delegate void aiDecomposeMatrix(ref Matrix4x4 mat, out Vector3D scaling, out Quaternion rotation, out Vector3D position);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiTransposeMatrix4)]
+            public delegate void aiTransposeMatrix4(ref Matrix4x4 mat);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiTransposeMatrix3)]
+            public delegate void aiTransposeMatrix3(ref Matrix3x3 mat);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiTransformVecByMatrix3)]
+            public delegate void aiTransformVecByMatrix3(ref Vector3D vec, ref Matrix3x3 mat);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiTransformVecByMatrix4)]
+            public delegate void aiTransformVecByMatrix4(ref Vector3D vec, ref Matrix4x4 mat);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiMultiplyMatrix4)]
+            public delegate void aiMultiplyMatrix4(ref Matrix4x4 dst, ref Matrix4x4 src);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiMultiplyMatrix3)]
+            public delegate void aiMultiplyMatrix3(ref Matrix3x3 dst, ref Matrix3x3 src);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiIdentityMatrix3)]
+            public delegate void aiIdentityMatrix3(out Matrix3x3 mat);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiIdentityMatrix4)]
+            public delegate void aiIdentityMatrix4(out Matrix4x4 mat);
+
+            #endregion
+
+            #region Error and Info Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetErrorString)]
+            public delegate IntPtr aiGetErrorString();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetExtensionList)]
+            public delegate void aiGetExtensionList(ref AiString extensionsOut);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetMemoryRequirements)]
+            public delegate void aiGetMemoryRequirements(IntPtr scene, ref AiMemoryInfo memoryInfo);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiIsExtensionSupported)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public delegate bool aiIsExtensionSupported([In, MarshalAs(UnmanagedType.LPStr)] String extension);
+
+            #endregion
+
+            #region Version Info Delegates
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetLegalString)]
+            public delegate IntPtr aiGetLegalString();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetVersionMinor)]
+            public delegate uint aiGetVersionMinor();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetVersionMajor)]
+            public delegate uint aiGetVersionMajor();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetVersionRevision)]
+            public delegate uint aiGetVersionRevision();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetCompileFlags)]
+            public delegate uint aiGetCompileFlags();
+
+            #endregion
         }
-    }
-
-    /// <summary>
-    /// Defines all the unmanaged assimp C-function names.
-    /// </summary>
-    internal static class AssimpFunctionNames
-    {
-
-        #region Import Function Names
-
-        public const String aiImportFile = "aiImportFile";
-        public const String aiImportFileEx = "aiImportFileEx";
-        public const String aiImportFileExWithProperties = "aiImportFileExWithProperties";
-        public const String aiImportFileFromMemory = "aiImportFileFromMemory";
-        public const String aiImportFileFromMemoryWithProperties = "aiImportFileFromMemoryWithProperties";
-        public const String aiReleaseImport = "aiReleaseImport";
-        public const String aiApplyPostProcessing = "aiApplyPostProcessing";
-
-        #endregion
-
-        #region Export Function Names
-
-        public const String aiGetExportFormatCount = "aiGetExportFormatCount";
-        public const String aiGetExportFormatDescription = "aiGetExportFormatDescription";
-        public const String aiExportSceneToBlob = "aiExportSceneToBlob";
-        public const String aiReleaseExportBlob = "aiReleaseExportBlob";
-        public const String aiExportScene = "aiExportScene";
-        public const String aiExportSceneEx = "aiExportSceneEx";
-        public const String aiCopyScene = "aiCopyScene";
-
-        #endregion
-
-        #region Logging Function Names
-
-        public const String aiAttachLogStream = "aiAttachLogStream";
-        public const String aiEnableVerboseLogging = "aiEnableVerboseLogging";
-        public const String aiDetachLogStream = "aiDetachLogStream";
-        public const String aiDetachAllLogStreams = "aiDetachAllLogStreams";
-
-        #endregion
-
-        #region Import Properties Function Names
-
-        public const String aiCreatePropertyStore = "aiCreatePropertyStore";
-        public const String aiReleasePropertyStore = "aiReleasePropertyStore";
-        public const String aiSetImportPropertyInteger = "aiSetImportPropertyInteger";
-        public const String aiSetImportPropertyFloat = "aiSetImportPropertyFloat";
-        public const String aiSetImportPropertyString = "aiSetImportPropertyString";
-        public const String aiSetImportPropertyMatrix = "aiSetImportPropertyMatrix";
-
-        #endregion
-
-        #region Material Getters Function Names
-
-        public const String aiGetMaterialColor = "aiGetMaterialColor";
-        public const String aiGetMaterialFloatArray = "aiGetMaterialFloatArray";
-        public const String aiGetMaterialIntegerArray = "aiGetMaterialIntegerArray";
-        public const String aiGetMaterialProperty = "aiGetMaterialProperty";
-        public const String aiGetMaterialString = "aiGetMaterialString";
-        public const String aiGetMaterialTextureCount = "aiGetMaterialTextureCount";
-        public const String aiGetMaterialTexture = "aiGetMaterialTexture";
-
-        #endregion
-
-        #region Error and Info Function Names
-
-        public const String aiGetErrorString = "aiGetErrorString";
-        public const String aiIsExtensionSupported = "aiIsExtensionSupported";
-        public const String aiGetExtensionList = "aiGetExtensionList";
-        public const String aiGetMemoryRequirements = "aiGetMemoryRequirements";
-
-        #endregion
-
-        #region Math Function Names
-
-        public const String aiCreateQuaternionFromMatrix = "aiCreateQuaternionFromMatrix";
-        public const String aiDecomposeMatrix = "aiDecomposeMatrix";
-        public const String aiTransposeMatrix4 = "aiTransposeMatrix4";
-        public const String aiTransposeMatrix3 = "aiTransposeMatrix3";
-        public const String aiTransformVecByMatrix3 = "aiTransformVecByMatrix3";
-        public const String aiTransformVecByMatrix4 = "aiTransformVecByMatrix4";
-        public const String aiMultiplyMatrix4 = "aiMultiplyMatrix4";
-        public const String aiMultiplyMatrix3 = "aiMultiplyMatrix3";
-        public const String aiIdentityMatrix3 = "aiIdentityMatrix3";
-        public const String aiIdentityMatrix4 = "aiIdentityMatrix4";
-
-        #endregion
-
-        #region Version Info Function Names
-
-        public const String aiGetLegalString = "aiGetLegalString";
-        public const String aiGetVersionMinor = "aiGetVersionMinor";
-        public const String aiGetVersionMajor = "aiGetVersionMajor";
-        public const String aiGetVersionRevision = "aiGetVersionRevision";
-        public const String aiGetCompileFlags = "aiGetCompileFlags";
-
-        #endregion
-    }
-
-    /// <summary>
-    /// Defines all of the delegates that represent the unmanaged assimp functions.
-    /// </summary>
-    internal static class AssimpDelegates
-    {
-
-        #region Import Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiImportFile)]
-        public delegate IntPtr aiImportFile([In, MarshalAs(UnmanagedType.LPStr)] String file, uint flags);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiImportFileEx)]
-        public delegate IntPtr aiImportFileEx([In, MarshalAs(UnmanagedType.LPStr)] String file, uint flags, IntPtr fileIO);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiImportFileExWithProperties)]
-        public delegate IntPtr aiImportFileExWithProperties([In, MarshalAs(UnmanagedType.LPStr)] String file, uint flag, IntPtr fileIO, IntPtr propStore);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiImportFileFromMemory)]
-        public delegate IntPtr aiImportFileFromMemory(byte[] buffer, uint bufferLength, uint flags, [In, MarshalAs(UnmanagedType.LPStr)] String formatHint);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiImportFileFromMemoryWithProperties)]
-        public delegate IntPtr aiImportFileFromMemoryWithProperties(byte[] buffer, uint bufferLength, uint flags, [In, MarshalAs(UnmanagedType.LPStr)] String formatHint, IntPtr propStore);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiReleaseImport)]
-        public delegate void aiReleaseImport(IntPtr scene);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiApplyPostProcessing)]
-        public delegate IntPtr aiApplyPostProcessing(IntPtr scene, uint Flags);
-
-        #endregion
-
-        #region Export Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetExportFormatCount)]
-        public delegate UIntPtr aiGetExportFormatCount();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetExportFormatDescription)]
-        public delegate IntPtr aiGetExportFormatDescription(UIntPtr index);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiExportSceneToBlob)]
-        public delegate IntPtr aiExportSceneToBlob(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, uint preProcessing);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiReleaseExportBlob)]
-        public delegate void aiReleaseExportBlob(IntPtr blobData);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiExportScene)]
-        public delegate ReturnCode aiExportScene(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, [In, MarshalAs(UnmanagedType.LPStr)] String fileName, uint preProcessing);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiExportSceneEx)]
-        public delegate ReturnCode aiExportSceneEx(IntPtr scene, [In, MarshalAs(UnmanagedType.LPStr)] String formatId, [In, MarshalAs(UnmanagedType.LPStr)] String fileName, IntPtr fileIO, uint preProcessing);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiCopyScene)]
-        public delegate void aiCopyScene(IntPtr sceneIn, out IntPtr sceneOut);
-
-        #endregion
-
-        #region Logging Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiAttachLogStream)]
-        public delegate void aiAttachLogStream(IntPtr logStreamPtr);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiEnableVerboseLogging)]
-        public delegate void aiEnableVerboseLogging([In, MarshalAs(UnmanagedType.Bool)] bool enable);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiDetachLogStream)]
-        public delegate ReturnCode aiDetachLogStream(IntPtr logStreamPtr);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiDetachAllLogStreams)]
-        public delegate void aiDetachAllLogStreams();
-
-        #endregion
-
-        #region Property Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiCreatePropertyStore)]
-        public delegate IntPtr aiCreatePropertyStore();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiReleasePropertyStore)]
-        public delegate void aiReleasePropertyStore(IntPtr propertyStore);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiSetImportPropertyInteger)]
-        public delegate void aiSetImportPropertyInteger(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, int value);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiSetImportPropertyFloat)]
-        public delegate void aiSetImportPropertyFloat(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, float value);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiSetImportPropertyString)]
-        public delegate void aiSetImportPropertyString(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, ref AiString value);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiSetImportPropertyMatrix)]
-        public delegate void aiSetImportPropertyMatrix(IntPtr propertyStore, [In, MarshalAs(UnmanagedType.LPStr)] String name, ref Matrix4x4 value);
-
-        #endregion
-
-        #region Material Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialColor)]
-        public delegate ReturnCode aiGetMaterialColor(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, IntPtr colorOut);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialFloatArray)]
-        public delegate ReturnCode aiGetMaterialFloatArray(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, IntPtr ptrOut, ref uint valueCount);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialIntegerArray)]
-        public delegate ReturnCode aiGetMaterialIntegerArray(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, IntPtr ptrOut, ref uint valueCount);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialProperty)]
-        public delegate ReturnCode aiGetMaterialProperty(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, out IntPtr propertyOut);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialString)]
-        public delegate ReturnCode aiGetMaterialString(ref AiMaterial mat, [In, MarshalAs(UnmanagedType.LPStr)] String key, uint texType, uint texIndex, out AiString str);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialTexture)]
-        public delegate ReturnCode aiGetMaterialTexture(ref AiMaterial mat, TextureType type, uint index, out AiString path, out TextureMapping mapping, out uint uvIndex, out float blendFactor, out TextureOperation textureOp, [In, Out] TextureWrapMode[] wrapModes, out uint flags);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMaterialTextureCount)]
-        public delegate uint aiGetMaterialTextureCount(ref AiMaterial mat, TextureType type);
-
-        #endregion
-
-        #region Math Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiCreateQuaternionFromMatrix)]
-        public delegate void aiCreateQuaternionFromMatrix(out Quaternion quat, ref Matrix3x3 mat);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiDecomposeMatrix)]
-        public delegate void aiDecomposeMatrix(ref Matrix4x4 mat, out Vector3D scaling, out Quaternion rotation, out Vector3D position);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiTransposeMatrix4)]
-        public delegate void aiTransposeMatrix4(ref Matrix4x4 mat);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiTransposeMatrix3)]
-        public delegate void aiTransposeMatrix3(ref Matrix3x3 mat);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiTransformVecByMatrix3)]
-        public delegate void aiTransformVecByMatrix3(ref Vector3D vec, ref Matrix3x3 mat);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiTransformVecByMatrix4)]
-        public delegate void aiTransformVecByMatrix4(ref Vector3D vec, ref Matrix4x4 mat);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiMultiplyMatrix4)]
-        public delegate void aiMultiplyMatrix4(ref Matrix4x4 dst, ref Matrix4x4 src);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiMultiplyMatrix3)]
-        public delegate void aiMultiplyMatrix3(ref Matrix3x3 dst, ref Matrix3x3 src);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiIdentityMatrix3)]
-        public delegate void aiIdentityMatrix3(out Matrix3x3 mat);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiIdentityMatrix4)]
-        public delegate void aiIdentityMatrix4(out Matrix4x4 mat);
-
-        #endregion
-
-        #region Error and Info Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetErrorString)]
-        public delegate IntPtr aiGetErrorString();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetExtensionList)]
-        public delegate void aiGetExtensionList(ref AiString extensionsOut);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetMemoryRequirements)]
-        public delegate void aiGetMemoryRequirements(IntPtr scene, ref AiMemoryInfo memoryInfo);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiIsExtensionSupported)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public delegate bool aiIsExtensionSupported([In, MarshalAs(UnmanagedType.LPStr)] String extension);
-
-        #endregion
-
-        #region Version Info Delegates
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetLegalString)]
-        public delegate IntPtr aiGetLegalString();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetVersionMinor)]
-        public delegate uint aiGetVersionMinor();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetVersionMajor)]
-        public delegate uint aiGetVersionMajor();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetVersionRevision)]
-        public delegate uint aiGetVersionRevision();
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl), AssimpFunctionName(AssimpFunctionNames.aiGetCompileFlags)]
-        public delegate uint aiGetCompileFlags();
 
         #endregion
     }
-
-    #endregion
-
-    #region Implementation
-
-    /// <summary>
-    /// Supported platforms.
-    /// </summary>
-    internal enum Platform
-    {
-        Windows,
-        Unix,
-        Mac
-    }
-
-    /// <summary>
-    /// Specifies default paths for the unmanaged library for all platforms and handles the choosing of the correct implementation platform based on
-    /// the .NET runtime.
-    /// </summary>
-    internal static class AssimpDefaultLibraryPath
-    {
-        public const String DefaultWindows32BitPath = "Assimp32.dll";
-        public const String DefaultWindows64BitPath = "Assimp64.dll";
-
-        public const String DefaultLinux32BitPath = "Assimp32.so";
-        public const String DefaultLinux64BitPath = "Assimp64.so";
-
-        public const String DefaultMac32BitPath = "libassimp32.dylib";
-        public const String DefaultMac64BitPath = "libassimp64.dylib";
-
-        public static AssimpLibraryImplementation CreateRuntimeImplementation()
-        {
-            Platform plat = GetPlatform();
-
-            switch(plat)
-            {
-                case Platform.Windows:
-                    return new AssimpLibraryWindowsImplementation();
-                case Platform.Unix:
-                    return new AssimpLibraryLinuxImplementation();
-                case Platform.Mac:
-                    return new AssimpLibraryMacImplementation();
-                default:
-                    System.Diagnostics.Debug.Assert(false, "Unknown platform");
-                    return null;
-            }
-        }
-
-        private static Platform GetPlatform()
-        {
-            switch(Environment.OSVersion.Platform)
-            {
-                case PlatformID.Unix:
-                    if (Directory.Exists("/Applications")
-                        && Directory.Exists("/System")
-                        && Directory.Exists("/Users")
-                        && Directory.Exists("/Volumes"))
-                        return Platform.Mac;
-                    else
-                        return Platform.Unix;
-
-                case PlatformID.MacOSX:
-                    return Platform.Mac;
-
-                default:
-                    return Platform.Windows;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Base class for library implementations, handles loading of each unmanaged function delegate. Implementations handle the environment specific
-    /// tasks of loading the native library and getting function proc addresses.
-    /// </summary>
-    internal abstract class AssimpLibraryImplementation : IDisposable
-    {
-        private Dictionary<String, Delegate> m_nameToUnmanagedFunction;
-        private IntPtr m_libraryHandle;
-        private bool m_isDisposed;
-
-        public bool LibraryLoaded
-        {
-            get
-            {
-                return m_libraryHandle != IntPtr.Zero;
-            }
-        }
-
-        public bool IsDisposed
-        {
-            get
-            {
-                return m_isDisposed;
-            }
-        }
-
-        public abstract String DefaultLibraryPath32Bit
-        {
-            get;
-        }
-
-        public abstract String DefaultLibraryPath64Bit
-        {
-            get;
-        }
-
-        public AssimpLibraryImplementation()
-        {
-            m_libraryHandle = IntPtr.Zero;
-            m_nameToUnmanagedFunction = new Dictionary<String, Delegate>();
-            m_isDisposed = false;
-        }
-
-        ~AssimpLibraryImplementation()
-        {
-            Dispose(false);
-        }
-
-        public void LoadAssimpLibrary(String path)
-        {
-            FreeAssimpLibrary(true);
-            m_libraryHandle = NativeLoadLibrary(path);
-
-            //When we load the library, we preload all the functions so we don't have to synchronize our GetFunction method
-            PreloadFunctions();
-        }
-
-        public void FreeAssimpLibrary()
-        {
-            FreeAssimpLibrary(true);
-        }
-
-        private void FreeAssimpLibrary(bool clearFunctions)
-        {
-            if(m_libraryHandle != IntPtr.Zero)
-            {
-                NativeFreeLibrary(m_libraryHandle);
-                m_libraryHandle = IntPtr.Zero;
-
-                if(clearFunctions)
-                    m_nameToUnmanagedFunction.Clear();
-            }
-        }
-
-        public T GetFunction<T>(String functionName) where T : class
-        {
-            return GetFunction(functionName, typeof(T)) as T;
-        }
-
-        public Object GetFunction(String functionName, Type type)
-        {
-            if(!LibraryLoaded || type == null || String.IsNullOrEmpty(functionName))
-                return null;
-
-            if(IsDisposed)
-                throw new ObjectDisposedException("AssimpLibrary has been disposed");
-
-            IntPtr procAddr = NativeGetProcAddress(m_libraryHandle, functionName);
-
-            if(procAddr == IntPtr.Zero)
-                return null;
-
-            Delegate function;
-
-            if(!m_nameToUnmanagedFunction.TryGetValue(functionName, out function))
-            {
-                function = Marshal.GetDelegateForFunctionPointer(procAddr, type);
-                m_nameToUnmanagedFunction.Add(functionName, function);
-            }
-
-            return (Object) function;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected abstract IntPtr NativeLoadLibrary(String path);
-        protected abstract void NativeFreeLibrary(IntPtr handle);
-        protected abstract IntPtr NativeGetProcAddress(IntPtr handle, String functionName);
-
-        private void PreloadFunctions()
-        {
-            Type[] funcDelegateTypes = typeof(AssimpDelegates).GetNestedTypes();
-
-            foreach(Type funcType in funcDelegateTypes)
-            {
-                AssimpFunctionNameAttribute assimpAttr = GetAssimpAttribute(funcType);
-
-                if(assimpAttr == null)
-                    continue;
-
-                GetFunction(assimpAttr.UnmanagedFunctionName, funcType);
-            }
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if(!m_isDisposed)
-                FreeAssimpLibrary(disposing);
-
-            m_isDisposed = true;
-        }
-
-        private AssimpFunctionNameAttribute GetAssimpAttribute(Type type)
-        {
-            object[] attributes = type.GetCustomAttributes(typeof(AssimpFunctionNameAttribute), false);
-            foreach(object attr in attributes)
-            {
-                if(attr is AssimpFunctionNameAttribute)
-                    return attr as AssimpFunctionNameAttribute;
-            }
-
-            return null;
-        }
-    }
-
-    #region Windows Implementation
-
-    /// <summary>
-    /// Windows implementation for loading the unmanaged assimp library.
-    /// </summary>
-    internal sealed class AssimpLibraryWindowsImplementation : AssimpLibraryImplementation
-    {
-
-        public override string DefaultLibraryPath32Bit
-        {
-            get
-            {
-                return AssimpDefaultLibraryPath.DefaultWindows32BitPath;
-            }
-        }
-
-        public override string DefaultLibraryPath64Bit
-        {
-            get
-            {
-                return AssimpDefaultLibraryPath.DefaultWindows64BitPath;
-            }
-        }
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
-        private static extern IntPtr LoadLibrary(String fileName);
-
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool FreeLibrary(IntPtr hModule);
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetProcAddress(IntPtr hModule, String procName);
-
-        protected override IntPtr NativeLoadLibrary(string path)
-        {
-            IntPtr libraryHandle = LoadLibrary(path);
-
-            if(libraryHandle == IntPtr.Zero)
-            {
-                int hr = Marshal.GetHRForLastWin32Error();
-                Exception innerException = Marshal.GetExceptionForHR(hr);
-                if(innerException != null)
-                    throw new AssimpException("Error loading unmanaged library from path: " + path + ", see inner exception for details.\n" + innerException.Message, innerException);
-                else
-                    throw new AssimpException("Error loading unmanaged library from path: " + path);
-            }
-
-            return libraryHandle;
-        }
-
-        protected override void NativeFreeLibrary(IntPtr handle)
-        {
-            FreeLibrary(handle);
-        }
-
-        protected override IntPtr NativeGetProcAddress(IntPtr handle, String functionName)
-        {
-            return GetProcAddress(handle, functionName);
-        }
-    }
-
-    #endregion
-
-    #region Linux Implementation
-
-    /// <summary>
-    /// Linux implementation for loading the unmanaged assimp library.
-    /// </summary>
-    internal sealed class AssimpLibraryLinuxImplementation : AssimpLibraryImplementation
-    {
-
-        public override string DefaultLibraryPath32Bit
-        {
-            get
-            {
-                return AssimpDefaultLibraryPath.DefaultLinux32BitPath;
-            }
-        }
-
-        public override string DefaultLibraryPath64Bit
-        {
-            get
-            {
-                return AssimpDefaultLibraryPath.DefaultLinux64BitPath;
-            }
-        }
-
-        [DllImport("libdl.so")]
-        private static extern IntPtr dlopen(String fileName, int flags);
-
-        [DllImport("libdl.so")]
-        private static extern IntPtr dlsym(IntPtr handle, String functionName);
-
-        [DllImport("libdl.so")]
-        private static extern int dlclose(IntPtr handle);
-
-        [DllImport("libdl.so")]
-        private static extern IntPtr dlerror();
-
-        private const int RTLD_NOW = 2;
-
-        protected override IntPtr NativeLoadLibrary(String path)
-        {
-            IntPtr libraryHandle = dlopen(path, RTLD_NOW);
-
-            if(libraryHandle == IntPtr.Zero)
-            {
-                IntPtr errPtr = dlerror();
-                String msg = Marshal.PtrToStringAnsi(errPtr);
-                if(!String.IsNullOrEmpty(msg))
-                    throw new AssimpException("Error loading unmanaged library from path: " + path + ", error detail:\n" + msg);
-                else
-                    throw new AssimpException("Error loading unmanaged library from path: " + path);
-            }
-
-            return libraryHandle;
-        }
-
-        protected override void NativeFreeLibrary(IntPtr handle)
-        {
-            dlclose(handle);
-        }
-
-        protected override IntPtr NativeGetProcAddress(IntPtr handle, string functionName)
-        {
-            return dlsym(handle, functionName);
-        }
-    }
-
-    #endregion
-
-    #region Mac Implementation
-
-    /// <summary>
-    /// Mac OSX implementation for loading the unmanaged assimp library.
-    /// </summary>
-    internal sealed class AssimpLibraryMacImplementation : AssimpLibraryImplementation
-    {
-        public override string DefaultLibraryPath32Bit
-        {
-            get
-            {
-                return AssimpDefaultLibraryPath.DefaultMac32BitPath;
-            }
-        }
-
-        public override string DefaultLibraryPath64Bit
-        {
-            get
-            {
-                return AssimpDefaultLibraryPath.DefaultMac64BitPath;
-            }
-        }
-
-        [DllImport("libSystem.B.dylib")]
-        private static extern IntPtr dlopen(String fileName, int flags);
-
-        [DllImport("libSystem.B.dylib")]
-        private static extern IntPtr dlsym(IntPtr handle, String functionName);
-
-        [DllImport("libSystem.B.dylib")]
-        private static extern int dlclose(IntPtr handle);
-
-        [DllImport("libSystem.B.dylib")]
-       private static extern IntPtr dlerror();
-
-        private const int RTLD_NOW = 2;
-
-        protected override IntPtr NativeLoadLibrary(String path)
-        {
-            IntPtr libraryHandle = dlopen(path, RTLD_NOW);
-
-            if(libraryHandle == IntPtr.Zero)
-            {
-                IntPtr errPtr = dlerror();
-                String msg = Marshal.PtrToStringAnsi(errPtr);
-                if(!String.IsNullOrEmpty(msg))
-                    throw new AssimpException("Error loading unmanaged library from path: " + path + ", error detail:\n" + msg);
-                else
-                    throw new AssimpException("Error loading unmanaged library from path: " + path);
-            }
-
-            return libraryHandle;
-        }
-
-        protected override void NativeFreeLibrary(IntPtr handle)
-        {
-            dlclose(handle);
-        }
-
-        protected override IntPtr NativeGetProcAddress(IntPtr handle, string functionName)
-        {
-            return dlsym(handle, functionName);
-        }
-    }
-
-    #endregion
-
-    #endregion
 }

@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -101,10 +101,7 @@ namespace Assimp
         /// <summary>
         /// Gets if the native value type is blittable (that is, does not require marshaling by the runtime, e.g. has MarshalAs attributes).
         /// </summary>
-        bool IMarshalable<MeshAnimationChannel, AiMeshAnim>.IsNativeBlittable
-        {
-            get { return true; }
-        }
+        bool IMarshalable<MeshAnimationChannel, AiMeshAnim>.IsNativeBlittable { get { return true; } }
 
         /// <summary>
         /// Writes the managed data to the native value.
@@ -125,9 +122,9 @@ namespace Assimp
         /// Reads the unmanaged data from the native value.
         /// </summary>
         /// <param name="nativeValue">Input native value</param>
-        void IMarshalable<MeshAnimationChannel, AiMeshAnim>.FromNative(ref AiMeshAnim nativeValue)
+        void IMarshalable<MeshAnimationChannel, AiMeshAnim>.FromNative(in AiMeshAnim nativeValue)
         {
-            m_name = nativeValue.Name.ToString();
+            m_name = AiString.GetString(nativeValue.Name); //Avoid struct copy
             m_meshKeys.Clear();
 
             if(nativeValue.NumKeys > 0 && nativeValue.Keys != IntPtr.Zero)

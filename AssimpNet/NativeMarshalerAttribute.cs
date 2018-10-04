@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 using System;
 using System.Diagnostics;
+using Assimp.Unmanaged;
 
 namespace Assimp
 {
@@ -55,7 +56,7 @@ namespace Assimp
             if (type == null)
                 throw new NullReferenceException("type");
 
-            if (!typeof(INativeCustomMarshaler).IsAssignableFrom(type))
+            if (!PlatformHelper.IsAssignable(typeof(INativeCustomMarshaler), type))
                 throw new ArgumentException(String.Format("{0} does not implement INativeCustomMarshaler.", type.FullName));
 
             m_marshaler = Activator.CreateInstance(type) as INativeCustomMarshaler;

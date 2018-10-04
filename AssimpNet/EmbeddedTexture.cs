@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -211,10 +211,7 @@ namespace Assimp
         /// <summary>
         /// Gets if the native value type is blittable (that is, does not require marshaling by the runtime, e.g. has MarshalAs attributes).
         /// </summary>
-        bool IMarshalable<EmbeddedTexture, AiTexture>.IsNativeBlittable
-        {
-            get { return true; }
-        }
+        bool IMarshalable<EmbeddedTexture, AiTexture>.IsNativeBlittable { get { return true; } }
 
         /// <summary>
         /// Writes the managed data to the native value.
@@ -251,7 +248,7 @@ namespace Assimp
         /// Reads the unmanaged data from the native value.
         /// </summary>
         /// <param name="nativeValue">Input native value</param>
-        void IMarshalable<EmbeddedTexture, AiTexture>.FromNative(ref AiTexture nativeValue)
+        void IMarshalable<EmbeddedTexture, AiTexture>.FromNative(in AiTexture nativeValue)
         {
             m_isCompressed = nativeValue.Height == 0;
 
@@ -265,7 +262,7 @@ namespace Assimp
                 if(nativeValue.Width > 0 && nativeValue.Data != IntPtr.Zero)
                     m_compressedData = MemoryHelper.FromNativeArray<byte>(nativeValue.Data, (int) nativeValue.Width);
 
-                m_compressedFormatHint = nativeValue.GetFormatHint();
+                m_compressedFormatHint = AiTexture.GetFormatHint(nativeValue); //Avoid struct copy
             }
             else
             {

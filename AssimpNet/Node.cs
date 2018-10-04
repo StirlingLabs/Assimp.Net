@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -273,13 +273,13 @@ namespace Assimp
                     }
 
                     //Write the child's node ptr to our array
-                    MemoryHelper.Write<IntPtr>(currPos, ref childPtr);
+                    MemoryHelper.Write<IntPtr>(currPos, childPtr);
                 }
             }
 
             //Finall finish writing to the native struct, and write the whole thing to the memory we allocated previously
             nativeValue.Children = childrenPtr;
-            MemoryHelper.Write<AiNode>(nodePtr, ref nativeValue);
+            MemoryHelper.Write<AiNode>(nodePtr, nativeValue);
 
             return nodePtr;
         }
@@ -289,10 +289,7 @@ namespace Assimp
         /// <summary>
         /// Gets a value indicating whether this instance is native blittable.
         /// </summary>
-        bool IMarshalable<Node, AiNode>.IsNativeBlittable
-        {
-            get { return true; }
-        }
+        bool IMarshalable<Node, AiNode>.IsNativeBlittable { get { return true; } }
 
         /// <summary>
         /// Writes the managed data to the native value.
@@ -342,7 +339,7 @@ namespace Assimp
                     }
 
                     //Write the child's node ptr to our array
-                    MemoryHelper.Write<IntPtr>(currPos, ref childPtr);
+                    MemoryHelper.Write<IntPtr>(currPos, childPtr);
                 }
             }
 
@@ -354,9 +351,9 @@ namespace Assimp
         /// Reads the unmanaged data from the native value.
         /// </summary>
         /// <param name="nativeValue">Input native value</param>
-        void IMarshalable<Node, AiNode>.FromNative(ref AiNode nativeValue)
+        void IMarshalable<Node, AiNode>.FromNative(in AiNode nativeValue)
         {
-            m_name = nativeValue.Name.GetString();
+            m_name = AiString.GetString(nativeValue.Name); //Avoid struct copy
             m_transform = nativeValue.Transformation;
             m_parent = null;
             m_children.Clear();

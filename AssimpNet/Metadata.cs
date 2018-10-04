@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ namespace Assimp
     /// <summary>
     /// Represents a container for holding metadata, representing as key-value pairs.
     /// </summary>
-    [Serializable]
     public sealed class Metadata : Dictionary<String, Metadata.Entry>, IMarshalable<Metadata, AiMetadata>
     {
         /// <summary>
@@ -44,10 +43,7 @@ namespace Assimp
         /// <summary>
         /// Gets if the native value type is blittable (that is, does not require marshaling by the runtime, e.g. has MarshalAs attributes).
         /// </summary>
-        bool IMarshalable<Metadata, AiMetadata>.IsNativeBlittable
-        {
-            get { return true; }
-        }
+        bool IMarshalable<Metadata, AiMetadata>.IsNativeBlittable { get { return true; } }
 
         /// <summary>
         /// Writes the managed data to the native value.
@@ -72,32 +68,32 @@ namespace Assimp
                     case MetaDataType.Bool:
                         entry.Data = MemoryHelper.AllocateMemory(sizeof(bool));
                         bool boolValue = (bool) kv.Value.Data;
-                        MemoryHelper.Write<bool>(entry.Data, ref boolValue);
+                        MemoryHelper.Write<bool>(entry.Data, boolValue);
                         break;
                     case MetaDataType.Float:
                         entry.Data = MemoryHelper.AllocateMemory(sizeof(float));
                         float floatValue = (float) kv.Value.Data;
-                        MemoryHelper.Write<float>(entry.Data, ref floatValue);
+                        MemoryHelper.Write<float>(entry.Data, floatValue);
                         break;
                     case MetaDataType.Int:
                         entry.Data = MemoryHelper.AllocateMemory(sizeof(int));
                         int intValue = (int) kv.Value.Data;
-                        MemoryHelper.Write<int>(entry.Data, ref intValue);
+                        MemoryHelper.Write<int>(entry.Data, intValue);
                         break;
                     case MetaDataType.String:
                         entry.Data = MemoryHelper.AllocateMemory(MemoryHelper.SizeOf<AiString>());
                         AiString aiStringValue = new AiString(kv.Value.Data as String);
-                        MemoryHelper.Write<AiString>(entry.Data, ref aiStringValue);
+                        MemoryHelper.Write<AiString>(entry.Data, aiStringValue);
                         break;
                     case MetaDataType.UInt64:
                         entry.Data = MemoryHelper.AllocateMemory(sizeof(UInt64));
                         UInt64 uint64Value = (UInt64) kv.Value.Data;
-                        MemoryHelper.Write<UInt64>(entry.Data, ref uint64Value);
+                        MemoryHelper.Write<UInt64>(entry.Data, uint64Value);
                         break;
                     case MetaDataType.Vector3D:
                         entry.Data = MemoryHelper.AllocateMemory(MemoryHelper.SizeOf<Vector3D>());
                         Vector3D vectorValue = (Vector3D) kv.Value.Data;
-                        MemoryHelper.Write<Vector3D>(entry.Data, ref vectorValue);
+                        MemoryHelper.Write<Vector3D>(entry.Data, vectorValue);
                         break;
                 }
 
@@ -114,7 +110,7 @@ namespace Assimp
         /// Reads the unmanaged data from the native value.
         /// </summary>
         /// <param name="nativeValue">Input native value</param>
-        void IMarshalable<Metadata, AiMetadata>.FromNative(ref AiMetadata nativeValue)
+        void IMarshalable<Metadata, AiMetadata>.FromNative(in AiMetadata nativeValue)
         {
             Clear();
 

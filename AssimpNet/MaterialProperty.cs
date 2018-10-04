@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -630,9 +630,7 @@ namespace Assimp
                 m_rawValue = new byte[size];
 
             fixed(byte* ptr = m_rawValue)
-            {
                 MemoryHelper.Write<T>(new IntPtr(ptr), data, 0, data.Length);
-            }
 
             return true;
         }
@@ -646,9 +644,7 @@ namespace Assimp
                 m_rawValue = new byte[size];
 
             fixed(byte* ptr = m_rawValue)
-            {
-                MemoryHelper.Write<T>(new IntPtr(ptr), ref value);
-            }
+                MemoryHelper.Write<T>(new IntPtr(ptr), value);
 
             return true;
         }
@@ -689,7 +685,7 @@ namespace Assimp
 
             fixed(byte* bytePtr = &data[0])
             {
-                MemoryHelper.Write<int>(new IntPtr(bytePtr), ref stringSize);
+                MemoryHelper.Write<int>(new IntPtr(bytePtr), stringSize);
                 byte[] utfBytes = Encoding.UTF8.GetBytes(value);
                 MemoryHelper.Write<byte>(new IntPtr(bytePtr + sizeof(int)), utfBytes, 0, utfBytes.Length);
                 //Last byte should be zero
@@ -712,10 +708,7 @@ namespace Assimp
         /// <summary>
         /// Gets if the native value type is blittable (that is, does not require marshaling by the runtime, e.g. has MarshalAs attributes).
         /// </summary>
-        bool IMarshalable<MaterialProperty, AiMaterialProperty>.IsNativeBlittable
-        {
-            get { return true; }
-        }
+        bool IMarshalable<MaterialProperty, AiMaterialProperty>.IsNativeBlittable { get { return true; } }
 
         /// <summary>
         /// Writes the managed data to the native value.
@@ -742,9 +735,9 @@ namespace Assimp
         /// Reads the unmanaged data from the native value.
         /// </summary>
         /// <param name="nativeValue">Input native value</param>
-        void IMarshalable<MaterialProperty, AiMaterialProperty>.FromNative(ref AiMaterialProperty nativeValue)
+        void IMarshalable<MaterialProperty, AiMaterialProperty>.FromNative(in AiMaterialProperty nativeValue)
         {
-            m_name = nativeValue.Key.GetString();
+            m_name = AiString.GetString(nativeValue.Key); //Avoid struct copy
             m_type = nativeValue.Type;
             m_texIndex = (int) nativeValue.Index;
             m_texType = nativeValue.Semantic;

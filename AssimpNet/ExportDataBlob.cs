@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using Assimp.Unmanaged;
 
 namespace Assimp
@@ -155,16 +156,10 @@ namespace Assimp
             if(stream == null || !stream.CanRead)
                 return null;
 
-            BlobBinaryReader reader = new BlobBinaryReader(stream);
-
-            try
-            {
+            //Reader set to leave the stream open
+            using(BlobBinaryReader reader = new BlobBinaryReader(stream))
                 return ReadBlob(reader);
-            }
-            finally
-            {
-                reader.Close(); //Make sure we close and not Dispose, to prevent underlying stream from being disposed.
-            }
+
         }
 
         private static void WriteBlob(ExportDataBlob blob, BinaryWriter writer)
@@ -201,15 +196,16 @@ namespace Assimp
             return blob;
         }
 
-        //Special binary reader, which will -not- dispose of underlying stream
+        //Special binary reader, which will -not- dispose of underlying stream. Compatible with all the different .net versions
         private class BlobBinaryReader : BinaryReader
         {
-
             public BlobBinaryReader(Stream stream)
-                : base(stream) { }
+                : base(stream, Encoding.UTF8) { }
 
-            public override void Close()
+            protected override void Dispose(bool disposing)
             {
+                //.Net <4.5 does not have "leave open" flag, so workaround we can dispose with false. Stream is not closed and everything
+                //is set to null
                 base.Dispose(false);
             }
         }

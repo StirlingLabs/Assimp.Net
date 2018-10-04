@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ namespace Assimp
     /// and it looks like they're only describing the memory layout. Matrices are treated
     /// as column vectors however (X base in the first column, Y base the second, and Z base the third)
     /// </summary>
-    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix3x3 : IEquatable<Matrix3x3>
     {

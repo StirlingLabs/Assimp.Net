@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -246,7 +246,7 @@ namespace Assimp
             if(!IsDisposed && disposing)
             {
                 if(m_fileStream != null)
-                    m_fileStream.Close();
+                    m_fileStream.Dispose();
 
                 m_fileStream = null;
 

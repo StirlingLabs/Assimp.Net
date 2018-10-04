@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (c) 2012-2017 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -349,9 +349,22 @@ namespace Assimp.Unmanaged
         /// <returns>The format hint</returns>
         public String GetFormatHint()
         {
-            fixed(sbyte* charPtr = FormatHint)
+            return GetFormatHint(this);
+        }
+
+        /// <summary>
+        /// Gets the format hint. Use this to avoid struct copy if the string was passed by read-only ref.
+        /// </summary>
+        /// <returns>The format hint</returns>
+        public static String GetFormatHint(in AiTexture aiTex)
+        {
+            fixed (sbyte* charPtr = aiTex.FormatHint)
             {
+#if !NETSTANDARD1_3
                 return new String(charPtr);
+#else
+                return Encoding.ASCII.GetString((byte*) charPtr, 4);
+#endif
             }
         }
     }
@@ -736,21 +749,19 @@ namespace Assimp.Unmanaged
 
         /// <summary>
         /// Convienence method for getting the AiString string - if the length is not greater than zero, it returns
-        /// an empty string rather than garbage.
+        /// an empty string rather than garbage. Use this to avoid struct copy if the string was passed by read-only ref.
         /// </summary>
         /// <returns>AiString string data</returns>
-        public unsafe String GetString()
+        public unsafe static String GetString(in AiString aiStr)
         {
-            int length = (int) Length.ToUInt32();
+            int length = (int) aiStr.Length.ToUInt32();
 
             if(length > 0)
             {
                 byte[] copy = new byte[length];
 
-                fixed(byte* bytePtr = Data)
-                {
+                fixed (byte* bytePtr = aiStr.Data)
                     MemoryHelper.Read<byte>(new IntPtr(bytePtr), copy, 0, length);
-                }
 
                 //Note: aiTypes.h specifies aiString is UTF-8 encoded string.
                 return Encoding.UTF8.GetString(copy, 0, length);
@@ -759,6 +770,16 @@ namespace Assimp.Unmanaged
             {
                 return String.Empty;
             }
+        }
+
+        /// <summary>
+        /// Convienence method for getting the AiString string - if the length is not greater than zero, it returns
+        /// an empty string rather than garbage.
+        /// </summary>
+        /// <returns>AiString string data</returns>
+        public String GetString()
+        {
+            return GetString(this);
         }
 
         /// <summary>
@@ -1035,7 +1056,7 @@ namespace Assimp.Unmanaged
         public IntPtr UserData;
     }
 
-    #region Delegates
+#region Delegates
 
     /// <summary>
     /// Callback delegate for Assimp's LogStream.
@@ -1119,9 +1140,9 @@ namespace Assimp.Unmanaged
     public delegate void AiFileCloseProc(IntPtr fileIO, IntPtr file);
 
 
-    #endregion
+#endregion
 
-    #region Collections
+#region Collections
 
     /// <summary>
     /// Fixed length array for representing the color channels of a mesh. Length is equal
@@ -1378,5 +1399,5 @@ namespace Assimp.Unmanaged
         }
     }
 
-    #endregion
+#endregion
 }
