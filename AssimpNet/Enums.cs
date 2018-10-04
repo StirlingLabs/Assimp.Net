@@ -1046,7 +1046,13 @@ namespace Assimp
         /// TER (Terragen) and HMP (3D Game Studio) are height map formats.
         /// </para>
         /// </summary>
-        Terrain = 0x10
+        Terrain = 0x10,
+
+        /// <summary>
+        /// Specifies that the scene data can be shared between structures. For example: one vertex in a few faces. This differs from <see cref="SceneFlags.NonVerboseFormat"/> as 
+        /// that has internal meanings about postprocessing steps.
+        /// </summary>
+        AllowShared = 0x20
     }
 
     /// <summary>
