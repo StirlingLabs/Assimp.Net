@@ -13,7 +13,7 @@ pipelines:
         script:
            #Pull down libdl.so, libminizip1.so dependency
           - apt-get update
-          - apt-get install -y libc6
+          - apt-get install -y libc6-dev
           - apt-get install -y libminizip1
            #Build project, sample, and run unit tests
           - export PROJECT_NAME=AssimpNet
