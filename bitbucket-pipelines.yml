@@ -8,12 +8,17 @@ image: microsoft/dotnet:sdk
 pipelines:
   default:
     - step:
-        script: #Ensure libdl.so dependency is installed
-          - apt-get update && apt-get install -y libc6-dev
-    - step:
         caches:
           - dotnetcore
-        script: #Build AssimpNet, Sample, and run tests
+        script:
+           #Pull down libdl.so dependency
+          - apt-get update && apt-get install libc6-dev
+           #Build project, sample, and run unit tests
+          - export PROJECT_NAME=AssimpNet
+          - export SAMPLE_NAME=AssimpNet.Sample
+          - export TEST_NAME=AssimpNet.Test
+          - export CONFIG=Release
+          - export FRAMEWORK-netstandard1.3
           - dotnet restore
           - dotnet build $PROJECT_NAME --framework $FRAMEWORK --configuration $CONFIG
           - dotnet build $SAMPLE_NAME --configuration $CONFIG
