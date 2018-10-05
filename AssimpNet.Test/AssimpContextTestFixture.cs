@@ -272,6 +272,23 @@ namespace Assimp.Test
         }
 
         [Test]
+        public void TestImporterDescriptions()
+        {
+            AssimpContext importer = new AssimpContext();
+            ImporterDescription[] importerDescrs = importer.GetImporterDescriptions();
+
+            Assert.IsNotNull(importerDescrs);
+            Assert.IsTrue(importerDescrs.Length > 0);
+
+            ImporterDescription descr = importer.GetImporterDescriptionFor("obj");
+            ImporterDescription descr2 = importer.GetImporterDescriptionFor(".obj");
+
+            Assert.IsNotNull(descr);
+            Assert.IsNotNull(descr2);
+            Assert.IsTrue(descr.Name == descr2.Name);
+        }
+
+        [Test]
         public void TestSupportedFormats()
         {
             AssimpContext importer = new AssimpContext();
@@ -286,6 +303,9 @@ namespace Assimp.Test
 
             Assert.IsTrue(importer.IsExportFormatSupported(exportDescs[0].FileExtension));
             Assert.IsTrue(importer.IsImportFormatSupported(importFormats[0]));
+
+            Assert.IsTrue(importer.IsExportFormatSupported("obj"));
+            Assert.IsTrue(importer.IsExportFormatSupported(".obj"));
         }
 
         [Test]

@@ -40,6 +40,7 @@ namespace Assimp
 
         private ExportFormatDescription[] m_exportFormats;
         private String[] m_importFormats;
+        private ImporterDescription[] m_importerDescrs;
 
         private float m_scale = 1.0f;
         private float m_xAxisRotation = 0.0f;
@@ -830,10 +831,48 @@ namespace Assimp
         /// <returns>Import formats supported</returns>
         public String[] GetSupportedImportFormats()
         {
-            if(m_importFormats == null)
-                m_importFormats = AssimpLibrary.Instance.GetExtensionList();
+            QueryImportFormatsIfNecessary();
 
             return (String[]) m_importFormats.Clone();
+        }
+
+        /// <summary>
+        /// Gets descriptions for each importer that assimp has registered.
+        /// </summary>
+        /// <returns>Descriptions of supported importers.</returns>
+        public ImporterDescription[] GetImporterDescriptions()
+        {
+            QueryImporterDescriptionsIfNecessary();
+
+            return (ImporterDescription[]) m_importerDescrs.Clone();
+        }
+
+        /// <summary>
+        /// Gets an importer description for the specified file extension. If no importers support it, null is returned. Multiple importers may support the file extension,
+        /// they are called in the order that they were registered.
+        /// </summary>
+        /// <param name="fileExtension">File extension to query importer support for.</param>
+        /// <returns>Importer description or null if it does not exist.</returns>
+        public ImporterDescription GetImporterDescriptionFor(String fileExtension)
+        {
+            if(String.IsNullOrEmpty(fileExtension))
+                return null;
+
+            QueryImporterDescriptionsIfNecessary();
+
+            if(fileExtension.StartsWith(".") && fileExtension.Length >= 2)
+                fileExtension = fileExtension.Substring(1);
+
+            foreach(ImporterDescription descr in m_importerDescrs)
+            {
+                foreach(String ext in descr.FileExtensions)
+                {
+                    if(String.Equals(fileExtension, ext, StringComparison.Ordinal))
+                        return descr;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -863,7 +902,7 @@ namespace Assimp
 
             foreach(ExportFormatDescription desc in m_exportFormats)
             {
-                if(String.Equals(desc.FileExtension, format))
+                if(String.Equals(desc.FileExtension, format, StringComparison.Ordinal))
                     return true;
             }
 
@@ -881,9 +920,8 @@ namespace Assimp
         public void SetConfig(PropertyConfig config)
         {
             if(config == null)
-            {
                 return;
-            }
+
             String name = config.Name;
             m_configs[config.Name] = config;
         }
@@ -895,14 +933,11 @@ namespace Assimp
         public void RemoveConfig(String configName)
         {
             if(String.IsNullOrEmpty(configName))
-            {
                 return;
-            }
+
             PropertyConfig oldConfig;
             if(m_configs.TryGetValue(configName, out oldConfig))
-            {
                 m_configs.Remove(configName);
-            }
         }
 
         /// <summary>
@@ -921,9 +956,8 @@ namespace Assimp
         public bool ContainsConfig(String configName)
         {
             if(String.IsNullOrEmpty(configName))
-            {
                 return false;
-            }
+
             return m_configs.ContainsKey(configName);
         }
 
@@ -972,6 +1006,18 @@ namespace Assimp
         {
             if(m_exportFormats == null)
                 m_exportFormats = AssimpLibrary.Instance.GetExportFormatDescriptions();
+        }
+
+        private void QueryImportFormatsIfNecessary()
+        {
+            if(m_importFormats == null)
+                m_importFormats = AssimpLibrary.Instance.GetExtensionList();
+        }
+
+        private void QueryImporterDescriptionsIfNecessary()
+        {
+            if(m_importerDescrs == null)
+                m_importerDescrs = AssimpLibrary.Instance.GetImporterDescriptions();
         }
 
         //Build import transformation matrix

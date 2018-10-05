@@ -1244,4 +1244,38 @@ namespace Assimp
         /// </summary>
         ReadText = 5
     }
+
+    /// <summary>
+    /// Defines flags that indicate level of support for common features for a given importer.
+    /// </summary>
+    [Flags]
+    public enum ImporterFeatureFlags
+    {
+        /// <summary>
+        /// Indicates there is a textual encoding of the file format and it is supported.
+        /// </summary>
+        SupportsText = 0x1,
+
+        /// <summary>
+        /// Indicates there is a binary encoding of the file format and it is supported.
+        /// </summary>
+        SupportsBinary = 0x2,
+
+        /// <summary>
+        /// Indicates there is a compressed encoding of the file format and it is supported.
+        /// </summary>
+        SupportsCompressed = 0x4,
+
+        /// <summary>
+        /// Indicates that the importer reads only a very particular subset of the file format. This is common
+        /// for formats that cannot easily be mapped to the Scene data structure.
+        /// </summary>
+        LimitedSupport = 0x8,
+
+        /// <summary>
+        /// Indicates that the importer is experimental and used with caution - this is only reserved for importers still in
+        /// development, and not typically yet in released production code.
+        /// </summary>
+        Experimental = 0x10
+    }
 }

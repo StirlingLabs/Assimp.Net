@@ -754,6 +754,33 @@ namespace Assimp.Unmanaged
         }
 
         /// <summary>
+        /// Gets a collection of importer descriptions that detail metadata and feature support for each importer.
+        /// </summary>
+        /// <returns>Collection of importer descriptions</returns>
+        public ImporterDescription[] GetImporterDescriptions()
+        {
+            LoadIfNotLoaded();
+
+            Functions.aiGetImportFormatCount funcGetCount = GetFunction<Functions.aiGetImportFormatCount>(FunctionNames.aiGetImportFormatCount);
+            Functions.aiGetImportFormatDescription funcGetDescr = GetFunction<Functions.aiGetImportFormatDescription>(FunctionNames.aiGetImportFormatDescription);
+
+            int count = (int) funcGetCount().ToUInt32();
+            ImporterDescription[] descrs = new ImporterDescription[count];
+
+            for(int i = 0; i < count; i++)
+            {
+                IntPtr descrPtr = funcGetDescr(new UIntPtr((uint) i));
+                if(descrPtr != IntPtr.Zero)
+                {
+                    ref AiImporterDesc descr = ref MemoryHelper.AsRef<AiImporterDesc>(descrPtr);
+                    descrs[i] = new ImporterDescription(descr);
+                }
+            }
+
+            return descrs;
+        }
+
+        /// <summary>
         /// Gets the memory requirements of the scene.
         /// </summary>
         /// <param name="scene">Pointer to the unmanaged scene data structure.</param>
@@ -1084,6 +1111,8 @@ namespace Assimp.Unmanaged
             public const String aiGetErrorString = "aiGetErrorString";
             public const String aiIsExtensionSupported = "aiIsExtensionSupported";
             public const String aiGetExtensionList = "aiGetExtensionList";
+            public const String aiGetImportFormatCount = "aiGetImportFormatCount";
+            public const String aiGetImportFormatDescription = "aiGetImportFormatDescription";
             public const String aiGetMemoryRequirements = "aiGetMemoryRequirements";
 
             #endregion
@@ -1288,6 +1317,12 @@ namespace Assimp.Unmanaged
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiIsExtensionSupported)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public delegate bool aiIsExtensionSupported([In, MarshalAs(UnmanagedType.LPStr)] String extension);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetImportFormatCount)]
+            public delegate UIntPtr aiGetImportFormatCount();
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetImportFormatDescription)]
+            public delegate IntPtr aiGetImportFormatDescription(UIntPtr index);
 
             #endregion
 

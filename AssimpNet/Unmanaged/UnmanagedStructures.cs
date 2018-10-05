@@ -1037,6 +1037,65 @@ namespace Assimp.Unmanaged
     }
 
     /// <summary>
+    /// Describes a variety of information about an importer.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    [CLSCompliant(false)]
+    public struct AiImporterDesc
+    {
+        /// <summary>
+        /// char*, full name of the importer (e.g. Blender3D Importer)
+        /// </summary>
+        public IntPtr Name;
+
+        /// <summary>
+        /// char*, original author (blank if unknown or assimp team)
+        /// </summary>
+        public IntPtr Author;
+
+        /// <summary>
+        /// char*, current maintainer, left blank if the author maintains.
+        /// </summary>
+        public IntPtr Maintainer;
+
+        /// <summary>
+        /// char*, implementation comments. E.g. unimplemented features.
+        /// </summary>
+        public IntPtr Comments;
+
+        /// <summary>
+        /// unsigned int, features supported by the importer.
+        /// </summary>
+        public ImporterFeatureFlags Flags;
+
+        /// <summary>
+        /// unsigned int, max major version of format supported. If no version scheme or importer doesn't care, will be zero.
+        /// </summary>
+        public uint MinMajor;
+
+        /// <summary>
+        /// unsigned int, min major version of format supported. If no version scheme or importer doesn't care, will be zero.
+        /// </summary>
+        public uint MinMinor;
+
+        /// <summary>
+        /// unsigned int, max major version of format supported. If no version scheme, forwards compatible, or importer doesn't care, will be zero.
+        /// </summary>
+        public uint MaxMajor;
+
+        /// <summary>
+        /// unsigned int, min major version of format supported. If no version scheme, forwards compatible, or importer doesn't care, will be zero.
+        /// </summary>
+        public uint MaxMinor;
+
+        /// <summary>
+        /// char*, list of file extensions the importer can handle. Entries are separated by space characters, and all entries are lower case WITHOUT a leading dot. (e.g. "xml dae").
+        /// Multiple importers may respond to the same file extension, assim
+        /// </summary>
+        public IntPtr FileExtensions;
+    }
+
+    /// <summary>
     /// Describes a file format which Assimp can export to.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
