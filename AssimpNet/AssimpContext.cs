@@ -819,8 +819,7 @@ namespace Assimp
         /// <returns>Export formats supported</returns>
         public ExportFormatDescription[] GetSupportedExportFormats()
         {
-            if(m_exportFormats == null)
-                m_exportFormats = AssimpLibrary.Instance.GetExportFormatDescriptions();
+            QueryExportFormatsIfNecessary();
 
             return (ExportFormatDescription[]) m_exportFormats.Clone();
         }
@@ -857,12 +856,12 @@ namespace Assimp
             if(String.IsNullOrEmpty(format))
                 return false;
 
-            ExportFormatDescription[] exportFormats = GetSupportedExportFormats();
+            QueryExportFormatsIfNecessary();
 
             if(format.StartsWith(".") && format.Length >= 2)
                 format = format.Substring(1);
 
-            foreach(ExportFormatDescription desc in exportFormats)
+            foreach(ExportFormatDescription desc in m_exportFormats)
             {
                 if(String.Equals(desc.FileExtension, format))
                     return true;
@@ -967,6 +966,12 @@ namespace Assimp
         {
             if(m_isDisposed)
                 throw new ObjectDisposedException("Assimp Context has been disposed.");
+        }
+
+        private void QueryExportFormatsIfNecessary()
+        {
+            if(m_exportFormats == null)
+                m_exportFormats = AssimpLibrary.Instance.GetExportFormatDescriptions();
         }
 
         //Build import transformation matrix
