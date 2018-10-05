@@ -63,6 +63,16 @@ namespace Assimp.Test
             }
         }
 
+        public static void AssertEquals(double expected, double actual)
+        {
+            Assert.IsTrue(Math.Abs(expected - actual) <= Tolerance);
+        }
+
+        public static void AssertEquals(double expected, double actual, String msg)
+        {
+            Assert.IsTrue(Math.Abs(expected - actual) <= Tolerance, msg);
+        }
+
         public static void AssertEquals(float expected, float actual)
         {
             Assert.IsTrue(Math.Abs(expected - actual) <= Tolerance);
