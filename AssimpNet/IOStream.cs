@@ -228,6 +228,9 @@ namespace Assimp
             long longNum = (long) numElements.ToUInt64();
             long count = longSize * longNum;
 
+            if(count == 0)
+                return UIntPtr.Zero;
+
             byte[] byteBuffer = GetByteBuffer(longSize, longNum);
             MemoryHelper.Read<byte>(dataToWrite, byteBuffer, 0, (int) count);
 
@@ -258,7 +261,9 @@ namespace Assimp
             try
             {
                 actualCount = Read(byteBuffer, count);
-                MemoryHelper.Write<byte>(dataRead, byteBuffer, 0, (int) actualCount);
+
+                if(actualCount > 0)
+                    MemoryHelper.Write<byte>(dataRead, byteBuffer, 0, (int) actualCount);
             }
             catch(Exception) { /*Assimp will report an IO error*/ }
 

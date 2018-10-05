@@ -179,6 +179,8 @@ namespace Assimp
         /// <summary>
         /// Imports a model from the stream without running any post-process steps. The importer sets configurations
         /// and loads the model into managed memory, releasing the unmanaged memory used by Assimp. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ImportFile" family of functions.
         /// </summary>
         /// <param name="stream">Stream to read from</param>
         /// <param name="formatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
@@ -192,8 +194,9 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Imports a model from the stream. The importer sets configurations
-        /// and loads the model into managed memory, releasing the unmanaged memory used by Assimp. It is up to the caller to dispose of the stream.
+        /// Imports a model from the stream. The importer sets configurations and loads the model into managed memory, releasing the unmanaged memory 
+        /// used by Assimp. It is up to the caller to dispose of the stream. If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ImportFile" family of functions.
         /// </summary>
         /// <param name="stream">Stream to read from</param>
         /// <param name="postProcessFlags">Post processing flags, if any</param>
@@ -617,7 +620,9 @@ namespace Assimp
         #region Stream to File
 
         /// <summary>
-        /// Converts the model contained in the stream to the specified format and save it to a file.
+        /// Converts the model contained in the stream to the specified format and save it to a file. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ConvertFromFileToFile" family of functions.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
         /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
@@ -633,7 +638,9 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Converts the model contained in the stream to the specified format and save it to a file.
+        /// Converts the model contained in the stream to the specified format and save it to a file. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ConvertFromFileToFile" family of functions.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
         /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
@@ -650,7 +657,9 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Converts the model contained in the stream to the specified format and save it to a file.
+        /// Converts the model contained in the stream to the specified format and save it to a file. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ConvertFromFileToFile" family of functions.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
         /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
@@ -705,7 +714,9 @@ namespace Assimp
         #region Stream to Blob
 
         /// <summary>
-        /// Converts the model contained in the stream to the specified format and save it to a data blob.
+        /// Converts the model contained in the stream to the specified format and save it to a data blob. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ConvertFromFileToBlob" family of functions.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
         /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
@@ -720,7 +731,9 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Converts the model contained in the stream to the specified format and save it to a data blob.
+        /// Converts the model contained in the stream to the specified format and save it to a data blob. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ConvertFromFileToBlob" family of functions.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
         /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will
@@ -736,7 +749,9 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Converts the model contained in the stream to the specified format and save it to a data blob.
+        /// Converts the model contained in the stream to the specified format and save it to a data blob. It is up to the caller to dispose of the stream.
+        /// If the format is distributed across multiple files/streams, set a custom <see cref="IOSystem"/>
+        /// and use the "ConvertFromFileToBlob" family of functions.
         /// </summary>
         /// <param name="inputStream">Stream to read from</param>
         /// <param name="importFormatHint">Optional format extension to serve as a hint to Assimp to choose which importer to use. If null or empty, the system will

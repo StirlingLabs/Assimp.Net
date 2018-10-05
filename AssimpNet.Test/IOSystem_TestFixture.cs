@@ -73,5 +73,41 @@ namespace Assimp.Test
                 importer.ImportFile(fileName, PostProcessSteps.None);
             });
         }
+
+        [Test]
+        public void TestIOSystem_ImportObj()
+        {
+            String dir = Path.Combine(TestHelper.RootPath, "TestFiles");
+            LogStream.IsVerboseLoggingEnabled = true;
+            ConsoleLogStream log = new ConsoleLogStream();
+            log.Attach();
+
+            using(AssimpContext importer = new AssimpContext())
+            {
+                FileIOSystem iOSystem = new FileIOSystem(dir);
+                importer.SetIOSystem(iOSystem);
+
+                //Using stream does not use the IO system...
+                using(Stream fs = File.OpenRead(Path.Combine(dir, "sphere.obj")))
+                {
+                    Scene scene = importer.ImportFileFromStream(fs, "obj");
+                    Assert.IsTrue(scene != null);
+                    Assert.IsTrue(scene.HasMeshes);
+                    Assert.IsTrue(scene.HasMaterials);
+
+                    //No material file, so the mesh will always use the default material
+                    Assert.IsTrue(scene.Materials[scene.Meshes[0].MaterialIndex].Name == "DefaultMaterial");
+                }
+
+                //Using custom IO system requires us to pass in the file name, assimp will ask the io system to get a stream
+                Scene scene2 = importer.ImportFile("sphere.obj");
+                Assert.IsTrue(scene2 != null);
+                Assert.IsTrue(scene2.HasMeshes);
+                Assert.IsTrue(scene2.HasMaterials);
+
+                //Should have found a material with the name "SphereMaterial" in the mtl file
+                Assert.IsTrue(scene2.Materials[scene2.Meshes[0].MaterialIndex].Name == "SphereMaterial");
+            }
+        }
     }
 }

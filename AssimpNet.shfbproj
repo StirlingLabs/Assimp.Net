@@ -15,7 +15,7 @@
     <RootNamespace>Documentation</RootNamespace>
     <Name>Documentation</Name>
     <!-- SHFB properties -->
-    <OutputPath>C:\Users\Nicholas\Documents\Visual Studio 2017\Projects\AssimpNet-Next\Docs\</OutputPath>
+    <OutputPath>C:\Users\Nicholas\Documents\Visual Studio 2017\Projects\AssimpNet\Docs\</OutputPath>
     <HtmlHelpName>AssimpNet Documentation %28October 2018%29</HtmlHelpName>
     <Language>en-US</Language>
     <PresentationStyle>VS2013</PresentationStyle>
@@ -25,7 +25,8 @@
     </VendorName>
     <DocumentationSources>
       <DocumentationSource sourceFile="AssimpNet\bin\Release\netstandard1.3\AssimpNet.dll" />
-<DocumentationSource sourceFile="AssimpNet\bin\Release\netstandard1.3\AssimpNet.xml" /></DocumentationSources>
+      <DocumentationSource sourceFile="AssimpNet\bin\Release\netstandard1.3\AssimpNet.xml" />
+    </DocumentationSources>
     <HelpTitle>AssimpNet Documentation %28October 2018%29</HelpTitle>
     <CopyrightText>Copyright &amp;#169%3b 2012-2018 AssimpNet - Nicholas Woodfield. All rights reserved.</CopyrightText>
     <NamespaceSummaries>

@@ -171,6 +171,9 @@ namespace Assimp
             if(m_fileStream == null || !m_fileStream.CanWrite)
                 throw new IOException("Stream is not writable.");
 
+            if(m_fileStream.Position >= m_fileStream.Length)
+                return 0;
+
             m_fileStream.Write(dataToWrite, (int) m_fileStream.Position, (int) count);
 
             return count;
@@ -186,6 +189,9 @@ namespace Assimp
 
             if(m_fileStream == null || !m_fileStream.CanRead)
                 throw new IOException("Stream is not readable.");
+
+            if(m_fileStream.Position >= m_fileStream.Length)
+                return 0;
 
             m_fileStream.Read(dataRead, (int) m_fileStream.Position, (int) count);
 
