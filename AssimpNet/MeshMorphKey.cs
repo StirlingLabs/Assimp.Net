@@ -51,7 +51,7 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Gets the values at the time of this keyframe.
+        /// Gets the values at the time of this keyframe. Number of values must equal number of weights.
         /// </summary>
         public List<int> Values
         {
@@ -62,7 +62,7 @@ namespace Assimp
         }
 
         /// <summary>
-        /// Gets the weights at the time of this keyframe.
+        /// Gets the weights at the time of this keyframe. Number of weights must equal number of values.
         /// </summary>
         public List<double> Weights
         {
@@ -96,7 +96,25 @@ namespace Assimp
         /// <param name="nativeValue">Output native value</param>
         void IMarshalable<MeshMorphKey, AiMeshMorphKey>.ToNative(IntPtr thisPtr, out AiMeshMorphKey nativeValue)
         {
-            throw new NotImplementedException();
+            nativeValue.Time = m_time;
+            nativeValue.NumValuesAndWeights = (uint) m_weights.Count;
+            nativeValue.Values = IntPtr.Zero;
+            nativeValue.Weights = IntPtr.Zero;
+
+            System.Diagnostics.Debug.Assert(m_weights.Count == m_values.Count);
+            if(m_weights.Count == m_values.Count)
+            {
+                if(m_weights.Count > 0)
+                {
+                    nativeValue.Values = MemoryHelper.ToNativeArray<int>(m_values.ToArray());
+                    nativeValue.Weights = MemoryHelper.ToNativeArray<double>(m_weights.ToArray());
+                }
+            }
+            else
+            {
+                //If both lists are not the same length then do not write anything out
+                nativeValue.NumValuesAndWeights = 0;
+            }
         }
 
         /// <summary>
@@ -105,7 +123,19 @@ namespace Assimp
         /// <param name="nativeValue">Input native value</param>
         void IMarshalable<MeshMorphKey, AiMeshMorphKey>.FromNative(in AiMeshMorphKey nativeValue)
         {
-            throw new NotImplementedException();
+            m_time = nativeValue.Time;
+
+            m_values.Clear();
+            m_weights.Clear();
+
+            if(nativeValue.NumValuesAndWeights > 0)
+            {
+                if(nativeValue.Values != IntPtr.Zero)
+                    m_values.AddRange(MemoryHelper.FromNativeArray<int>(nativeValue.Values, (int) nativeValue.NumValuesAndWeights));
+
+                if(nativeValue.Weights != IntPtr.Zero)
+                    m_weights.AddRange(MemoryHelper.FromNativeArray<double>(nativeValue.Weights, (int) nativeValue.NumValuesAndWeights));
+            }
         }
 
         /// <summary>
