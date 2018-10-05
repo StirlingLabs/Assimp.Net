@@ -579,6 +579,58 @@ namespace Assimp.Unmanaged
     }
 
     /// <summary>
+    /// Represents an aiMeshMorphKey struct.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    [CLSCompliant(false)]
+    public struct AiMeshMorphKey
+    {
+        /// <summary>
+        /// The time of this key.
+        /// </summary>
+        public double Time;
+
+        /// <summary>
+        /// unsigned int*, values at the time of this key.
+        /// </summary>
+        public IntPtr Values;
+
+        /// <summary>
+        /// double*, weights at the time of this key.
+        /// </summary>
+        public IntPtr Weights;
+
+        /// <summary>
+        /// unsigned int, the number of values/weights.
+        /// </summary>
+        public uint NumValuesAndWeights;
+    }
+
+    /// <summary>
+    /// Represents an aiMeshMorphAnim struct.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    [CLSCompliant(false)]
+    public struct AiMeshMorphAnim
+    {
+        /// <summary>
+        /// aiString, the name of the mesh to be animated. Empty strings are not allowed, animated meshes need to be named (not necessarily uniquely,
+        /// the name can basically serve as a wildcard to select a group of meshes with similar animation setup).
+        /// </summary>
+        public AiString Name;
+
+        /// <summary>
+        /// unsigned int, number of key frames. Must be at least one.
+        /// </summary>
+        public uint NumKeys;
+
+        /// <summary>
+        /// aiMeshMorphKey*, key frames of the animation.
+        /// </summary>
+        public IntPtr Keys;
+    }
+
+    /// <summary>
     /// Represents an aiAnimation struct.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
@@ -620,6 +672,17 @@ namespace Assimp.Unmanaged
         /// aiMeshAnim**, mesh animation channels. Each channel affects a single mesh. 
         /// </summary>
         public IntPtr MeshChannels;
+
+        /// <summary>
+        /// Number of mesh morph animation channels. Each channel affects a single mesh and defines
+        /// morphing animation.
+        /// </summary>
+        public uint NumMeshMorphChannels;
+
+        /// <summary>
+        /// aiMeshMorphAnim**, mesh morph animation channels. Each channel affects a single mesh. 
+        /// </summary>
+        public IntPtr MeshMorphChannels;
     }
 
     /// <summary>

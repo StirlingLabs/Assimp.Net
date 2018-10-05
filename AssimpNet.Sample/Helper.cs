@@ -1,5 +1,4 @@
-﻿using System;
-/*
+﻿/*
 * Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,6 +20,7 @@
 * THE SOFTWARE.
 */
 
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using TeximpNet;
