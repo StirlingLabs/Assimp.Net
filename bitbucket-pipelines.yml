@@ -18,7 +18,7 @@ pipelines:
           - export SAMPLE_NAME=AssimpNet.Sample
           - export TEST_NAME=AssimpNet.Test
           - export CONFIG=Release
-          - export FRAMEWORK-netstandard1.3
+          - export FRAMEWORK=netstandard1.3
           - dotnet restore
           - dotnet build $PROJECT_NAME --framework $FRAMEWORK --configuration $CONFIG
           - dotnet build $SAMPLE_NAME --configuration $CONFIG
