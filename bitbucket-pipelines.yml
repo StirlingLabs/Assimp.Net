@@ -12,7 +12,7 @@ pipelines:
           - dotnetcore
         script:
            #Pull down libdl.so dependency
-          - apt-get update && apt-get install libc6-dev
+          - apt-get update && apt-get install -y libc6-dev
            #Build project, sample, and run unit tests
           - export PROJECT_NAME=AssimpNet
           - export SAMPLE_NAME=AssimpNet.Sample
