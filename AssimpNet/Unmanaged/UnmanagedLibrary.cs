@@ -527,8 +527,16 @@ namespace Assimp.Unmanaged
 
                 if(libraryHandle == IntPtr.Zero)
                 {
-                    int hr = Marshal.GetHRForLastWin32Error();
-                    Exception innerException = Marshal.GetExceptionForHR(hr);
+                    Exception innerException = null;
+
+                    //Some runtimes (e.g. Mono) throw a not supported/platform not supported exception when calling these functions, catch it so we can throw our exception
+                    //that will give a better error to the user
+                    try
+                    {
+                        int hr = Marshal.GetHRForLastWin32Error();
+                        innerException = Marshal.GetExceptionForHR(hr);
+                    }
+                    catch(Exception) { }
 
                     if(innerException != null)
                         throw new AssimpException(String.Format("Error loading unmanaged library from path: {0}\n\n{1}", path, innerException.Message), innerException);
