@@ -35,7 +35,7 @@
     <Content Include="..\libs\Assimp\win-x64\Assimp64.dll" Link="build\native\win-x64\Assimp64.dll" PackagePath="build\native\win-x64\" />
     <Content Include="..\libs\Assimp\win-x86\Assimp32.dll" Link="build\native\win-x86\Assimp32.dll" PackagePath="build\native\win-x86\" />
     <Content Include="..\libs\Assimp\linux-x64\libAssimp64.so" Link="build\native\linux-x64\libAssimp64.so" PackagePath="build\native\linux-x64\" />
-    <Content Include="..\libs\Assimp\macOS-x64\libAssimp64.dylib" Link="build\native\macOS-x64\libAssimp64.dylib" PackagePath="build\native\macOS-x64\" />
+    <Content Include="..\libs\Assimp\osx-x64\libAssimp64.dylib" Link="build\native\osx-x64\libAssimp64.dylib" PackagePath="build\native\osx-x64\" />
     <Content Include="AssimpNet.targets" PackagePath="build\" />
   </ItemGroup>
 
