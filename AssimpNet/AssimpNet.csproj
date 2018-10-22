@@ -5,8 +5,8 @@
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core'">true</SignAssembly>
-    <AssemblyOriginatorKeyFile Condition=" '$(MSBuildRuntimeType)' != 'Core'">AssimpKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>AssimpKey.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Nicholas Woodfield</Authors>
     <Company />
