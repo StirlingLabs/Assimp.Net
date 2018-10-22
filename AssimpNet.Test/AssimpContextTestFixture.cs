@@ -379,22 +379,6 @@ namespace Assimp.Test
         }
 
         [Test]
-        public void TestLoadFreeLibrary()
-        {
-            if(AssimpLibrary.Instance.IsLibraryLoaded)
-                AssimpLibrary.Instance.FreeLibrary();
-
-            AssimpLibrary.Instance.LoadLibrary();
-
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            AssimpContext importer = new AssimpContext();
-            importer.ImportFile(path);
-            importer.Dispose();
-
-            AssimpLibrary.Instance.FreeLibrary();
-        }
-
-        [Test]
         public void TestMultipleImportersMultipleThreads()
         {
             LogStream.IsVerboseLoggingEnabled = true;
