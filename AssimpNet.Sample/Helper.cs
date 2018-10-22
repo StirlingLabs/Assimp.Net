@@ -134,11 +134,6 @@ namespace Assimp.Sample
             vOut.Z = vIn.Z;
         }
 
-        public static bool AreBlockCompressionFormatsSupported(GraphicsDevice gd)
-        {
-            return false;
-        }
-
         public static Texture LoadTextureFromFile(String filePath, GraphicsDevice gd, ResourceFactory factory)
         {
             if(!File.Exists(filePath) || gd == null || factory == null)
@@ -146,23 +141,16 @@ namespace Assimp.Sample
 
             try
             {
-                if(AreBlockCompressionFormatsSupported(gd) && DDSFile.IsDDSFile(filePath))
+                //FreeImage can load DDS, but they return an uncompressed image, and only the first mip level, which is good enough for our purpose here.
+                //See DDSContainer/DDSFile to load from DDS format all the different types of textures!
+                using(Surface image = Surface.LoadFromFile(filePath))
                 {
-                    DDSContainer ddsImage = DDSFile.Read(filePath, DDSFlags.ForceRgb | DDSFlags.No16Bpp);
+                    image.FlipVertically();
 
-                }
-                else
-                {
-                    //FreeImage can load DDS, but they return an uncompressed image, and only the first mip level
-                    using(Surface image = Surface.LoadFromFile(filePath))
-                    {
-                        image.FlipVertically();
+                    if(image.ImageType != ImageType.Bitmap || image.BitsPerPixel != 32)
+                        image.ConvertTo(ImageConversion.To32Bits);
 
-                        if(image.ImageType != ImageType.Bitmap || image.BitsPerPixel != 32)
-                            image.ConvertTo(ImageConversion.To32Bits);
-
-                        return CreateTextureFromSurface(image, gd, factory);
-                    }
+                    return CreateTextureFromSurface(image, gd, factory);
                 }
             }
             catch(Exception) { }
