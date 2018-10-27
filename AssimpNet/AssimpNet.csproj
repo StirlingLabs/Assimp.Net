@@ -48,7 +48,6 @@
   <!-- Copy targets and native files to a build folder so unit tests can access it (overall will setup a mock nuget folder structure)  -->
   <Target Name="CopyBuildFiles" AfterTargets="AfterBuild">
     <Copy SourceFiles="%(Content.Identity)" DestinationFiles="bin\$(Configuration)\%(Content.Link)" SkipUnchangedFiles="true" Condition="'%(Content.Link)' != ''" />
-   <!-- <Copy SourceFiles="AssimpNet.targets" DestinationFolder="bin\$(Configuration)\build\$(TargetFramework)" SkipUnchangedFiles="true" /> -->
   </Target>
 
 </Project>
