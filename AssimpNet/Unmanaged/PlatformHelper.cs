@@ -69,6 +69,30 @@ namespace Assimp.Unmanaged
     //Helper class for making it easier to access certain reflection methods on types between .Net framework and .Net standard (pre-netstandard 2.0)
     internal class PlatformHelper
     {
+        public static String GetInformationalVersion()
+        {
+#if NETSTANDARD1_3
+            AssemblyInformationalVersionAttribute attr = typeof(PlatformHelper).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            return (attr != null) ? attr.InformationalVersion : null;
+#else
+            object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+            if(attributes == null || attributes.Length == 0)
+                return null;
+
+            AssemblyInformationalVersionAttribute attr = attributes[0] as AssemblyInformationalVersionAttribute;
+            return (attr != null) ? attr.InformationalVersion : null;
+#endif
+        }
+
+        public static String GetAssemblyName()
+        {
+#if NETSTANDARD1_3
+            return typeof(PlatformHelper).GetTypeInfo().Assembly.GetName().Name;
+#else
+            return Assembly.GetExecutingAssembly().GetName().Name;
+#endif
+        }
+
         public static String GetAppBaseDirectory()
         {
 #if NETSTANDARD1_3
@@ -140,7 +164,7 @@ namespace Assimp.Unmanaged
         {
             if(func == null)
                 return IntPtr.Zero;
-
+            
             return Marshal.GetFunctionPointerForDelegate(func);
         }
 

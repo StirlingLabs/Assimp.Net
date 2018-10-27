@@ -33,7 +33,7 @@ namespace Assimp.Net4Sample
         {
             //Simple test to make sure the non-net standard legacy target functions (unit tests all run with the net standard dll)
             String fileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Assets", "duck.dae");
-
+           // Assimp.Unmanaged.AssimpLibrary.Instance.Resolver.ResolveLibraryPath()
             AssimpContext importer = new AssimpContext();
             importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
             Scene scene = importer.ImportFile(fileName, PostProcessPreset.TargetRealTimeQuality | PostProcessSteps.FlipWindingOrder);

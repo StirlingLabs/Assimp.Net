@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>Assimp.Test</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <ForceCopyNativeAssimp>true</ForceCopyNativeAssimp>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,6 +48,6 @@
     </None>
   </ItemGroup>
 
-  <Import Project="$(ProjectDir)..\AssimpNet\bin\$(Configuration)\build\AssimpNet.targets" />
+  <Import Project="$(ProjectDir)..\AssimpNet\bin\$(Configuration)\nuget\build\AssimpNet.targets" />
   
 </Project>

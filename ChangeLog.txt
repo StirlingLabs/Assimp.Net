@@ -2,13 +2,40 @@
 CHANGELOG
 ----------------------------------------------------------------------
 
-4.1.0 (10-04-2018)
+4.1.0 (10-26-2018)
 
-  - Updated to target .Net Standard 1.3 (and .Net 3.5 and .Net 4)
+  - Updated to target .Net Standard 1.3 (additional .Net 3.5 and .Net 4 targets)
   - Removed old IL patcher to use new MemoryInterop.ILPatcher build time dependency (allows us to build cross-platform)
   - Rewrote Sample application to be a .Net Core app that uses the Veldrid low-level graphics library for rendering
-  - Added x64 linux native binary
+  - Added x64 linux native binary, x64 macOS native binary
+		- Tested on Ubuntu 18.04 and MacOS 10.13 (High Sierra)
   - Several fixes and updates to target latest Assimp release
+  - Ported over "UnmanagedLibrary" abstract code and refactored AssimpLibrary
+  - Added "ThrowOnLoadFailure" to configure getting back a "false" if native library fails to load or throw an exception (the default). Mono should no longer
+    throw a "NotImplemented" exception because of trying to get the error code from windows.
+  - !!Breaking Change!! Native DLLs are deployed differently and resolved at runtime differently
+		- Removed "DefaultLibraryPathXXBit" properties from AssimpLibrary, they are meaningless now (and probably not used)
+		- Introduced "UnmanagedLibraryResolver" that lets you set the following to completely configure native DLL loading:
+				1. Multiple probing paths
+				2. Multiple fallback library names (e.g. versioned binaries)
+				3. Override name if the default native library name is not good enough for your tastes.
+		- Search order of the native DLL is as follows:
+				1. Search user-specified probing paths
+				2. Search {AppBaseDirectory}/runtimes/{RID}/native/
+				3. Search {AppBaseDirectory}/
+				4. Search nuget cache based on assembly name/informational version ({UserProfile}/.nuget/packages/AssimpNet/{PackageVersion}/runtimes/{RID}/native/)
+				5. If all above failed, return the given name of the DLL (or override name) and let the OS try and find it (different OS' may have different strategies).
+		- The resolver is only used in AssimpLibrary.LoadLibrary(). The other two overloads still take in a user-supplied path/to/your/DLL.
+		- Native DLLs are now deployed in the "runtimes" folder of the nuget package. This means they are now picked up as dependencies by netcore (*.deps.json)
+		  and automatically get copied during the "dotnet publish" command. During development, the system will try and locate the native DLLs in the nuget cache
+		  (.net framework 3.5/4.0 targets still use the MSBuild targets file to copy the runtime folder to the output folder). The folder structure looks like this:
+				- runtimes/win-x64/native/assimp.dll
+				- runtimes/win-x86/native/assimp.dll
+				- runtimes/osx-x64/native/libassimp.dll
+				- runtimes/linux-x64/native/libassimp.dll
+		- All native binaries are named "assimp" or "libassimp" depending on platform, since we're putting them in "well known" architecture folders, no need to have unique names
+  - Added a Unity script that will make it easier for users to load the native DLLs when running in Editor/Standalone Unity 3D
+
 
 Targets Assimp 4.1.0
 

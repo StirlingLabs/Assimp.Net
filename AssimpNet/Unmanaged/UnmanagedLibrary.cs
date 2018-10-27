@@ -38,9 +38,9 @@ namespace Assimp.Unmanaged
         Windows,
 
         /// <summary>
-        /// Unix platform.
+        /// Linux platform.
         /// </summary>
-        Unix,
+        Linux,
 
         /// <summary>
         /// Mac platform.
@@ -87,8 +87,9 @@ namespace Assimp.Unmanaged
         private static Object s_defaultLoadSync = new Object();
 
         private UnmanagedLibraryImplementation m_impl;
+        private UnmanagedLibraryResolver m_resolver;
         private String m_libraryPath = String.Empty;
-        private volatile bool m_checkNeedsLoading = true;
+        private volatile bool m_checkNeedsLoading = true;       
 
         /// <summary>
         /// Occurs when the unmanaged library is loaded.
@@ -112,35 +113,52 @@ namespace Assimp.Unmanaged
         }
 
         /// <summary>
-        /// Queries the default path to the 32-bit unmanaged library DLL.
+        /// Gets the default name of the unmanaged library DLL. This is dependent based on the platform extension and name prefix. Additional
+        /// names can be set in the <see cref="UnmanagedLibraryResolver"/> (e.g. to load versioned DLLs)
         /// </summary>
-        public String DefaultLibraryPath32Bit
+        public String DefaultLibraryName
         {
             get
             {
-                return m_impl.DefaultLibraryPath32Bit;
+                return m_impl.DefaultLibraryName;
             }
         }
 
         /// <summary>
-        /// Queries the default path to the 64-bit unmanaged library DLL.
-        /// </summary>
-        public String DefaultLibraryPath64bit
-        {
-            get
-            {
-                return m_impl.DefaultLibraryPath64Bit;
-            }
-        }
-
-        /// <summary>
-        /// Queries the path to the unmanaged library DLL that is currently loaded.
+        /// Gets the path to the unmanaged library DLL that is currently loaded.
         /// </summary>
         public String LibraryPath
         {
             get
             {
                 return m_libraryPath;
+            }
+        }
+
+        /// <summary>
+        /// Gets the resolver used to find the unmanaged library DLL when loading.
+        /// </summary>
+        public UnmanagedLibraryResolver Resolver
+        {
+            get
+            {
+                return m_resolver;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether an <see cref="AssimpException"/> is thrown if the unmanaged DLL fails to load for whatever reason. By
+        /// default this is true.
+        /// </summary>
+        public bool ThrowOnLoadFailure
+        {
+            get
+            {
+                return m_impl.ThrowOnLoadFailure;
+            }
+            set
+            {
+                m_impl.ThrowOnLoadFailure = value;
             }
         }
 
@@ -158,12 +176,11 @@ namespace Assimp.Unmanaged
         /// <summary>
         /// Constructs a new <see cref="UnmanagedLibrary"/>.
         /// </summary>
-        /// <param name="default32BitName">Default name (NOT path) of the 32-bit unmanaged library.</param>
-        /// <param name="default64BitName">Default name (NOT path) of the 64-bit unmanaged library.</param>
+        /// <param name="defaultName">Default name (NOT path) of the unmanaged library.</param>
         /// <param name="unmanagedFunctionDelegateTypes">Delegate types to instantiate and load.</param>
-        protected UnmanagedLibrary(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
+        protected UnmanagedLibrary(String defaultName, Type[] unmanagedFunctionDelegateTypes)
         {
-            CreateRuntimeImplementation(default32BitName, default64BitName, unmanagedFunctionDelegateTypes);
+            CreateRuntimeImplementation(defaultName, unmanagedFunctionDelegateTypes);
         }
 
         /// <summary>
@@ -176,7 +193,7 @@ namespace Assimp.Unmanaged
                 return Platform.Windows;
 
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return Platform.Unix;
+                return Platform.Linux;
 
             if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return Platform.Mac;
@@ -185,12 +202,13 @@ namespace Assimp.Unmanaged
         }
 
         /// <summary>
-        /// Loads the unmanaged library using the default library paths based on the OS bitness.
+        /// Loads the unmanaged library using the <see cref="UnmanagedLibraryResolver"/>.
         /// </summary>
         /// <returns>True if the library was found and successfully loaded.</returns>
         public bool LoadLibrary()
         {
-            return LoadLibrary((Is64Bit) ? DefaultLibraryPath64bit : DefaultLibraryPath32Bit);
+            String libPath = m_resolver.ResolveLibraryPath(DefaultLibraryName);
+            return LoadLibrary(libPath);
         }
 
         /// <summary>
@@ -219,7 +237,7 @@ namespace Assimp.Unmanaged
             }
 
             //Automatically append extension if necessary
-            if(!Path.HasExtension(libPath))
+            if(!String.IsNullOrEmpty(libPath) && !Path.HasExtension(libPath))
                 libPath = Path.ChangeExtension(libPath, m_impl.DllExtension);
 
             if(m_impl.LoadLibrary(libPath))
@@ -306,18 +324,21 @@ namespace Assimp.Unmanaged
                 evt(this, EventArgs.Empty);
         }
 
-        private void CreateRuntimeImplementation(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
+        private void CreateRuntimeImplementation(String defaultLibName, Type[] unmanagedFunctionDelegateTypes)
         {
-            switch(GetPlatform())
+            Platform platform = GetPlatform();
+            m_resolver = new UnmanagedLibraryResolver(platform);
+
+            switch(platform)
             {
                 case Platform.Windows:
-                    m_impl = new UnmanagedWindowsLibraryImplementation(default32BitName, default64BitName, unmanagedFunctionDelegateTypes);
+                    m_impl = new UnmanagedWindowsLibraryImplementation(defaultLibName, unmanagedFunctionDelegateTypes);
                     break;
-                case Platform.Unix:
-                    m_impl = new UnmanagedLinuxLibraryImplementation(default32BitName, default64BitName, unmanagedFunctionDelegateTypes);
+                case Platform.Linux:
+                    m_impl = new UnmanagedLinuxLibraryImplementation(defaultLibName, unmanagedFunctionDelegateTypes);
                     break;
                 case Platform.Mac:
-                    m_impl = new UnmanagedMacLibraryImplementation(default32BitName, default64BitName, unmanagedFunctionDelegateTypes);
+                    m_impl = new UnmanagedMacLibraryImplementation(defaultLibName, unmanagedFunctionDelegateTypes);
                     break;
                 default:
                     throw new PlatformNotSupportedException();
@@ -328,12 +349,12 @@ namespace Assimp.Unmanaged
 
         internal abstract class UnmanagedLibraryImplementation : IDisposable
         {
-            private String m_default32Path;
-            private String m_default64Path;
+            private String m_defaultLibName;
             private Type[] m_unmanagedFunctionDelegateTypes;
             private Dictionary<String, Delegate> m_nameToUnmanagedFunction;
             private IntPtr m_libraryHandle;
             private bool m_isDisposed;
+            private bool m_throwOnLoadFailure;
 
             public bool IsLibraryLoaded
             {
@@ -351,19 +372,23 @@ namespace Assimp.Unmanaged
                 }
             }
 
-            public String DefaultLibraryPath32Bit
+            public String DefaultLibraryName
             {
                 get
                 {
-                    return m_default32Path;
+                    return m_defaultLibName;
                 }
             }
 
-            public String DefaultLibraryPath64Bit
+            public bool ThrowOnLoadFailure
             {
                 get
                 {
-                    return m_default64Path;
+                    return m_throwOnLoadFailure;
+                }
+                set
+                {
+                    m_throwOnLoadFailure = value;
                 }
             }
 
@@ -371,22 +396,17 @@ namespace Assimp.Unmanaged
 
             public virtual String DllPrefix { get { return String.Empty; } }
 
-            public UnmanagedLibraryImplementation(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
+            public UnmanagedLibraryImplementation(String defaultLibName, Type[] unmanagedFunctionDelegateTypes)
             {
-                default32BitName = DllPrefix + Path.ChangeExtension(default32BitName, DllExtension);
-                default64BitName = DllPrefix + Path.ChangeExtension(default64BitName, DllExtension);
-
-                //Resolve paths, find TeximpNet.dll. Default path is in the same directory
-                String managedAssemblyPath = PlatformHelper.GetAppBaseDirectory();
-
-                m_default32Path = Path.Combine(managedAssemblyPath, default32BitName);
-                m_default64Path = Path.Combine(managedAssemblyPath, default64BitName);
+                m_defaultLibName = DllPrefix + Path.ChangeExtension(defaultLibName, DllExtension);
 
                 m_unmanagedFunctionDelegateTypes = unmanagedFunctionDelegateTypes;
 
                 m_nameToUnmanagedFunction = new Dictionary<String, Delegate>();
                 m_isDisposed = false;
                 m_libraryHandle = IntPtr.Zero;
+
+                m_throwOnLoadFailure = true;
             }
 
             ~UnmanagedLibraryImplementation()
@@ -516,8 +536,8 @@ namespace Assimp.Unmanaged
                 }
             }
 
-            public UnmanagedWindowsLibraryImplementation(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
-                : base(default32BitName, default64BitName, unmanagedFunctionDelegateTypes)
+            public UnmanagedWindowsLibraryImplementation(String defaultLibName, Type[] unmanagedFunctionDelegateTypes)
+                : base(defaultLibName, unmanagedFunctionDelegateTypes)
             {
             }
 
@@ -525,15 +545,15 @@ namespace Assimp.Unmanaged
             {
                 IntPtr libraryHandle = WinLoadLibrary(path);
 
-                if(libraryHandle == IntPtr.Zero)
+                if(libraryHandle == IntPtr.Zero && ThrowOnLoadFailure)
                 {
                     Exception innerException = null;
 
-                    //Some runtimes (e.g. Mono) throw a not supported/platform not supported exception when calling these functions, catch it so we can throw our exception
-                    //that will give a better error to the user
+                    //Keep the try-catch in case we're running on Mono. We're providing our own implementation of "Marshal.GetHRForLastWin32Error" which is NOT implemented
+                    //in mono, but let's just be cautious.
                     try
                     {
-                        int hr = Marshal.GetHRForLastWin32Error();
+                        int hr = GetHRForLastWin32Error();
                         innerException = Marshal.GetExceptionForHR(hr);
                     }
                     catch(Exception) { }
@@ -555,6 +575,18 @@ namespace Assimp.Unmanaged
             protected override void NativeFreeLibrary(IntPtr handle)
             {
                 FreeLibrary(handle);
+            }
+
+            private int GetHRForLastWin32Error()
+            {
+                //Mono, for some reason, throws in Marshal.GetHRForLastWin32Error(), but it should implement GetLastWin32Error, which is recommended than
+                //p/invoking it ourselves when SetLastError is set in DllImport
+                int dwLastError = Marshal.GetLastWin32Error();
+
+                if((dwLastError & 0x80000000) == 0x80000000)
+                    return dwLastError;
+                else
+                    return (dwLastError & 0x0000FFFF) | unchecked((int) 0x80070000);
             }
 
             #region Native Methods
@@ -594,8 +626,8 @@ namespace Assimp.Unmanaged
                 }
             }
 
-            public UnmanagedLinuxLibraryImplementation(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
-                : base(default32BitName, default64BitName, unmanagedFunctionDelegateTypes)
+            public UnmanagedLinuxLibraryImplementation(String defaultLibName, Type[] unmanagedFunctionDelegateTypes)
+                : base(defaultLibName, unmanagedFunctionDelegateTypes)
             {
             }
 
@@ -603,7 +635,7 @@ namespace Assimp.Unmanaged
             {
                 IntPtr libraryHandle = dlopen(path, RTLD_NOW);
 
-                if(libraryHandle == IntPtr.Zero)
+                if(libraryHandle == IntPtr.Zero &&  ThrowOnLoadFailure)
                 {
                     IntPtr errPtr = dlerror();
                     String msg = Marshal.PtrToStringAnsi(errPtr);
@@ -667,8 +699,8 @@ namespace Assimp.Unmanaged
                 }
             }
 
-            public UnmanagedMacLibraryImplementation(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
-                : base(default32BitName, default64BitName, unmanagedFunctionDelegateTypes)
+            public UnmanagedMacLibraryImplementation(String defaultLibName, Type[] unmanagedFunctionDelegateTypes)
+                : base(defaultLibName, unmanagedFunctionDelegateTypes)
             {
             }
 
@@ -676,7 +708,7 @@ namespace Assimp.Unmanaged
             {
                 IntPtr libraryHandle = dlopen(path, RTLD_NOW);
 
-                if(libraryHandle == IntPtr.Zero)
+                if(libraryHandle == IntPtr.Zero && ThrowOnLoadFailure)
                 {
                     IntPtr errPtr = dlerror();
                     String msg = Marshal.PtrToStringAnsi(errPtr);

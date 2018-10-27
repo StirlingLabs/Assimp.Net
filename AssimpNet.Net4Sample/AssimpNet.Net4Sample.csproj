@@ -65,5 +65,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(ProjectDir)..\AssimpNet\bin\$(Configuration)\build\AssimpNet.targets" />
+  <Import Project="$(ProjectDir)..\AssimpNet\bin\$(Configuration)\nuget\build\AssimpNet.targets" />
 </Project>

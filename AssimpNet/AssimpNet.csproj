@@ -10,7 +10,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Nicholas Woodfield</Authors>
     <Company />
-    <Version>4.1.0</Version>
+    <Version>4.1.0-rc3</Version>
     <PackageLicenseUrl>http://opensource.org/licenses/mit-license.php</PackageLicenseUrl>
     <Copyright>Copyright © 2012-2018 Nicholas Woodfield</Copyright>
     <PackageIconUrl>https://bytebucket.org/Starnick/assimpnet/raw/18e2bc4dbf261221bac39741247287c4f5f373bb/logo.png</PackageIconUrl>
@@ -29,14 +29,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\ChangeLog.txt" Link="build\ChangeLog.txt" PackagePath="" />
-    <Content Include="..\License.txt" Link="build\License.txt" PackagePath="" />
-    <Content Include="..\Docs\AssimpNet Documentation %28October 2018%29.chm" Link="build\AssimpNet Documentation %28October 2018%29.chm" PackagePath="" />
-    <Content Include="..\libs\Assimp\win-x64\Assimp64.dll" Link="build\native\win-x64\Assimp64.dll" PackagePath="build\native\win-x64\" />
-    <Content Include="..\libs\Assimp\win-x86\Assimp32.dll" Link="build\native\win-x86\Assimp32.dll" PackagePath="build\native\win-x86\" />
-    <Content Include="..\libs\Assimp\linux-x64\libAssimp64.so" Link="build\native\linux-x64\libAssimp64.so" PackagePath="build\native\linux-x64\" />
-    <Content Include="..\libs\Assimp\osx-x64\libAssimp64.dylib" Link="build\native\osx-x64\libAssimp64.dylib" PackagePath="build\native\osx-x64\" />
-    <Content Include="AssimpNet.targets" PackagePath="build\" />
+    <Content Include="..\ChangeLog.txt" Link="nuget\ChangeLog.txt" PackagePath="" />
+    <Content Include="..\License.txt" Link="nuget\License.txt" PackagePath="" />
+    <Content Include="..\Docs\AssimpNet Documentation %28October 2018%29.chm" Link="nuget\AssimpNet Documentation %28October 2018%29.chm" PackagePath="" />
+    <Content Include="..\libs\Assimp\win-x64\assimp.dll" Link="nuget\runtimes\win-x64\native\assimp.dll" PackagePath="runtimes\win-x64\native\" />
+    <Content Include="..\libs\Assimp\win-x86\assimp.dll" Link="nuget\runtimes\win-x86\native\assimp.dll" PackagePath="runtimes\win-x86\native\" />
+    <Content Include="..\libs\Assimp\linux-x64\libassimp.so" Link="nuget\runtimes\linux-x64\native\libassimp.so" PackagePath="runtimes\linux-x64\native\" />
+    <Content Include="..\libs\Assimp\osx-x64\libassimp.dylib" Link="nuget\runtimes\osx-x64\native\libassimp.dylib" PackagePath="runtimes\osx-x64\native\" />
+    <Content Include="AssimpNet.targets" Link="nuget\build\AssimpNet.targets" PackagePath="build\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,7 +48,7 @@
   <!-- Copy targets and native files to a build folder so unit tests can access it (overall will setup a mock nuget folder structure)  -->
   <Target Name="CopyBuildFiles" AfterTargets="AfterBuild">
     <Copy SourceFiles="%(Content.Identity)" DestinationFiles="bin\$(Configuration)\%(Content.Link)" SkipUnchangedFiles="true" Condition="'%(Content.Link)' != ''" />
-    <Copy SourceFiles="AssimpNet.targets" DestinationFolder="bin\$(Configuration)\build" SkipUnchangedFiles="true" />
+   <!-- <Copy SourceFiles="AssimpNet.targets" DestinationFolder="bin\$(Configuration)\build\$(TargetFramework)" SkipUnchangedFiles="true" /> -->
   </Target>
 
 </Project>

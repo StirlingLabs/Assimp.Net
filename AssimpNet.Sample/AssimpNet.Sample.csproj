@@ -10,6 +10,7 @@
     <ShaderOutputPath>$(BaseIntermediateOutputPath)</ShaderOutputPath>
     <ShaderContentIncludePath>Shaders</ShaderContentIncludePath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ForceCopyNativeAssimp>true</ForceCopyNativeAssimp>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,8 +35,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Import Project="$(ProjectDir)..\AssimpNet\bin\$(Configuration)\build\AssimpNet.targets" />
+  
+  <Import Project="$(ProjectDir)..\AssimpNet\bin\$(Configuration)\nuget\build\AssimpNet.targets" />
 
   <Target Name="IncludeGeneratedShaderEmbeddedResource" AfterTargets="AssignTargetPaths" Condition="'$(ShaderContentIncludePath)' != ''">
     <ItemGroup>

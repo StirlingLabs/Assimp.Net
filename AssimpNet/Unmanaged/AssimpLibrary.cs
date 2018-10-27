@@ -21,9 +21,7 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Assimp.Unmanaged
@@ -37,14 +35,9 @@ namespace Assimp.Unmanaged
         private static readonly Object s_sync = new Object();
 
         /// <summary>
-        /// Default name of the 32-bit unmanaged library. Based on runtime implementation the prefix ("lib" on non-windows) and extension (.dll, .so, .dylib) will be appended automatically.
+        /// Default name of the unmanaged library. Based on runtime implementation the prefix ("lib" on non-windows) and extension (.dll, .so, .dylib) will be appended automatically.
         /// </summary>
-        private const String Default32BitName = "Assimp32";
-
-        /// <summary>
-        /// Default name of the 64-bit unmanaged library. Based on runtime implementation the prefix ("lib" on non-windows) and extension (.dll, .so, .dylib) will be appended automatically.
-        /// </summary>
-        private const String Default64BitName = "Assimp64";
+        private const String DefaultLibName = "assimp";
 
         private static AssimpLibrary s_instance;
 
@@ -79,12 +72,12 @@ namespace Assimp.Unmanaged
             }
         }
 
-        private AssimpLibrary(String default32BitName, String default64BitName, Type[] unmanagedFunctionDelegateTypes)
-            : base(default32BitName, default64BitName, unmanagedFunctionDelegateTypes) { }
+        private AssimpLibrary(String defaultLibName, Type[] unmanagedFunctionDelegateTypes)
+            : base(defaultLibName, unmanagedFunctionDelegateTypes) { }
 
         private static AssimpLibrary CreateInstance()
         {
-            return new AssimpLibrary(Default32BitName, Default64BitName, PlatformHelper.GetNestedTypes(typeof(Functions)));
+            return new AssimpLibrary(DefaultLibName, PlatformHelper.GetNestedTypes(typeof(Functions)));
         }
 
         #region Import Methods
