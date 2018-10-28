@@ -191,8 +191,8 @@ namespace Assimp.Unmanaged
                 return libName;
 
             //Pick fallbacks and proving paths
-            String[] fallbackNames = (UnmanagedLibrary.Is64Bit) ? m_64BitLibNames : m_32BitLibNames;
-            String[] probingPaths = (UnmanagedLibrary.Is64Bit) ? m_32BitProbingPaths : m_64BitProbingPaths;
+            String[] fallbackNames = (is64Bit) ? m_64BitLibNames : m_32BitLibNames;
+            String[] probingPaths = (is64Bit) ? m_64BitProbingPaths : m_32BitProbingPaths;
             String rid = GetRuntimeIdentifier();
 
             return ResolveLibraryPathInternal(libName, rid, fallbackNames, probingPaths);
