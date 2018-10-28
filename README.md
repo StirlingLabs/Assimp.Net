@@ -21,13 +21,36 @@ The library is split between two parts, a low level and a high level. The intent
 * Marshaling to and from managed memory handled automatically, all you need to worry about is processing your data.
 * Located in the *Assimp* namespace.
 
+## Supported Frameworks ##
+
+The library runs on both **.NET Core** and **.NET Framework**, targeting specifically:
+
+* **.NET Standard 1.3**
+* **.NET Framework 4.0**
+* **.NET Framework 3.5**
+
+This means the NuGet package is compatible with a **wide range** of applications. When targeting .NET Framework, the package has a MSBuild targets file to copy native dependencies to your application output folder. For .NET Core applications,
+the native dependencies are resolved by the deps.json dependency graph automatically.
+
+The library can be compiled on any platform that supports  the DotNet CLI build tools or Visual Studio 2017. There is one **build-time only** dependency, an IL Patcher also distributed as a cross-platform NuGet package. The patcher requires .NET Core 2.0+ or .NET Framework 4.7+ to be installed on your machine to build.
+
 ## Supported Platforms ##
 
-AssimpNet officially targets the **.NET Standard 1.3** and supplies binaries for **32/64 bit Windows** and **64 bit Linux (tested on ubuntu)**. The library is able to support **MacOS** but native binaries are not yet bundled with the official NuGet package. To use the library on your
-preferred platform, you may have to build and supply the native binaries yourself.
+The NuGet package supports the following Operating Systems and Architectures out of the box (located in the *runtimes* folder):
 
-Additionally, the NuGet package has targets for **.NET Framework 4.x** and **.NET Framework 3.5** should you need them. It was compiled with Visual Studio 2017, but it has been compiled on Ubuntu using the DotNet CLI. There is one **build-time only** dependency, an IL Patcher also distributed as a cross-platform NuGet package. As long as you're
-able to build with Visual Studio or the DotNet CLI, the library *should* compile without issue on any platform.
+* **Windows** 
+	* x86, x64
+* **Linux**
+	* x64 (Tested Ubuntu 18.04 Bionic Beaver)
+* **MacOS**
+	* x64 (Tested MacOS 10.13 High Sierra)
+
+You may have to build and provide your own native binaries for a target platform that is not listed. If the library does not support a platform you are targeting, please let us know or contribute an implementation! The logic to dynmically load the native library is abstracted, so new implementations can easily be added.
+
+## Unity Users ##
+
+With the release of version 4.1.0, a Unity plugin replicating the NuGet package is outputted to the build folder. You can simply drag and drop the contents into your Unity project, or search the asset store for "AssimpNet Unity Plugin". The plugin utilizes a
+runtime initiliazation script to ensure the native dependencies are loaded when running in editor or standalone.
 
 ## Licensing ##
 
