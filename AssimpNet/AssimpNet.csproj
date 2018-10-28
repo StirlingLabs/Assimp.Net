@@ -45,6 +45,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Copies Unity plugin files into a folder with Release build DLLs which can be drag n dropped into a unity project -->
+  <Import Project="..\UnityPlugin\UnityPlugin.targets" />
+
   <!-- Copy targets and native files to a build folder so unit tests can access it (overall will setup a mock nuget folder structure)  -->
   <Target Name="CopyBuildFiles" AfterTargets="AfterBuild">
     <Copy SourceFiles="%(Content.Identity)" DestinationFiles="bin\$(Configuration)\%(Content.Link)" SkipUnchangedFiles="true" Condition="'%(Content.Link)' != ''" />
