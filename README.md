@@ -38,11 +38,11 @@ The library can be compiled on any platform that supports  the DotNet CLI build 
 The NuGet package supports the following Operating Systems and Architectures out of the box (located in the *runtimes* folder):
 
 * **Windows** 
-	* x86, x64
+	* x86, x64 (Tested on Windows 10)
 * **Linux**
-	* x64 (Tested Ubuntu 18.04 Bionic Beaver)
+	* x64 (Tested on Ubuntu 18.04 Bionic Beaver)
 * **MacOS**
-	* x64 (Tested MacOS 10.13 High Sierra)
+	* x64 (Tested on MacOS 10.13 High Sierra)
 
 You may have to build and provide your own native binaries for a target platform that is not listed. If the library does not support a platform you are targeting, please let us know or contribute an implementation! The logic to dynmically load the native library is abstracted, so new platform implementations can easily be added.
 
