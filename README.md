@@ -5,7 +5,7 @@
 ## Introduction ##
 This is the official repository for **AssimpNet**, the cross-platform .NET wrapper for the Open Asset Import Library (otherwise known as [Assimp](https://github.com/assimp/assimp)), which is a 3D model import-export library. The primary motivation is for this library to power (offline) content pipelines to import and process 3D models into your game engine's internal format, although the wrapper can be used at runtime to enable your users to import custom content. Please see the Assimp website for a full list of supported formats and features. Each version of the managed wrapper tries to maintain parity with the features off the native version.
 
-P/Invoke is used to communicate with the C-API of the native library. The managed assembly is compiled as **AnyCpu** and the native DLLs are loaded dynamically for either 32 or 64 bit applications.
+P/Invoke is used to communicate with the C-API of the native library. The managed assembly is compiled as **AnyCpu** and the native binaries are loaded dynamically for either 32 or 64 bit applications.
 
 The library is split between two parts, a low level and a high level. The intent is to give as much freedom as possible to the developer to work with the native library from managed code.
 
@@ -29,13 +29,13 @@ The library runs on both **.NET Core** and **.NET Framework**, targeting specifi
 * **.NET Framework 4.0**
 * **.NET Framework 3.5**
 
-This means the NuGet package is compatible with a **wide range** of applications. When targeting .NET Framework, the package uses a MSBuild targets file to copy native dependencies to your application output folder. For .NET Core applications, the native dependencies are resolved by the *deps.json* dependency graph automatically.
+This means the NuGet package is compatible with a **wide range** of applications. When targeting .NET Framework, the package uses a MSBuild targets file to copy native binaries to your application output folder. For .NET Core applications, the native binaries are resolved by the *deps.json* dependency graph automatically.
 
 The library can be compiled on any platform that supports  the DotNet CLI build tools or Visual Studio 2017. There is one **build-time only** dependency, an IL Patcher also distributed as a cross-platform NuGet package. The patcher requires .NET Core 2.0+ or .NET Framework 4.7+ to be installed on your machine to build.
 
 ## Supported Platforms ##
 
-The NuGet package supports the following Operating Systems and Architectures out of the box (located in the *runtimes* folder):
+The NuGet package supports the following Operating Systems and Architectures out of the box (located in the *runtimes* folder, under [RID](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog)-specific folders):
 
 * **Windows** 
 	* x86, x64 (Tested on Windows 10)
@@ -49,7 +49,7 @@ You may have to build and provide your own native binaries for a target platform
 ## Unity Users ##
 
 With the release of version 4.1.0, a Unity plugin replicating the NuGet package is outputted to the build folder. You can simply drag and drop the contents into your Unity project, or search the asset store for "**AssimpNet Unity Plugin**". The plugin utilizes a
-runtime initiliazation script to ensure the native dependencies are loaded when running in editor or standalone.
+runtime initiliazation script to ensure the native binaries are loaded when running in editor or standalone.
 
 ## Licensing ##
 
