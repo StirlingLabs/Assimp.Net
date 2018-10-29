@@ -44,7 +44,7 @@ The NuGet package supports the following Operating Systems and Architectures out
 * **MacOS**
 	* x64 (Tested on MacOS 10.13 High Sierra)
 
-You may have to build and provide your own native binaries for a target platform that is not listed. If the library does not support a platform you are targeting, please let us know or contribute an implementation! The logic to dynmically load the native library is abstracted, so new platform implementations can easily be added.
+You may have to build and provide your own native binaries for a target platform that is not listed. If the library does not support a platform you are targeting, please let us know or contribute an implementation! The logic to dynamically load the native library is abstracted, so new platform implementations can easily be added.
 
 ## Unity Users ##
 
