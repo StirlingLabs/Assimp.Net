@@ -278,7 +278,7 @@ namespace Assimp.Sample
             SN.Matrix4x4 trafo;
             Helper.ToNumerics(parent.Transform, out trafo);
 
-            SN.Matrix4x4 world = rootTransform * trafo;
+            SN.Matrix4x4 world = trafo * rootTransform;
 
             foreach(int meshIndex in parent.MeshIndices)
                 m_meshesToDraw.Add(new MeshDrawCall(meshIndex, world));
@@ -369,7 +369,7 @@ namespace Assimp.Sample
             for(int i = 0; i < m_meshesToDraw.Count; i++)
             {
                 MeshDrawCall mesh = m_meshesToDraw[i];
-                mesh.World = scaleMatrix * mesh.World;
+                mesh.World = mesh.World * scaleMatrix;
                 m_meshesToDraw[i] = mesh;
             }
 
