@@ -48,7 +48,7 @@ You may have to build and provide your own native binaries for a target platform
 
 ## Unity Users ##
 
-With the release of version 4.1.0, a Unity plugin replicating the NuGet package is outputted to the build folder. You can simply drag and drop the contents into your Unity project, or search the asset store for "**AssimpNet Unity Plugin**". The plugin utilizes a
+With the release of version 4.1.0, a Unity plugin replicating the NuGet package is outputted to the build folder. You can simply drag and drop the contents into your Unity project. The plugin utilizes a
 runtime initiliazation script to ensure the native binaries are loaded when running in editor or standalone.
 
 ## Licensing ##
