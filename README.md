@@ -31,7 +31,7 @@ The library runs on both **.NET Core** and **.NET Framework**, targeting specifi
 
 This means the NuGet package is compatible with a **wide range** of applications. When targeting .NET Framework, the package uses a MSBuild targets file to copy native binaries to your application output folder. For .NET Core applications, the native binaries are resolved by the *deps.json* dependency graph automatically.
 
-The library can be compiled on any platform that supports  the DotNet CLI build tools or Visual Studio 2017. There is one **build-time only** dependency, an IL Patcher also distributed as a cross-platform NuGet package. The patcher requires .NET Core 2.0+ or .NET Framework 4.7+ to be installed on your machine to build.
+The library can be compiled on any platform that supports  the DotNet CLI build tools or Visual Studio 2017. There is a single **build-time only** dependency, an IL Patcher also distributed as a cross-platform NuGet package. The patcher requires .NET Core 2.0+ or .NET Framework 4.7+ to be installed on your machine to build.
 
 ## Supported Platforms ##
 
