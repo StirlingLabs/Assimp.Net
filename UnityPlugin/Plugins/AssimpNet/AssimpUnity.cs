@@ -98,6 +98,12 @@ namespace Assimp
                 case RuntimePlatform.OSXEditor:
                     native64LibPath = Path.Combine(editorPluginNativeFolder, "osx", "x86_64");
                     native32LibPath = Path.Combine(editorPluginNativeFolder, "osx", "x86");
+                    
+                    //In order to get unity to accept the dylib, had to rename it as *.bundle. Set an override name so we try and load that file. Seems to load
+                    //fine.
+                    string bundlelibName = Path.ChangeExtension(libInstance.DefaultLibraryName, ".bundle");
+                    override64LibName = bundlelibName;
+                    override32LibName = bundlelibName;
                     break;
                 case RuntimePlatform.OSXPlayer:
                     native64LibPath = pluginsFolder;
