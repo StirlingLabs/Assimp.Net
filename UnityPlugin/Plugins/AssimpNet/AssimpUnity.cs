@@ -78,42 +78,54 @@ namespace Assimp
             switch(Application.platform)
             {
                 case RuntimePlatform.WindowsEditor:
-                    native64LibPath = Path.Combine(editorPluginNativeFolder, "win", "x86_64");
-                    native32LibPath = Path.Combine(editorPluginNativeFolder, "win", "x86");
+                    {
+                        native64LibPath = Path.Combine(editorPluginNativeFolder, "win", "x86_64");
+                        native32LibPath = Path.Combine(editorPluginNativeFolder, "win", "x86");
+                    }
                     break;
                 case RuntimePlatform.WindowsPlayer:
-                    //Seems like windows they are not added to any specific folder, just dropped inside Plugins folder
-                    native64LibPath = pluginsFolder;
-                    native32LibPath = pluginsFolder;
+                    {
+                        //Seems like windows they are not added to any specific folder, just dropped inside Plugins folder
+                        native64LibPath = pluginsFolder;
+                        native32LibPath = pluginsFolder;
+                    }
                     break;
                 case RuntimePlatform.LinuxEditor:
-                    native64LibPath = Path.Combine(editorPluginNativeFolder, "linux", "x86_64");
-                    native32LibPath = Path.Combine(editorPluginNativeFolder, "linux", "x86");
+                    {
+                        native64LibPath = Path.Combine(editorPluginNativeFolder, "linux", "x86_64");
+                        native32LibPath = Path.Combine(editorPluginNativeFolder, "linux", "x86");
+                    }
                     break;
                 case RuntimePlatform.LinuxPlayer:
-                    //Linux standalone creates subfolders presumably since it allows "universal" types
-                    native64LibPath = Path.Combine(pluginsFolder, "x86_64");
-                    native32LibPath = Path.Combine(pluginsFolder, "x86");
+                    {
+                        //Linux standalone creates subfolders presumably since it allows "universal" types
+                        native64LibPath = Path.Combine(pluginsFolder, "x86_64");
+                        native32LibPath = Path.Combine(pluginsFolder, "x86");
+                    }
                     break;
                 case RuntimePlatform.OSXEditor:
-                    native64LibPath = Path.Combine(editorPluginNativeFolder, "osx", "x86_64");
-                    native32LibPath = Path.Combine(editorPluginNativeFolder, "osx", "x86");
-                    
-                    //In order to get unity to accept the dylib, had to rename it as *.bundle. Set an override name so we try and load that file. Seems to load
-                    //fine.
-                    string bundlelibName = Path.ChangeExtension(libInstance.DefaultLibraryName, ".bundle");
-                    override64LibName = bundlelibName;
-                    override32LibName = bundlelibName;
+                    {
+                        native64LibPath = Path.Combine(editorPluginNativeFolder, "osx", "x86_64");
+                        native32LibPath = Path.Combine(editorPluginNativeFolder, "osx", "x86");
+
+                        //In order to get unity to accept the dylib, had to rename it as *.bundle. Set an override name so we try and load that file. Seems to load
+                        //fine.
+                        string bundlelibName = Path.ChangeExtension(libInstance.DefaultLibraryName, ".bundle");
+                        override64LibName = bundlelibName;
+                        override32LibName = bundlelibName;
+                    }
                     break;
                 case RuntimePlatform.OSXPlayer:
-                    native64LibPath = pluginsFolder;
-                    native32LibPath = pluginsFolder;
+                    {
+                        native64LibPath = pluginsFolder;
+                        native32LibPath = pluginsFolder;
 
-                    //In order to get unity to accept the dylib, had to rename it as *.bundle. Set an override name so we try and load that file. Seems to load
-                    //fine.
-                    string bundlelibName = Path.ChangeExtension(libInstance.DefaultLibraryName, ".bundle");
-                    override64LibName = bundlelibName;
-                    override32LibName = bundlelibName;
+                        //In order to get unity to accept the dylib, had to rename it as *.bundle. Set an override name so we try and load that file. Seems to load
+                        //fine.
+                        string bundlelibName = Path.ChangeExtension(libInstance.DefaultLibraryName, ".bundle");
+                        override64LibName = bundlelibName;
+                        override32LibName = bundlelibName;
+                    }
                     break;
                 //TODO: Add more platforms if you have binaries that can run on it
             }
