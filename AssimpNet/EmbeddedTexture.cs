@@ -198,7 +198,7 @@ namespace Assimp
             m_height = height;
             m_nonCompressedData = uncompressedData;
 
-            if((m_width * m_height) == NonCompressedDataSize)
+            if((m_width * m_height) != NonCompressedDataSize)
                 throw new ArgumentException("Texel data size does not match width * height.");
 
             m_isCompressed = false;
