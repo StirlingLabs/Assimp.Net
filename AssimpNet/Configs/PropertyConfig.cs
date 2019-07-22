@@ -2096,16 +2096,16 @@ namespace Assimp.Configs
     /// <summary>
     /// Specifies if the FBX importer should search for embedded loaded textures, where no embedded texture data is provided. Default is false.
     /// </summary>
-    public sealed class FBXImportSearchEmbeddedTexturesConfig : BooleanPropertyConfig
+    public sealed class FBXImportEmbeddedTexturesLegacyNamingConfig : BooleanPropertyConfig
     {
         /// <summary>
         /// Gets the string name used by FBXImportSearchEmbeddedTexturesConfig.
         /// </summary>
-        public static String FBXImportSearchEmbeddedTexturesConfigName
+        public static String FBXImportEmbeddedTexturesLegacyNamingConfigName
         {
             get
             {
-                return AiConfigs.AI_CONFIG_IMPORT_FBX_SEARCH_EMBEDDED_TEXTURES;
+                return AiConfigs.AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING;
             }
         }
 
@@ -2113,8 +2113,8 @@ namespace Assimp.Configs
         /// Constructs a new FBXImportSearchEmbeddedTexturesConfig.
         /// </summary>
         /// <param name="searchEmbeddedTextures">True if the FBX importer should search for embedded loaded textures, where no embedded texture data is provided.</param>
-        public FBXImportSearchEmbeddedTexturesConfig(bool searchEmbeddedTextures)
-            : base(FBXImportSearchEmbeddedTexturesConfigName, searchEmbeddedTextures, false) { }
+        public FBXImportEmbeddedTexturesLegacyNamingConfig(bool searchEmbeddedTextures)
+            : base(FBXImportEmbeddedTexturesLegacyNamingConfigName, searchEmbeddedTextures, false) { }
     }
 
     /// <summary>

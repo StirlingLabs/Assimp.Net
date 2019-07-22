@@ -35,6 +35,8 @@ namespace Assimp
     /// </summary>
     public sealed class EmbeddedTexture : IMarshalable<EmbeddedTexture, AiTexture>
     {
+        private String m_filename;
+        
         private bool m_isCompressed;
 
         //Uncompressed textures only
@@ -45,6 +47,12 @@ namespace Assimp
         //Compressed textures only
         private byte[] m_compressedData;
         private String m_compressedFormatHint;
+
+        public string Filename
+        {
+            get => m_filename;
+            set => m_filename = value;
+        }
 
         /// <summary>
         /// Gets if the texture is compressed or not.
@@ -220,6 +228,8 @@ namespace Assimp
         /// <param name="nativeValue">Output native value</param>
         void IMarshalable<EmbeddedTexture, AiTexture>.ToNative(IntPtr thisPtr, out AiTexture nativeValue)
         {
+            nativeValue.Filename = new AiString(m_filename);
+            
             if(IsCompressed)
             {
                 nativeValue.Width = (uint) CompressedDataSize;
@@ -250,6 +260,7 @@ namespace Assimp
         /// <param name="nativeValue">Input native value</param>
         void IMarshalable<EmbeddedTexture, AiTexture>.FromNative(in AiTexture nativeValue)
         {
+            m_filename = AiString.GetString(nativeValue.Filename); //Avoid struct copy;
             m_isCompressed = nativeValue.Height == 0;
 
             if(IsCompressed)

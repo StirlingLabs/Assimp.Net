@@ -41,6 +41,7 @@ namespace Assimp
         private List<EmbeddedTexture> m_textures;
         private List<Animation> m_animations;
         private List<Material> m_materials;
+        private Metadata m_metadata;
 
         /// <summary>
         /// Gets or sets the state of the imported scene. By default no flags are set, but
@@ -276,6 +277,12 @@ namespace Assimp
             }
         }
 
+        public Metadata Metadata
+        {
+            get => m_metadata;
+            set => m_metadata = value;
+        }
+
         /// <summary>
         /// Constructs a new instance of the <see cref="Scene"/> class.
         /// </summary>
@@ -367,6 +374,7 @@ namespace Assimp
             nativeValue.Cameras = IntPtr.Zero;
             nativeValue.Textures = IntPtr.Zero;
             nativeValue.Animations = IntPtr.Zero;
+            nativeValue.Metadata = IntPtr.Zero;
             nativeValue.PrivateData = IntPtr.Zero;
 
             nativeValue.NumMaterials = (uint) MaterialCount;
@@ -403,6 +411,9 @@ namespace Assimp
             //Write animations
             if(nativeValue.NumAnimations > 0)
                 nativeValue.Animations = MemoryHelper.ToNativeArray<Animation, AiAnimation>(m_animations.ToArray(), true);
+            
+            if(m_metadata != null)
+                nativeValue.Metadata = MemoryHelper.ToNativePointer<Metadata, AiMetadata>(m_metadata);
         }
 
         /// <summary>
@@ -442,6 +453,9 @@ namespace Assimp
             //Read animations
             if(nativeValue.NumAnimations > 0 && nativeValue.Animations != IntPtr.Zero)
                 m_animations.AddRange(MemoryHelper.FromNativeArray<Animation, AiAnimation>(nativeValue.Animations, (int) nativeValue.NumAnimations, true));
+            
+            if(nativeValue.Metadata != IntPtr.Zero)
+                m_metadata = MemoryHelper.FromNativePointer<Metadata, AiMetadata>(nativeValue.Metadata);
         }
 
 
@@ -478,6 +492,9 @@ namespace Assimp
             if(aiScene.NumAnimations > 0 && aiScene.Animations != IntPtr.Zero)
                 MemoryHelper.FreeNativeArray<AiAnimation>(aiScene.Animations, (int) aiScene.NumAnimations, Animation.FreeNative, true);
 
+            if(aiScene.Metadata != IntPtr.Zero)
+                Metadata.FreeNative(aiScene.Metadata, true);
+            
             if(freeNative)
                 MemoryHelper.FreeMemory(nativeValue);
         }

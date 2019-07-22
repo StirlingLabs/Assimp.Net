@@ -102,6 +102,15 @@ namespace Assimp.Unmanaged
         /// aiCamera**, cameras in the scene.
         /// </summary>
         public IntPtr Cameras;
+        
+        /// <summary>
+        /// aiMetadata*, The global metadata assigned to the scene itself.
+        /// 
+        /// This data contains global metadata which belongs to the scene like 
+        /// unit-conversions, versions, vendors or other model-specific data. This 
+        /// can be used to store format-specific metadata as well.
+        /// </summary>
+        public IntPtr Metadata;
 
         /// <summary>
         /// void*, Private data do not touch!
@@ -328,6 +337,11 @@ namespace Assimp.Unmanaged
         /// aiTexel*, array of texel data.
         /// </summary>
         public IntPtr Data;
+        
+        /// <summary>
+        /// Texture original filename.
+        /// </summary>
+        public AiString Filename;
 
         /// <summary>
         /// Sets the format hint.
@@ -995,6 +1009,11 @@ namespace Assimp.Unmanaged
     [CLSCompliant(false)]
     public struct AiAnimMesh
     {
+        /// <summary>
+        /// Anim Mesh name 
+        /// </summary>
+        public AiString Name;
+        
         /// <summary>
         /// aiVector3D*, replacement position array.
         /// </summary>

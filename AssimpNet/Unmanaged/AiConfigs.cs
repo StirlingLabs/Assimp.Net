@@ -238,7 +238,7 @@ namespace Assimp.Unmanaged
         /// Source UV channel for tangent space computation. The specified channel must exist or an error will be raised.
         /// <para>Type: integer. Default: 0</para>
         /// </summary>
-        public const String AI_CONFIG_PP_CT_TEXTURE_CHANNEL_INDEX = "AI_CONFIG_PP_CT_TEXTURE_CHANNEL_INDEX";
+        public const String AI_CONFIG_PP_CT_TEXTURE_CHANNEL_INDEX = "PP_CT_TEXTURE_CHANNEL_INDEX";
 
         /// <summary>
         /// Threshold used to determine if a bone is kept or removed during the <see cref="PostProcessSteps.Debone"/> step.
@@ -519,10 +519,10 @@ namespace Assimp.Unmanaged
         public const String AI_CONFIG_IMPORT_FBX_READ_TEXTURES = "IMPORT_FBX_READ_TEXTURES";
 
         /// <summary>
-        /// Specifies whether the FBX importer will search for embedded loaded textures, where no embedded texture data is provided.
+        /// Specifies whether the fbx importer will use the legacy embedded texture naming.
         /// <para>Type: Bool. Default: false.</para>
         /// </summary>
-        public const String AI_CONFIG_IMPORT_FBX_SEARCH_EMBEDDED_TEXTURES = "IMPORT_FBX_SEARCH_EMBEDDED_TEXTURES";
+        public const String AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING = "AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING";
 
         /// <summary>
         /// Specifies whether the FBX importer will read cameras.
@@ -564,6 +564,22 @@ namespace Assimp.Unmanaged
         /// </summary>
         public const String AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES = "IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES";
 
+        /// <summary>
+        /// Smd load multiple animations
+        /// <para>Type: Bool. Default: true.</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_SMD_LOAD_ANIMATION_LIST = "IMPORT_SMD_LOAD_ANIMATION_LIST";
+        
+        /// <summary>
+        /// Specifies whether the Collada loader should use Collada names as node names.
+        /// 
+        /// If this property is set to true, the Collada names will be used as the
+        /// node name. The default is to use the id tag (resp. sid tag, if no id tag is present)
+        /// instead.
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES = "IMPORT_COLLADA_USE_COLLADA_NAMES";
+
         #endregion
 
         #region Exporter Settings
@@ -573,6 +589,8 @@ namespace Assimp.Unmanaged
         /// <para>Type: Bool. Default: false.</para>
         /// </summary>
         public const String AI_CONFIG_EXPORT_XFILE_64BIT = "EXPORT_XFILE_64BIT";
+        
+        public const String AI_CONFIG_EXPORT_POINT_CLOUDS = "EXPORT_POINT_CLOUDS";
 
         #endregion
     }

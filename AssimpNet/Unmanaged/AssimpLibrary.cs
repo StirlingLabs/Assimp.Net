@@ -997,6 +997,24 @@ namespace Assimp.Unmanaged
         }
 
         /// <summary>
+        /// Returns the branchname of the Assimp runtime.
+        /// </summary>
+        /// <returns>The current branch name.</returns>
+        public String GetBranchName()
+        {
+            LoadIfNotLoaded();
+
+            Functions.aiGetBranchName func = GetFunction<Functions.aiGetBranchName>(FunctionNames.aiGetBranchName);
+
+            IntPtr ptr = func();
+
+            if(ptr == IntPtr.Zero)
+                return String.Empty;
+
+            return Marshal.PtrToStringAnsi(ptr);
+        }
+
+        /// <summary>
         /// Gets the native Assimp DLL's current version number as "major.minor.revision" string. This is the
         /// version of Assimp that this wrapper is currently using.
         /// </summary>
@@ -1132,6 +1150,7 @@ namespace Assimp.Unmanaged
             public const String aiGetVersionMajor = "aiGetVersionMajor";
             public const String aiGetVersionRevision = "aiGetVersionRevision";
             public const String aiGetCompileFlags = "aiGetCompileFlags";
+            public const String aiGetBranchName = "aiGetBranchName";
 
             #endregion
         }
@@ -1332,6 +1351,9 @@ namespace Assimp.Unmanaged
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetVersionRevision)]
             public delegate uint aiGetVersionRevision();
+            
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetBranchName)]
+            public delegate IntPtr aiGetBranchName();
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), UnmanagedFunctionName(FunctionNames.aiGetCompileFlags)]
             public delegate uint aiGetCompileFlags();
