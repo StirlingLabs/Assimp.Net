@@ -211,6 +211,14 @@ namespace Assimp.Unmanaged
         public const String AI_CONFIG_PP_FID_ANIM_ACCURACY = "PP_FID_ANIM_ACCURACY";
 
         /// <summary>
+        /// Input parameter to the <see cref="PostProcessSteps.FindInvalidData"/> step. Set to true to
+        /// ignore texture coordinates. This may be useful if you have to assign different kinds of textures,
+        /// like seasonally variable ones - one for summer and one for winter.
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
+        public const String AI_CONFIG_PP_FID_IGNORE_TEXTURECOORDS = "PP_FID_IGNORE_TEXTURECOORDS";
+
+        /// <summary>
         /// Input parameter to the <see cref="PostProcessSteps.TransformUVCoords"/> step.
         /// It specifies which UV transformations are to be evaluated.
         /// <para>This is bitwise combination of the <see cref="UVTransformFlags"/> flag.</para>
@@ -272,6 +280,12 @@ namespace Assimp.Unmanaged
         /// <para>Type: Float. Default: 1.0f.</para>
         /// </summary>
         public const String AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY = "GLOBAL_SCALE_FACTOR";
+
+        /// <summary>
+        /// Applies application-specific scale to the global scale factor to allow for backwards compatibility.
+        /// <para>Type: Float. Default: 1.0f.</para>
+        /// </summary>
+        public const String AI_CONFIG_APP_SCALE_KEY = "APP_SCALE_FACTOR";
 
         #endregion
 
@@ -494,6 +508,14 @@ namespace Assimp.Unmanaged
         public const String AI_CONFIG_IMPORT_COLLADA_IGNORE_UP_DIRECTION = "IMPORT_COLLADA_IGNORE_UP_DIRECTION";
 
         /// <summary>
+        /// Specifies whether the Collada loader should use Collada names as node names.
+        /// If this property is set to true, the Collada names will be used as the
+        /// node name. The default is to use the id tag (resp. sid tag, if no id tag is present) instead.
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
+        public const String AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES = "IMPORT_COLLADA_USE_COLLADA_NAMES";
+
+        /// <summary>
         /// Specifies whether the FBX importer will merge all geometry layers present in the source file or take only the first.
         /// <para>Type: bool. Default: true.</para>
         /// </summary>
@@ -565,20 +587,23 @@ namespace Assimp.Unmanaged
         public const String AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES = "IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES";
 
         /// <summary>
-        /// Smd load multiple animations
+        /// Specifies whether the importer shall convert the unit from centimeter (cm) to meter (m).
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
+        public const String AI_CONFIG_FBX_CONVERT_TO_M = "AI_CONFIG_FBX_CONVERT_TO_M";
+
+        /// <summary>
+        /// Specifies whether the importer will load multiple animations.
         /// <para>Type: Bool. Default: true.</para>
         /// </summary>
         public const String AI_CONFIG_IMPORT_SMD_LOAD_ANIMATION_LIST = "IMPORT_SMD_LOAD_ANIMATION_LIST";
-        
+
         /// <summary>
-        /// Specifies whether the Collada loader should use Collada names as node names.
-        /// 
-        /// If this property is set to true, the Collada names will be used as the
-        /// node name. The default is to use the id tag (resp. sid tag, if no id tag is present)
-        /// instead.
-        /// <para>Type: Bool. Default: false.</para>
+        /// Specifies whether the importer removes empty bones or not. Empty bones are often used to define connections for other models (e.g.
+        /// attachment points).
+        /// <para>Type: Bool. Default: true.</para>
         /// </summary>
-        public const String AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES = "IMPORT_COLLADA_USE_COLLADA_NAMES";
+        public const String AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES = "AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES";
 
         #endregion
 
@@ -590,6 +615,13 @@ namespace Assimp.Unmanaged
         /// </summary>
         public const String AI_CONFIG_EXPORT_XFILE_64BIT = "EXPORT_XFILE_64BIT";
         
+        /// <summary>
+        /// Specifies whether the export should be able to export point clouds. When this flag is not defined
+        /// the render data has to contain valid faces. Point  clouds are only a collection of vertices which have no spatial
+        /// organization by a face and the validation process will remove them. Enabling this feature will switch off the
+        /// flag and enable the functionality to export pure point clouds.
+        /// <para>Type: Bool. Default: false.</para>
+        /// </summary>
         public const String AI_CONFIG_EXPORT_POINT_CLOUDS = "EXPORT_POINT_CLOUDS";
 
         #endregion
