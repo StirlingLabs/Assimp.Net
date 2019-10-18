@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Assimp.Unmanaged;
 
 namespace Assimp
@@ -318,6 +319,43 @@ namespace Assimp
             m_animations.Clear();
             m_materials.Clear();
             m_metadata.Clear();
+        }
+
+        /// <summary>
+        /// Gets an embedded texture by a string. The string may be a texture ID in the format of "*1" or is the
+        /// file name of the texture.
+        /// </summary>
+        /// <param name="fileName">Texture ID or original file name.</param>
+        /// <returns>Embedded texture or null if it could not be found.</returns>
+        public EmbeddedTexture GetEmbeddedTexture(String fileName)
+        {
+            if(String.IsNullOrEmpty(fileName))
+                return null;
+
+            //Lookup using texture ID (if referenced like: "*1", "*2", etc)
+            if (fileName.StartsWith("*"))
+            {
+                String indexStr = fileName.Substring(1);
+                int index;
+                if(!int.TryParse(indexStr, out index) || index < 0 || index >= m_textures.Count)
+                    return null;
+
+                return m_textures[index];
+            }
+
+            //Lookup using filename
+            String shortFileName = Path.GetFileName(fileName);
+            foreach(EmbeddedTexture tex in m_textures)
+            {
+                if(tex == null)
+                    continue;
+
+                String otherFilename = Path.GetFileName(tex.Filename);
+                if(String.Equals(shortFileName, otherFilename, StringComparison.Ordinal))
+                    return tex;
+            }
+
+            return null;
         }
 
         /// <summary>

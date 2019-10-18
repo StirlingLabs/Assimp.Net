@@ -44,5 +44,24 @@ namespace Assimp.Test
             Assert.IsFalse(success);
             Assert.IsTrue(String.IsNullOrEmpty(prop.FullyQualifiedName));
         }
+
+        [TestCase]
+        public void TestEmbeddedTexture()
+        {
+            Scene scene = new Scene();
+            EmbeddedTexture tex1 = new EmbeddedTexture();
+            tex1.Filename = "Terrain.bmp";
+            scene.Textures.Add(tex1);
+
+            EmbeddedTexture tex2 = new EmbeddedTexture();
+            tex2.Filename = "Grass.png";
+            scene.Textures.Add(tex2);
+
+            EmbeddedTexture texQuery = scene.GetEmbeddedTexture("*1");
+            Assert.IsTrue(texQuery == tex2);
+
+            texQuery = scene.GetEmbeddedTexture("C:/TextureFolder/Terrains/Terrain.bmp");
+            Assert.IsTrue(texQuery == tex1);
+        }
     }
 }

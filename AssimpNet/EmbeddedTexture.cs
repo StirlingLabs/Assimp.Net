@@ -48,10 +48,19 @@ namespace Assimp
         private byte[] m_compressedData;
         private String m_compressedFormatHint;
 
+        /// <summary>
+        /// Gets or sets the texture's original filename.
+        /// </summary>
         public string Filename
         {
-            get => m_filename;
-            set => m_filename = value;
+            get
+            {
+                return m_filename;
+            }
+            set
+            {
+                m_filename = value;
+            }
         }
 
         /// <summary>
@@ -181,8 +190,10 @@ namespace Assimp
         /// </summary>
         /// <param name="compressedFormatHint">The 3 character format hint.</param>
         /// <param name="compressedData">The compressed data.</param>
-        public EmbeddedTexture(String compressedFormatHint, byte[] compressedData)
+        /// <param name="originalFileName">Optional file name for the texture.</param>
+        public EmbeddedTexture(String compressedFormatHint, byte[] compressedData, String originalFileName = "")
         {
+            m_filename = originalFileName;
             m_compressedFormatHint = compressedFormatHint;
             m_compressedData = compressedData;
 
@@ -199,9 +210,11 @@ namespace Assimp
         /// <param name="width">Width of the texture</param>
         /// <param name="height">Height of the texture</param>
         /// <param name="uncompressedData">Color data</param>
+        /// <param name="originalFileName">Optional file name for the texture.</param>
         /// <exception cref="ArgumentException">Thrown if the data size does not match width * height.</exception>
-        public EmbeddedTexture(int width, int height, Texel[] uncompressedData)
+        public EmbeddedTexture(int width, int height, Texel[] uncompressedData, String originalFileName = "")
         {
+            m_filename = originalFileName;
             m_width = width;
             m_height = height;
             m_nonCompressedData = uncompressedData;
