@@ -711,10 +711,10 @@ namespace Assimp
             {
                 //String is stored as 32 bit length prefix THEN followed by zero-terminated UTF8 data (basically need to reconstruct an AiString)
                 AiString aiString;
-                aiString.Length = new UIntPtr((uint) MemoryHelper.Read<int>(new IntPtr(ptr)));
+                aiString.Length = (uint) MemoryHelper.Read<int>(new IntPtr(ptr));
 
                 //Memcpy starting at dataPtr + sizeof(int) for length + 1 (to account for null terminator)
-                MemoryHelper.CopyMemory(new IntPtr(aiString.Data), MemoryHelper.AddIntPtr(new IntPtr(ptr), sizeof(int)), (int) aiString.Length.ToUInt32() + 1);
+                MemoryHelper.CopyMemory(new IntPtr(aiString.Data), MemoryHelper.AddIntPtr(new IntPtr(ptr), sizeof(int)), (int) aiString.Length + 1);
 
                 return aiString.GetString();
             }

@@ -833,9 +833,9 @@ namespace Assimp.Unmanaged
     public unsafe struct AiString
     {
         /// <summary>
-        /// Byte length of the UTF-8 string.
+        /// Byte length of the UTF-8 string, NOT logical length.
         /// </summary>
-        public UIntPtr Length;
+        public uint Length;
 
         /// <summary>
         /// Actual string data.
@@ -848,7 +848,7 @@ namespace Assimp.Unmanaged
         /// <param name="data">The string data</param>
         public AiString(String data)
         {
-            Length = UIntPtr.Zero;
+            Length = 0;
 
             SetString(data);
         }
@@ -861,7 +861,7 @@ namespace Assimp.Unmanaged
         /// <returns>AiString string data</returns>
         public unsafe static String GetString(in AiString aiStr)
         {
-            int length = (int) aiStr.Length.ToUInt32();
+            int length = (int) aiStr.Length;
 
             if(length > 0)
             {
@@ -898,7 +898,7 @@ namespace Assimp.Unmanaged
         {
             if(String.IsNullOrEmpty(data))
             {
-                Length = new UIntPtr(0);
+                Length = 0;
                 fixed(byte* bytePtr = Data)
                     MemoryHelper.ClearMemory(new IntPtr(bytePtr), 0, AiDefines.MAX_LENGTH);
 
@@ -917,7 +917,7 @@ namespace Assimp.Unmanaged
                         MemoryHelper.Write<byte>(new IntPtr(bytePtr), copy, 0, copy.Length);
                 }
 
-                Length = new UIntPtr((uint) copy.Length);
+                Length = (uint) copy.Length;
 
                 return true;
             }
