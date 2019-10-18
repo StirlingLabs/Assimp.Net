@@ -277,10 +277,16 @@ namespace Assimp
             }
         }
 
+        /// <summary>
+        /// Gets the metadata of the scene. This data contains global metadata which belongs to the scene like 
+        /// unit-conversions, versions, vendors or other model-specific data. This can be used to store format-specific metadata as well.
+        /// </summary>
         public Metadata Metadata
         {
-            get => m_metadata;
-            set => m_metadata = value;
+            get
+            {
+                return m_metadata;
+            }
         }
 
         /// <summary>
@@ -296,6 +302,7 @@ namespace Assimp
             m_textures = new List<EmbeddedTexture>();
             m_animations = new List<Animation>();
             m_materials = new List<Material>();
+            m_metadata = new Metadata();
         }
 
         /// <summary>
@@ -310,6 +317,7 @@ namespace Assimp
             m_textures.Clear();
             m_animations.Clear();
             m_materials.Clear();
+            m_metadata.Clear();
         }
 
         /// <summary>
@@ -412,7 +420,8 @@ namespace Assimp
             if(nativeValue.NumAnimations > 0)
                 nativeValue.Animations = MemoryHelper.ToNativeArray<Animation, AiAnimation>(m_animations.ToArray(), true);
             
-            if(m_metadata != null)
+            //Write metadata
+            if(m_metadata.Count > 0)
                 nativeValue.Metadata = MemoryHelper.ToNativePointer<Metadata, AiMetadata>(m_metadata);
         }
 
@@ -453,9 +462,16 @@ namespace Assimp
             //Read animations
             if(nativeValue.NumAnimations > 0 && nativeValue.Animations != IntPtr.Zero)
                 m_animations.AddRange(MemoryHelper.FromNativeArray<Animation, AiAnimation>(nativeValue.Animations, (int) nativeValue.NumAnimations, true));
-            
+
+            //Read metadata
             if(nativeValue.Metadata != IntPtr.Zero)
+            {
                 m_metadata = MemoryHelper.FromNativePointer<Metadata, AiMetadata>(nativeValue.Metadata);
+
+                // Make sure we never have a null instance
+                if(m_metadata == null)
+                    m_metadata = new Metadata();
+            }
         }
 
 
