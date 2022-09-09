@@ -20,13 +20,39 @@
 * THE SOFTWARE.
 */
 
-using SN = System.Numerics;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 
-namespace Assimp.Sample
+namespace Assimp.Unmanaged
 {
-    public class Camera
+    /// <summary>
+    /// An attribute that represents the name of an unmanaged function to import.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Delegate)]
+    public class UnmanagedFunctionNameAttribute : Attribute
     {
-        public SN.Matrix4x4 ViewProjection { get; set; }
-        public SN.Vector3 Position { get; set; }
+        private String m_unmanagedFunctionName;
+
+        /// <summary>
+        /// Name of the unmanaged function.
+        /// </summary>
+        public String UnmanagedFunctionName
+        {
+            get
+            {
+                return m_unmanagedFunctionName;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new <see cref="UnmanagedFunctionName"/>.
+        /// </summary>
+        /// <param name="unmanagedFunctionName">Name of the function.</param>
+        public UnmanagedFunctionNameAttribute(String unmanagedFunctionName)
+        {
+            m_unmanagedFunctionName = unmanagedFunctionName;
+        }
     }
 }

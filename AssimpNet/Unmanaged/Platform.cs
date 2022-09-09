@@ -1,5 +1,5 @@
-﻿/*
-* Copyright (c) 2012-2018 AssimpNet - Nicholas Woodfield
+/*
+* Copyright (c) 2012-2020 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,31 @@
 * THE SOFTWARE.
 */
 
-using Assimp.Configs;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace Assimp.Net4Sample
+namespace Assimp.Unmanaged
 {
-    class Program
+    /// <summary>
+    /// Enumerates supported platforms.
+    /// </summary>
+    public enum Platform
     {
-        static void Main(string[] args)
-        {
-            //Simple test to make sure the non-net standard legacy target functions (unit tests all run with the net standard dll)
-            String fileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Assets", "duck.dae");
+        /// <summary>
+        /// Windows platform.
+        /// </summary>
+        Windows,
 
-            AssimpContext importer = new AssimpContext();
-            importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
-            Scene scene = importer.ImportFile(fileName, PostProcessPreset.TargetRealTimeQuality | PostProcessSteps.FlipWindingOrder);
+        /// <summary>
+        /// Linux platform.
+        /// </summary>
+        Linux,
 
-            if(scene != null && scene.HasMeshes)
-                Console.WriteLine("Import SUCCESSFUL!");
-            else
-                Console.WriteLine("Import FAILED!");
-
-        }
+        /// <summary>
+        /// Mac platform.
+        /// </summary>
+        Mac
     }
 }
