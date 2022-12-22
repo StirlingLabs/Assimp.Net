@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (c) 2012-2020 AssimpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -116,7 +116,19 @@ namespace Assimp.Unmanaged
         /// </summary>
         public AiString Name;
 
-        // Internal data, do not touch
+        /// <summary>
+        /// Number of skeletons contained.
+        /// </summary>
+        public uint NumSkeletons;
+
+        /// <summary>
+        /// aiSkeleton**, skeletons in the scene.
+        /// </summary>
+        public IntPtr Skeletons;
+
+        /// <summary>
+        /// Internal data, do not touch
+        /// </summary>
         public IntPtr Private;
     }
 
@@ -905,7 +917,7 @@ namespace Assimp.Unmanaged
             {
                 Length = 0;
                 fixed(byte* bytePtr = Data)
-                    MemoryHelper.ClearMemory(new IntPtr(bytePtr), 0, AiDefines.MAX_LENGTH);
+                    MemoryHelper.ClearMemory(new IntPtr(bytePtr), AiDefines.MAX_LENGTH);
 
                 return true;
             }
