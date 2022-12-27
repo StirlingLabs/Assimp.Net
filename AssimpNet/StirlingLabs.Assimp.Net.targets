@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <Target Name="SLSelectRuntimeForPacking" BeforeTargets="Pack">
+        <PropertyGroup>
+            <!-- specify all runtimes -->
+            <SLSelectAllRuntimes>True</SLSelectAllRuntimes>
+        </PropertyGroup>
+    </Target>
+
+    <Target Name="SLSelectRuntime" BeforeTargets="GetRestoreProjectStyleTask;_GetAllRestoreProjectPathItems;_LoadRestoreGraphEntryPoints;_GenerateRestoreProjectSpec;Restore;CoreBuild">
+<!--        <Message Importance="high" Text="SLSelectRuntimeId BEFORE: $(SLSelectRuntimeId)"/>-->
+<!--        <Message Importance="high" Text="SLSelectAllRuntimes BEFORE: $(SLSelectAllRuntimes)"/>-->
+<!--        <Message Importance="high" Text="SLVersion BEFORE: $(SLVersion)"/>-->
+        <PropertyGroup>
+            <SLVersion>@(PackageReference->WithMetadataValue('Identity','StirlingLabs.Assimp.Net')->Metadata('Version'))</SLVersion>
+            <SLVersion Condition="'$(SLVersion)'=='' AND '%(PackageReference.Identity)' == 'StirlingLabs.Assimp.Net'">%(PackageReference.Version)</SLVersion>
+            <SLVersion Condition="'$(SLVersion)'==''">*</SLVersion>
+            <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(RuntimeIdentifier)</SLSelectRuntimeId>
+            <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(DefaultAppHostRuntimeIdentifier)</SLSelectRuntimeId>
+            <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(NETCoreSdkPortableRuntimeIdentifier)</SLSelectRuntimeId>
+            <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(NETCoreSdkRuntimeIdentifier)</SLSelectRuntimeId>
+            <SLSelectAllRuntimes Condition="'$(SLSelectAllRuntimes)'!='False' AND '$(SLSelectAllRuntimes)'!=''">True</SLSelectAllRuntimes>
+            <SLSelectAllRuntimes Condition="'$(SLSelectAllRuntimes)'=='False' OR '$(SLSelectAllRuntimes)'!='True'">False</SLSelectAllRuntimes>
+        </PropertyGroup>
+
+<!--        <Message Importance="high" Text="PackageReferences BEFORE: @(PackageReference)"/>-->
+<!--        -->
+<!--        <Message Importance="high" Text="SLSelectRuntimeId: $(SLSelectRuntimeId)"/>-->
+<!--        <Message Importance="high" Text="SLSelectAllRuntimes: $(SLSelectAllRuntimes)"/>-->
+<!--        <Message Importance="high" Text="SLVersion: $(SLVersion)"/>-->
+
+<!--        <Message Importance="high" Text="All Runtimes" Condition="$(SLSelectAllRuntimes) OR '$(SLSelectRuntimeId)'==''"/>-->
+<!--        <Message Importance="high" Text="Linux Runtimes" Condition="!$(SLSelectAllRuntimes) AND $(SLSelectRuntimeId.StartsWith('linux'))"/>-->
+<!--        <Message Importance="high" Text="OS X Runtimes" Condition="!$(SLSelectAllRuntimes) AND $(SLSelectRuntimeId.StartsWith('osx'))"/>-->
+<!--        <Message Importance="high" Text="Windows Runtimes" Condition="!$(SLSelectAllRuntimes) AND $(SLSelectRuntimeId.StartsWith('win'))"/>-->
+
+        <!-- Linux -->
+        <ItemGroup Condition="!$(SLSelectAllRuntimes) AND !$(SLSelectRuntimeId.StartsWith('linux'))">
+            <PackageReference Remove="StirlingLabs.assimp.native.linux-x64"/>
+        </ItemGroup>
+        <CreateItem Condition="$(SLSelectAllRuntimes) OR $(SLSelectRuntimeId.StartsWith('linux'))"
+                    Include="StirlingLabs.assimp.native.linux-x64" AdditionalMetadata="Version=$(SLVersion)">
+            <Output TaskParameter="Include" ItemName="PackageReference"/>
+        </CreateItem>
+
+        <!-- OS X -->
+        <ItemGroup Condition="!$(SLSelectAllRuntimes) AND !$(SLSelectRuntimeId.StartsWith('osx'))">
+            <PackageReference Remove="StirlingLabs.assimp.native.osx"/>
+        </ItemGroup>
+        <CreateItem Condition="$(SLSelectAllRuntimes) OR $(SLSelectRuntimeId.StartsWith('osx'))"
+                    Include="StirlingLabs.assimp.native.osx" AdditionalMetadata="Version=$(SLVersion)">
+            <Output TaskParameter="Include" ItemName="PackageReference"/>
+        </CreateItem>
+
+        <!-- Windows -->
+        <ItemGroup Condition="!$(SLSelectAllRuntimes) AND !$(SLSelectRuntimeId.StartsWith('win'))">
+            <PackageReference Remove="StirlingLabs.assimp.native.win-x64"/>
+        </ItemGroup>
+        <CreateItem Condition="$(SLSelectAllRuntimes) OR $(SLSelectRuntimeId.StartsWith('win'))"
+                    Include="StirlingLabs.assimp.native.win-x64" AdditionalMetadata="Version=$(SLVersion)">
+            <Output TaskParameter="Include" ItemName="PackageReference"/>
+        </CreateItem>
+
+        <!--
+        <Message Importance="high" Text="PackageReferences AFTER: @(PackageReference)"/>
+        -->
+    </Target>
+</Project>

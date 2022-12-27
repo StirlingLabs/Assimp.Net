@@ -220,6 +220,14 @@ namespace Assimp.Unmanaged
                     return potentialPath;
             }
 
+            runtimeFolder = Path.Combine(PlatformHelper.GetAppBaseDirectory(), Path.Combine("runtimes", Path.Combine(rid.Split('-')[0], "native")));
+            if(Directory.Exists(runtimeFolder))
+            {
+                String potentialPath = TryGetExistingFile(runtimeFolder, libName, fallbackNames);
+                if(!String.IsNullOrEmpty(potentialPath))
+                    return potentialPath;
+            }
+
             //Check base directory
             String pathInAppFolder = TryGetExistingFile(PlatformHelper.GetAppBaseDirectory(), libName, fallbackNames);
             if(!String.IsNullOrEmpty(pathInAppFolder))

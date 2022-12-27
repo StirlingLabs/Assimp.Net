@@ -1,0 +1,27 @@
+<Project>
+    <PropertyGroup>
+        <Authors>The Stirling Labs Team</Authors>
+        <Owners>Stirling Labs</Owners>
+        <Company>Stirling Labs</Company>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/StirlingLabs/Assimp.Net.git</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/StirlingLabs/Assimp.Net</PackageProjectUrl>
+        <description>
+            Cross-platform .Net wrapper for the Open Asset Import Library.
+        </description>
+        <GitDefaultBranch>main</GitDefaultBranch>
+        <GitCommitsIgnoreMerges>true</GitCommitsIgnoreMerges>
+        <VersionNetDebugImportance>low</VersionNetDebugImportance>
+        <PackageLicenseFile>License.txt</PackageLicenseFile>
+        <PackageIcon>SL.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+    <ImportGroup>
+        <Import Project="StirlingLabs.Version/Version.proj" />
+    </ImportGroup>
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)License.txt" Pack="true" PackagePath="License.txt" Visible="false"/>
+        <None Include="$(MSBuildThisFileDirectory)SL.png" Pack="true" PackagePath="SL.png" Visible="false"/>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="README.md" Visible="false"/>
+    </ItemGroup>
+</Project>

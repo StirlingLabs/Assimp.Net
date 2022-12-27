@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup>
+        <SLVersion>@(PackageReference->WithMetadataValue('Identity','StirlingLabs.Assimp.Net')->Metadata('Version'))</SLVersion>
+        <SLVersion Condition="'$(SLVersion)'==''">*</SLVersion>
+        <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(RuntimeIdentifier)</SLSelectRuntimeId>
+        <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(DefaultAppHostRuntimeIdentifier)</SLSelectRuntimeId>
+        <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(NETCoreSdkPortableRuntimeIdentifier)</SLSelectRuntimeId>
+        <SLSelectRuntimeId Condition="'$(SLSelectRuntimeId)'==''">$(NETCoreSdkRuntimeIdentifier)</SLSelectRuntimeId>
+        <SLSelectAllRuntimes Condition="'$(SLSelectAllRuntimes)'!='False' AND '$(SLSelectAllRuntimes)'!=''">True</SLSelectAllRuntimes>
+        <SLSelectAllRuntimes Condition="'$(SLSelectAllRuntimes)'=='False' OR '$(SLSelectAllRuntimes)'!='True'">False</SLSelectAllRuntimes>
+        <BuildDependsOn>SLSelectRuntime;$(BuildDependsOn)</BuildDependsOn>
+        <CompileDependsOn>SLSelectRuntime;$(BuildDependsOn)</CompileDependsOn>
+        <ResolveReferencesDependsOn>SLSelectRuntime;$(ResolveReferencesDependsOn)</ResolveReferencesDependsOn>
+        <GenerateNuspecDependsOn>SLSelectRuntime;$(GenerateNuspecDependsOn)</GenerateNuspecDependsOn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(SLSelectRuntimeId)'==''">
+        <SLSelectRuntimeId Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</SLSelectRuntimeId>
+        <SLSelectRuntimeId Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx</SLSelectRuntimeId>
+        <SLSelectRuntimeId Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-x64</SLSelectRuntimeId>
+    </PropertyGroup>
+
+    <ItemGroup Condition="!$(SLSelectAllRuntimes) AND !$(SLSelectRuntimeId.StartsWith('linux'))">
+        <PackageReference Remove="StirlingLabs.assimp.native.linux-x64"/>
+    </ItemGroup>
+    <ItemGroup Condition="$(SLSelectAllRuntimes) OR $(SLSelectRuntimeId.StartsWith('linux'))">
+        <PackageReference Include="StirlingLabs.assimp.native.linux-x64" Version="$(SLVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="!$(SLSelectAllRuntimes) AND !$(SLSelectRuntimeId.StartsWith('osx'))">
+        <ProjectReference Remove="StirlingLabs.assimp.native.osx"/>
+    </ItemGroup>
+    <ItemGroup Condition="$(SLSelectAllRuntimes) OR $(SLSelectRuntimeId.StartsWith('osx'))">
+        <PackageReference Include="StirlingLabs.assimp.native.osx" Version="$(SLVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="!$(SLSelectAllRuntimes) AND !$(SLSelectRuntimeId.StartsWith('win'))">
+        <PackageReference Remove="StirlingLabs.assimp.native.win-x64"/>
+    </ItemGroup>
+    <ItemGroup Condition="$(SLSelectAllRuntimes) OR $(SLSelectRuntimeId.StartsWith('win'))">
+        <PackageReference Include="StirlingLabs.assimp.native.win-x64" Version="$(SLVersion)"/>
+    </ItemGroup>
+</Project>

@@ -4,7 +4,6 @@
     <TargetFrameworks>netstandard2.1;net6;net7</TargetFrameworks>
     <RootNamespace>Assimp.Test</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <ForceCopyNativeAssimp>true</ForceCopyNativeAssimp>
   </PropertyGroup>
 
   <ItemGroup>
