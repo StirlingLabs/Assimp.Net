@@ -33,6 +33,7 @@ namespace Assimp.Test
     [TestFixture]
     public class AssimpContextTestFixture
     {
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -377,23 +378,33 @@ namespace Assimp.Test
 
             Assert.IsTrue(success);
         }
-
+        
         [Test]
-        public void TestMultipleImportersMultipleThreads()
-        {
+        public void TestMultipleImportersMultipleThreads([Range(0,32)]int threadCount) {
+            var rng = new Random(threadCount);
+            
             LogStream.IsVerboseLoggingEnabled = true;
 
-            Thread threadA = new Thread(new ThreadStart(LoadSceneB));
-            Thread threadB = new Thread(new ThreadStart(LoadSceneB));
-            Thread threadC = new Thread(new ThreadStart(ConvertSceneC));
+            var threads = new List<Thread>(threadCount);
 
-            threadB.Start();
-            threadA.Start();
-            threadC.Start();
+            for (var i = 0; i < threadCount; ++i) {
+                threads.Add((i % 4) switch {
+                        0 => new Thread(new ThreadStart(LoadSceneB)),
+                        1 => new Thread(new ThreadStart(LoadSceneB)),
+                        2 => new Thread(new ThreadStart(ConvertSceneC)),
+                        3 => new Thread(new ThreadStart(ConvertSceneD))
+                    });
+            }
 
-            threadC.Join();
-            threadA.Join();
-            threadB.Join();
+            threads.Shuffle(rng);
+            
+            for (var i = 0; i < threadCount; ++i)
+                threads[i].Start();
+            
+            threads.Shuffle(rng);
+
+            for (var i = 0; i < threadCount; ++i)
+                threads[i].Join();
 
             LogStream.DetachAllLogstreams();
         }
@@ -438,6 +449,23 @@ namespace Assimp.Test
             ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "obj");
 
             Console.WriteLine("Thread C: Done converting");
+        }
+
+        private void ConvertSceneD()
+        {
+            Console.WriteLine("Thread D: Starting convert.");
+            AssimpContext importer = new AssimpContext();
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
+            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.obj");
+
+            new ConsoleLogStream("Thread D:").Attach();
+            importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
+            importer.SetConfig(new FavorSpeedConfig(true));
+
+            Console.WriteLine("Thread D: Converting");
+            ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "obj");
+
+            Console.WriteLine("Thread D: Done converting");
         }
     }
 }

@@ -21,6 +21,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -182,6 +183,16 @@ namespace Assimp.Test
             AssertEquals(tkM.Row1, new TK.Vector4(mat.A2, mat.B2, mat.C2, mat.D2), msg + " => checking second column vector");
             AssertEquals(tkM.Row2, new TK.Vector4(mat.A3, mat.B3, mat.C3, mat.D3), msg + " => checking third column vector");
             AssertEquals(tkM.Row3, new TK.Vector4(mat.A4, mat.B4, mat.C4, mat.D4), msg + " => checking third column vector");
+        }
+        
+        public static void Shuffle<T>(this IList<T> list, Random rng)
+        {
+            var n = list.Count;
+            while (n > 1) {
+                n--;
+                var k = rng.Next(n + 1);
+                (list[k], list[n]) = (list[n], list[k]);
+            }
         }
     }
 }
