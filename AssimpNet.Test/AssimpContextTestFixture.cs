@@ -379,7 +379,7 @@ namespace Assimp.Test
             Assert.IsTrue(success);
         }
         
-        [Test]
+        [Test, Parallelizable(ParallelScope.None)]
         public void TestMultipleImportersMultipleThreads([Range(0,32)]int threadCount) {
             var rng = new Random(threadCount);
             
