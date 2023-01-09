@@ -20,6 +20,8 @@
 * THE SOFTWARE.
 */
 
+using ImageMagick;
+
 namespace Assimp.Sample
 {
     class Program
@@ -27,6 +29,7 @@ namespace Assimp.Sample
         static void Main(string[] args)
         {
             SampleApp app = new SampleApp();
+            MagickNET.Initialize();
             app.Run();
         }
     }

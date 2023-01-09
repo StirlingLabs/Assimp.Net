@@ -23,8 +23,8 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using TeximpNet;
-using TeximpNet.DDS;
+using ImageMagick;
+using ImageMagick.Formats;
 using Veldrid;
 using SN = System.Numerics;
 
@@ -141,42 +141,46 @@ namespace Assimp.Sample
 
             try
             {
-                //FreeImage can load DDS, but they return an uncompressed image, and only the first mip level, which is good enough for our purpose here.
-                //See DDSContainer/DDSFile to load from DDS format all the different types of textures!
-                using(Surface image = Surface.LoadFromFile(filePath))
-                {
-                    image.FlipVertically();
+                var settings = new MagickReadSettings();
+                settings.ColorSpace = ColorSpace.sRGB;
+                settings.Depth = 8;
+                settings.ColorType = ColorType.TrueColorAlpha;
 
-                    if(image.ImageType != ImageType.Bitmap || image.BitsPerPixel != 32)
-                        image.ConvertTo(ImageConversion.To32Bits);
-
-                    return CreateTextureFromSurface(image, gd, factory);
-                }
+                using var image = new MagickImage();
+                image.Read(filePath, settings);
+                
+                return CreateTextureFromImage(image, gd, factory);
             }
             catch(Exception) { }
 
             return null;
         }
 
-        private static Texture CreateTextureFromSurface(Surface image, GraphicsDevice gd, ResourceFactory factory)
+        private static unsafe Texture CreateTextureFromImage(IMagickImage image, GraphicsDevice gd, ResourceFactory factory)
         {
-            if(image.ImageType != ImageType.Bitmap || image.BitsPerPixel != 32 || gd == null || factory == null)
+            if(image.ColorType != ColorType.TrueColorAlpha || image.Depth != 8 || gd == null || factory == null)
                 return null;
+            image.Format = MagickFormat.Rgba;
 
-            uint width = (uint) image.Width;
-            uint height = (uint) image.Height;
-
+            var width = (uint)image.Width;
+            var height = (uint)image.Height;
+            var bytesPerPixel = image.Depth / 8 * image.ChannelCount;
+            
             Texture staging = factory.CreateTexture(
-                          TextureDescription.Texture2D(width, height, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm, TextureUsage.Staging));
+                          TextureDescription.Texture2D(width, height, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm_SRgb, TextureUsage.Staging));
 
             Texture texture = factory.CreateTexture(
-                TextureDescription.Texture2D(width, height, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm, TextureUsage.Sampled));
+                TextureDescription.Texture2D(width, height, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm_SRgb, TextureUsage.Sampled));
 
             CommandList cl = gd.ResourceFactory.CreateCommandList();
             cl.Begin();
 
             MappedResource map = gd.Map(staging, MapMode.Write, 0);
-            CopyColor(map.Data, image);
+            var imageBytes = image.ToByteArray();
+            fixed (byte* imageBytesPtr = imageBytes)
+            {
+                MemoryHelper.CopyMemory(map.Data, (IntPtr)imageBytesPtr, imageBytes.Length);
+            }
             gd.Unmap(staging, 0);
 
             cl.CopyTexture(staging, 0, 0, 0, 0, 0, texture, 0, 0, 0, 0, 0, width, height, 1, 1);
@@ -190,53 +194,28 @@ namespace Assimp.Sample
         }
 
         //Shamelessly stolen from Tesla Graphics Engine. Copy from either BGRA or RGBA order to RGBA order
-        private static unsafe void CopyColor(IntPtr dstPtr, Surface src)
+        private static unsafe void CopyColor(IntPtr dstPtr, MagickImage src)
         {
             int texelSize = Color.SizeInBytes;
 
             int width = src.Width;
             int height = src.Height;
             int dstPitch = width * texelSize;
-            bool swizzle = Surface.IsBGRAOrder;
+            int pitch = Math.Min((int)src.Density.Y, dstPitch); //todo: check the pitch calculation
 
-            int pitch = Math.Min(src.Pitch, dstPitch);
-
-            if(swizzle)
+            var pixels = src.GetPixels();
+            //For each scanline...
+            for(var row = 0; row < height; row++)
             {
-                //For each scanline...
-                for(int row = 0; row < height; row++)
+                var scanline = pixels.GetArea(0, row, width, 1);
+                fixed (byte* sPtr = scanline) // todo: can we avoid allocation?
                 {
-                    Color* dPtr = (Color*) dstPtr.ToPointer();
-                    Color* sPtr = (Color*) src.GetScanLine(row).ToPointer();
-
-                    //Copy each pixel, swizzle components...
-                    for(int count = 0; count < pitch; count += texelSize)
-                    {
-                        Color v = *(sPtr++);
-                        byte temp = v.R;
-                        v.R = v.B;
-                        v.B = temp;
-
-                        *(dPtr++) = v;
-                    }
-
-                    //Advance to next scanline...
-                    dstPtr += dstPitch;
-                }
-            }
-            else
-            {
-                //For each scanline...
-                for(int row = 0; row < height; row++)
-                {
-                    IntPtr sPtr = src.GetScanLine(row);
-
                     //Copy entirely...
-                    MemoryHelper.CopyMemory(dstPtr, sPtr, pitch);
-
-                    //Advance to next scanline...
-                    dstPtr += dstPitch;
+                    MemoryHelper.CopyMemory(dstPtr, (IntPtr)sPtr, pitch);
                 }
+
+                //Advance to next scanline...
+                dstPtr += dstPitch;
             }
         }
     }
