@@ -18,4 +18,3 @@ jobs:
     uses: StirlingLabs/Actions/.github/workflows/dotnetRelease.yaml@main
     with:
       nuget: false
-      secrets: inherit
