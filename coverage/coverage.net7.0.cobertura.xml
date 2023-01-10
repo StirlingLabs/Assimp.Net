@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.5212" branch-rate="0.494" version="1.9" timestamp="1673380682" lines-covered="2820" lines-valid="5410" branches-covered="1254" branches-valid="2538">
+<coverage line-rate="0.5212" branch-rate="0.494" version="1.9" timestamp="1673381215" lines-covered="2820" lines-valid="5410" branches-covered="1254" branches-valid="2538">
   <sources />
   <packages>
     <package name="StirlingLabs.Assimp.Net" line-rate="0.5212" branch-rate="0.494" complexity="3441">
@@ -5624,14 +5624,14 @@
             </method>
             <method name="OnAiLogStreamCallback" signature="(System.String,System.IntPtr)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="302" hits="247" branch="True" condition-coverage="100% (2/2)">
+                <line number="302" hits="249" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
                     <condition number="6" type="jump" coverage="100%" />
                   </conditions>
                 </line>
                 <line number="304" hits="73" branch="False" />
-                <line number="308" hits="174" branch="False" />
-                <line number="310" hits="174" branch="False" />
+                <line number="308" hits="176" branch="False" />
+                <line number="310" hits="176" branch="False" />
               </lines>
             </method>
             <method name="Initialize" signature="(Assimp.Unmanaged.AiLogStreamCallback,Assimp.LoggingCallback,System.String,System.IntPtr)" line-rate="0.9" branch-rate="0.5" complexity="2">
@@ -5781,14 +5781,14 @@
             <line number="282" hits="0" branch="False" />
             <line number="287" hits="12" branch="False" />
             <line number="293" hits="11" branch="False" />
-            <line number="302" hits="247" branch="True" condition-coverage="100% (2/2)">
+            <line number="302" hits="249" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="6" type="jump" coverage="100%" />
               </conditions>
             </line>
             <line number="304" hits="73" branch="False" />
-            <line number="308" hits="174" branch="False" />
-            <line number="310" hits="174" branch="False" />
+            <line number="308" hits="176" branch="False" />
+            <line number="310" hits="176" branch="False" />
             <line number="322" hits="12" branch="True" condition-coverage="50% (1/2)">
               <conditions>
                 <condition number="1" type="jump" coverage="50%" />
@@ -5828,14 +5828,14 @@
           <methods>
             <method name="LogMessage" signature="(System.String,System.String)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="361" hits="174" branch="True" condition-coverage="100% (2/2)">
+                <line number="361" hits="176" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
                     <condition number="6" type="jump" coverage="100%" />
                   </conditions>
                 </line>
                 <line number="363" hits="132" branch="False" />
-                <line number="367" hits="42" branch="False" />
-                <line number="369" hits="42" branch="False" />
+                <line number="367" hits="44" branch="False" />
+                <line number="369" hits="44" branch="False" />
               </lines>
             </method>
             <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -5850,14 +5850,14 @@
             </method>
           </methods>
           <lines>
-            <line number="361" hits="174" branch="True" condition-coverage="100% (2/2)">
+            <line number="361" hits="176" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="6" type="jump" coverage="100%" />
               </conditions>
             </line>
             <line number="363" hits="132" branch="False" />
-            <line number="367" hits="42" branch="False" />
-            <line number="369" hits="42" branch="False" />
+            <line number="367" hits="44" branch="False" />
+            <line number="369" hits="44" branch="False" />
             <line number="346" hits="12" branch="False" />
             <line number="352" hits="6" branch="False" />
           </lines>

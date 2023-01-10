@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.5212" branch-rate="0.494" version="1.9" timestamp="1673380680" lines-covered="2820" lines-valid="5410" branches-covered="1254" branches-valid="2538">
+<coverage line-rate="0.5212" branch-rate="0.494" version="1.9" timestamp="1673381212" lines-covered="2820" lines-valid="5410" branches-covered="1254" branches-valid="2538">
   <sources />
   <packages>
     <package name="StirlingLabs.Assimp.Net" line-rate="0.5212" branch-rate="0.494" complexity="3441">
