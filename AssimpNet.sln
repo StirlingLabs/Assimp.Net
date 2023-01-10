@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssimpNet", "AssimpNet\AssimpNet.csproj", "{EAB14BD7-4180-407A-BB55-D67C9D32F9FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssimpNet.Sample", "AssimpNet.Sample\AssimpNet.Sample.csproj", "{7EB942AE-787E-4E61-9C71-B868F4C2B53C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssimpNet.Test", "AssimpNet.Test\AssimpNet.Test.csproj", "{5C5206C9-691B-4C17-B4E1-E34F40AAC1D3}"
 EndProject
 Global
