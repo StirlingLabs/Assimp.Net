@@ -8,11 +8,10 @@
     <SignAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core'">true</SignAssembly>
     <AssemblyOriginatorKeyFile Condition=" '$(MSBuildRuntimeType)' != 'Core'">AssimpKey.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Nicholas Woodfield</Authors>
-    <Company />
-    <Version>5.0.0-beta1</Version>
+    <Authors>Nicholas Woodfield and Stirling Labs' Team</Authors>
+    <Company>Stirling Labs</Company>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
-    <Copyright>Portions Copyright © 2012-2020 Nicholas Woodfield</Copyright>
+    <Copyright>Portions Copyright © 2012-2020 Nicholas Woodfield © 2022-2023 Stirling Labs</Copyright>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://github.com/StirlingLabsStirlingLabs/Assimp.Net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/StirlingLabs/Assimp.Net.git</RepositoryUrl>

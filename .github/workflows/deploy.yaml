@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build
+    uses: StirlingLabs/Actions/.github/workflows/dotnetBuild.yaml@main
+    with:
+      release: true
+  
+  release:
+    name: Release
+    needs: [ build ]
+    uses: StirlingLabs/Actions/.github/workflows/dotnetRelease.yaml@main
+    with:
+      nuget: false
+      secrets: inherit

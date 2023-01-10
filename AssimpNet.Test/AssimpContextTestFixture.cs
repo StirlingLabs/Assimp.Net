@@ -380,7 +380,7 @@ namespace Assimp.Test
         }
         
         [Test, Parallelizable(ParallelScope.None)]
-        public void TestMultipleImportersMultipleThreads([Range(0,32)]int threadCount) {
+        public void TestMultipleImportersMultipleThreadsHardcore([Range(1,32)]int threadCount) {
             var rng = new Random(threadCount);
             
             LogStream.IsVerboseLoggingEnabled = true;
@@ -389,7 +389,7 @@ namespace Assimp.Test
 
             for (var i = 0; i < threadCount; ++i) {
                 threads.Add((i % 4) switch {
-                        0 => new Thread(new ThreadStart(LoadSceneB)),
+                        0 => new Thread(new ThreadStart(LoadSceneA)),
                         1 => new Thread(new ThreadStart(LoadSceneB)),
                         2 => new Thread(new ThreadStart(ConvertSceneC)),
                         3 => new Thread(new ThreadStart(ConvertSceneD))
