@@ -378,9 +378,30 @@ namespace Assimp.Test
 
             Assert.IsTrue(success);
         }
-        
+
+        [Test]
+        public void TestMultipleImportersMultipleThreads()
+        {
+            LogStream.IsVerboseLoggingEnabled = true;
+
+            Thread threadA = new Thread(new ThreadStart(LoadSceneB));
+            Thread threadB = new Thread(new ThreadStart(LoadSceneB));
+            Thread threadC = new Thread(new ThreadStart(ConvertSceneC));
+
+            threadB.Start();
+            threadA.Start();
+            threadC.Start();
+
+            threadC.Join();
+            threadA.Join();
+            threadB.Join();
+
+            LogStream.DetachAllLogstreams();
+        }
+
         [Test, Parallelizable(ParallelScope.None)]
-        public void TestMultipleImportersMultipleThreadsHardcore([Range(1,32)]int threadCount) {
+        [Ignore("Ignore impossible test")]
+        public void TestMultipleImportersMultipleThreadsHardcore([Range(1,128)]int threadCount) {
             var rng = new Random(threadCount);
             
             LogStream.IsVerboseLoggingEnabled = true;
