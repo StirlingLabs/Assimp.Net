@@ -400,7 +400,7 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.None)]
-        [Ignore("Ignore impossible test")]
+        [Ignore("Ignore impossible test, this is for debugging purposes only")]
         public void TestMultipleImportersMultipleThreadsHardcore([Range(1,128)]int threadCount) {
             var rng = new Random(threadCount);
             
@@ -415,6 +415,67 @@ namespace Assimp.Test
                         2 => new Thread(new ThreadStart(ConvertSceneC)),
                         3 => new Thread(new ThreadStart(ConvertSceneD))
                     });
+            }
+
+            threads.Shuffle(rng);
+            
+            for (var i = 0; i < threadCount; ++i)
+                threads[i].Start();
+            
+            threads.Shuffle(rng);
+
+            for (var i = 0; i < threadCount; ++i)
+                threads[i].Join();
+
+            LogStream.DetachAllLogstreams();
+        }
+
+        [Test, Parallelizable(ParallelScope.None)]
+        public void TestMultipleStreamingImportersMultipleThreads([Range(1,4)]int threadCount) {
+            var rng = new Random(threadCount);
+            
+            LogStream.IsVerboseLoggingEnabled = true;
+
+            var threads = new List<Thread>(threadCount);
+
+            for (var i = 0; i < threadCount; ++i) {
+                threads.Add((i % 4) switch {
+                    0 => new Thread(new ThreadStart(StreamSceneA)),
+                    1 => new Thread(new ThreadStart(StreamSceneB)),
+                    2 => new Thread(new ThreadStart(ConvertStreamSceneA)),
+                    3 => new Thread(new ThreadStart(ConvertStreamSceneB))
+                });
+            }
+
+            threads.Shuffle(rng);
+            
+            for (var i = 0; i < threadCount; ++i)
+                threads[i].Start();
+            
+            threads.Shuffle(rng);
+
+            for (var i = 0; i < threadCount; ++i)
+                threads[i].Join();
+
+            LogStream.DetachAllLogstreams();
+        }
+
+        [Test, Parallelizable(ParallelScope.None)]
+        [Ignore("Ignore impossible test, this is for debugging purposes only")]
+        public void TestMultipleStreamingImportersMultipleThreadsHardcore([Range(1,128)]int threadCount) {
+            var rng = new Random(threadCount);
+            
+            LogStream.IsVerboseLoggingEnabled = true;
+
+            var threads = new List<Thread>(threadCount);
+
+            for (var i = 0; i < threadCount; ++i) {
+                threads.Add((i % 4) switch {
+                    0 => new Thread(new ThreadStart(StreamSceneA)),
+                    1 => new Thread(new ThreadStart(StreamSceneB)),
+                    2 => new Thread(new ThreadStart(ConvertStreamSceneA)),
+                    3 => new Thread(new ThreadStart(ConvertStreamSceneB))
+                });
             }
 
             threads.Shuffle(rng);
@@ -488,5 +549,80 @@ namespace Assimp.Test
 
             Console.WriteLine("Thread D: Done converting");
         }
+        
+        private void StreamSceneA()
+        {
+            Console.WriteLine("Thread A: Starting import.");
+            AssimpContext importer = new AssimpContext();
+            new ConsoleLogStream("Thread A:").Attach();
+            Console.WriteLine("Thread A: Importing");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
+
+            using var sr = new StreamReader(path);
+            var scene = importer.ImportFileFromStream(sr.BaseStream);
+            sr.Close();
+
+            // Scene scene = importer.ImportFile(path);
+            Console.WriteLine("Thread A: Done importing");
+        }
+
+        private void StreamSceneB()
+        {
+            Console.WriteLine("Thread A: Starting import.");
+            AssimpContext importer = new AssimpContext();
+            new ConsoleLogStream("Thread A:").Attach();
+            Console.WriteLine("Thread A: Importing");
+            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+
+            using var sr = new StreamReader(path);
+            var scene = importer.ImportFileFromStream(sr.BaseStream);
+            sr.Close();
+
+            // Scene scene = importer.ImportFile(path);
+            Console.WriteLine("Thread A: Done importing");
+        }
+
+        private void ConvertStreamSceneA()
+        {
+            Console.WriteLine("Thread C: Starting convert.");
+            var importer = new AssimpContext();
+            var inputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            var inputHint = Path.GetExtension(inputFilename).TrimStart('.');
+            var outputFilename = Path.GetTempFileName();
+            const string outputHint = "obj";
+
+            new ConsoleLogStream("Thread C:").Attach();
+            importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
+            importer.SetConfig(new FavorSpeedConfig(true));
+
+            Console.WriteLine("Thread C: Converting");
+            using var sr = new StreamReader(inputFilename);
+            // var blob = importer.ConvertFromStreamToBlob(sr.BaseStream, inputHint, outputHint);
+            var s = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputFilename, outputHint);
+            sr.Close();
+            Console.WriteLine("Thread C: Done converting");
+        }
+
+        private void ConvertStreamSceneB()
+        {
+            Console.WriteLine("Thread D: Starting convert.");
+            var importer = new AssimpContext();
+            var inputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
+            var inputHint = Path.GetExtension(inputFilename).TrimStart('.');
+            var outputFilename = Path.GetTempFileName();
+            const string outputHint = "obj";
+
+            new ConsoleLogStream("Thread D:").Attach();
+            importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
+            importer.SetConfig(new FavorSpeedConfig(true));
+
+            Console.WriteLine("Thread D: Converting");
+            using var sr = new StreamReader(inputFilename);
+            // var blob = importer.ConvertFromStreamToBlob(sr.BaseStream, inputHint, outputHint);
+            var s = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputFilename, outputHint);
+            sr.Close();
+            Console.WriteLine("Thread D: Done converting");
+        }
+
     }
 }
