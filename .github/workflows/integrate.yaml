@@ -21,14 +21,4 @@ jobs:
       needs.threshold.outputs.continue == 'true' && 
       needs.threshold.outputs.release != 'true'
     uses: StirlingLabs/Actions/.github/workflows/dotnetBuild.yaml@main
-
-# Please note that this CI requires:
-#
-# - Use https://github.com/StirlingLabs/Version.Net
-# - nuget add GitHubActionsTestLogger
-# - *.csproj contains:
-#    <PropertyGroup>
-#        <PackageOutputPath Condition="'$(CI)'!=''">../artifacts</PackageOutputPath>
-#        <GeneratePackageOnBuild Condition="'$(CI)'!=''">true</GeneratePackageOnBuild>
-#    </PropertyGroup>
- 
+    
