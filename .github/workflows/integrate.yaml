@@ -21,4 +21,6 @@ jobs:
       needs.threshold.outputs.continue == 'true' && 
       needs.threshold.outputs.release != 'true'
     uses: StirlingLabs/Actions/.github/workflows/dotnetBuild.yaml@main
-    
+    with:
+      release: false
+      strictPreflight: false
