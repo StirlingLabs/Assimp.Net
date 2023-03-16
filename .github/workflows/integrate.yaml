@@ -24,5 +24,3 @@ jobs:
     with:
       release: false
       strictPreflight: false
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
