@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.5259" branch-rate="0.4984" version="1.9" timestamp="1680855058" lines-covered="2851" lines-valid="5421" branches-covered="1268" branches-valid="2544">
+<coverage line-rate="0.5259" branch-rate="0.4984" version="1.9" timestamp="1680855420" lines-covered="2851" lines-valid="5421" branches-covered="1268" branches-valid="2544">
   <sources />
   <packages>
     <package name="StirlingLabs.Assimp.Net" line-rate="0.5259" branch-rate="0.4984" complexity="3450">
@@ -5464,7 +5464,7 @@
           <methods>
             <method name="get_s_logStreams" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="52" hits="27139" branch="False" />
+                <line number="52" hits="27138" branch="False" />
               </lines>
             </method>
             <method name="get_AttachedLogStreamCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -5547,9 +5547,9 @@
                     <condition number="11" type="jump" coverage="100%" />
                   </conditions>
                 </line>
-                <line number="214" hits="1163" branch="False" />
-                <line number="216" hits="581" branch="False" />
-                <line number="217" hits="581" branch="False" />
+                <line number="214" hits="1151" branch="False" />
+                <line number="216" hits="593" branch="False" />
+                <line number="217" hits="593" branch="False" />
               </lines>
             </method>
             <method name="StaticDetach" signature="()" line-rate="1" branch-rate="1" complexity="2">
@@ -5559,9 +5559,9 @@
                     <condition number="10" type="jump" coverage="100%" />
                   </conditions>
                 </line>
-                <line number="221" hits="1162" branch="False" />
-                <line number="223" hits="580" branch="False" />
-                <line number="224" hits="580" branch="False" />
+                <line number="221" hits="1150" branch="False" />
+                <line number="223" hits="592" branch="False" />
+                <line number="224" hits="592" branch="False" />
               </lines>
             </method>
             <method name="Attach" signature="()" line-rate="0.8332999999999999" branch-rate="0.75" complexity="4">
@@ -5604,7 +5604,7 @@
                   </conditions>
                 </line>
                 <line number="267" hits="1742" branch="False" />
-                <line number="268" hits="1744" branch="False" />
+                <line number="268" hits="1745" branch="False" />
                 <line number="269" hits="1742" branch="False" />
                 <line number="270" hits="1742" branch="False" />
                 <line number="273" hits="1742" branch="False" />
@@ -5663,25 +5663,25 @@
             </method>
             <method name="OnAiLogStreamCallback" signature="(System.String)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="340" hits="27035" branch="True" condition-coverage="100% (2/2)">
+                <line number="340" hits="27082" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
                     <condition number="6" type="jump" coverage="100%" />
                   </conditions>
                 </line>
                 <line number="342" hits="13" branch="False" />
-                <line number="346" hits="27022" branch="False" />
-                <line number="348" hits="27022" branch="False" />
+                <line number="346" hits="27069" branch="False" />
+                <line number="348" hits="27069" branch="False" />
               </lines>
             </method>
             <method name="StaticOnAiLogStreamCallback" signature="(System.String,System.IntPtr)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="351" hits="87478" branch="True" condition-coverage="100% (2/2)">
+                <line number="351" hits="87570" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
                     <condition number="35" type="jump" coverage="100%" />
                   </conditions>
                 </line>
-                <line number="353" hits="21828" branch="False" />
-                <line number="355" hits="21911" branch="False" />
+                <line number="353" hits="21875" branch="False" />
+                <line number="355" hits="21910" branch="False" />
               </lines>
             </method>
             <method name="Initialize" signature="(Assimp.LoggingCallback,System.String)" line-rate="0.8" branch-rate="0.5" complexity="2">
@@ -5743,7 +5743,7 @@
             </method>
           </methods>
           <lines>
-            <line number="52" hits="27139" branch="False" />
+            <line number="52" hits="27138" branch="False" />
             <line number="66" hits="2" branch="False" />
             <line number="75" hits="0" branch="False" />
             <line number="79" hits="31" branch="False" />
@@ -5774,17 +5774,17 @@
                 <condition number="11" type="jump" coverage="100%" />
               </conditions>
             </line>
-            <line number="214" hits="1163" branch="False" />
-            <line number="216" hits="581" branch="False" />
-            <line number="217" hits="581" branch="False" />
+            <line number="214" hits="1151" branch="False" />
+            <line number="216" hits="593" branch="False" />
+            <line number="217" hits="593" branch="False" />
             <line number="220" hits="1742" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="10" type="jump" coverage="100%" />
               </conditions>
             </line>
-            <line number="221" hits="1162" branch="False" />
-            <line number="223" hits="580" branch="False" />
-            <line number="224" hits="580" branch="False" />
+            <line number="221" hits="1150" branch="False" />
+            <line number="223" hits="592" branch="False" />
+            <line number="224" hits="592" branch="False" />
             <line number="232" hits="1744" branch="False" />
             <line number="234" hits="1744" branch="False" />
             <line number="236" hits="1744" branch="True" condition-coverage="50% (1/2)">
@@ -5819,7 +5819,7 @@
               </conditions>
             </line>
             <line number="267" hits="1742" branch="False" />
-            <line number="268" hits="1744" branch="False" />
+            <line number="268" hits="1745" branch="False" />
             <line number="269" hits="1742" branch="False" />
             <line number="270" hits="1742" branch="False" />
             <line number="273" hits="1742" branch="False" />
@@ -5850,21 +5850,21 @@
             <line number="320" hits="0" branch="False" />
             <line number="325" hits="1744" branch="False" />
             <line number="331" hits="1742" branch="False" />
-            <line number="340" hits="27035" branch="True" condition-coverage="100% (2/2)">
+            <line number="340" hits="27082" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="6" type="jump" coverage="100%" />
               </conditions>
             </line>
             <line number="342" hits="13" branch="False" />
-            <line number="346" hits="27022" branch="False" />
-            <line number="348" hits="27022" branch="False" />
-            <line number="351" hits="87478" branch="True" condition-coverage="100% (2/2)">
+            <line number="346" hits="27069" branch="False" />
+            <line number="348" hits="27069" branch="False" />
+            <line number="351" hits="87570" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="35" type="jump" coverage="100%" />
               </conditions>
             </line>
-            <line number="353" hits="21828" branch="False" />
-            <line number="355" hits="21911" branch="False" />
+            <line number="353" hits="21875" branch="False" />
+            <line number="355" hits="21910" branch="False" />
             <line number="366" hits="1744" branch="True" condition-coverage="50% (1/2)">
               <conditions>
                 <condition number="1" type="jump" coverage="50%" />
@@ -19658,15 +19658,15 @@
           <methods>
             <method name="get_Instance" signature="()" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="52" hits="11923" branch="False" />
-                <line number="54" hits="11923" branch="True" condition-coverage="100% (2/2)">
+                <line number="52" hits="11947" branch="False" />
+                <line number="54" hits="11947" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
                     <condition number="21" type="jump" coverage="100%" />
                   </conditions>
                 </line>
                 <line number="55" hits="1" branch="False" />
-                <line number="57" hits="11923" branch="False" />
-                <line number="59" hits="11923" branch="False" />
+                <line number="57" hits="11947" branch="False" />
+                <line number="59" hits="11947" branch="False" />
               </lines>
             </method>
             <method name="get_IsMultithreadingSupported" signature="()" line-rate="0" branch-rate="1" complexity="1">
@@ -19815,10 +19815,10 @@
             </method>
             <method name="AttachLogStream" signature="(System.IntPtr)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="305" hits="581" branch="False" />
-                <line number="307" hits="581" branch="False" />
-                <line number="309" hits="581" branch="False" />
-                <line number="310" hits="581" branch="False" />
+                <line number="305" hits="593" branch="False" />
+                <line number="307" hits="593" branch="False" />
+                <line number="309" hits="593" branch="False" />
+                <line number="310" hits="593" branch="False" />
               </lines>
             </method>
             <method name="EnableVerboseLogging" signature="(System.Boolean)" line-rate="1" branch-rate="1" complexity="1">
@@ -19837,9 +19837,9 @@
             </method>
             <method name="DetachLogStream" signature="(System.IntPtr)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="343" hits="580" branch="False" />
-                <line number="345" hits="580" branch="False" />
-                <line number="347" hits="580" branch="False" />
+                <line number="343" hits="592" branch="False" />
+                <line number="345" hits="592" branch="False" />
+                <line number="347" hits="592" branch="False" />
               </lines>
             </method>
             <method name="DetachAllLogStreams" signature="()" line-rate="0" branch-rate="1" complexity="1">
@@ -20306,15 +20306,15 @@
             </method>
           </methods>
           <lines>
-            <line number="52" hits="11923" branch="False" />
-            <line number="54" hits="11923" branch="True" condition-coverage="100% (2/2)">
+            <line number="52" hits="11947" branch="False" />
+            <line number="54" hits="11947" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="21" type="jump" coverage="100%" />
               </conditions>
             </line>
             <line number="55" hits="1" branch="False" />
-            <line number="57" hits="11923" branch="False" />
-            <line number="59" hits="11923" branch="False" />
+            <line number="57" hits="11947" branch="False" />
+            <line number="59" hits="11947" branch="False" />
             <line number="70" hits="0" branch="False" />
             <line number="79" hits="1" branch="False" />
             <line number="93" hits="0" branch="False" />
@@ -20411,19 +20411,19 @@
             <line number="288" hits="0" branch="False" />
             <line number="290" hits="0" branch="False" />
             <line number="292" hits="0" branch="False" />
-            <line number="305" hits="581" branch="False" />
-            <line number="307" hits="581" branch="False" />
-            <line number="309" hits="581" branch="False" />
-            <line number="310" hits="581" branch="False" />
+            <line number="305" hits="593" branch="False" />
+            <line number="307" hits="593" branch="False" />
+            <line number="309" hits="593" branch="False" />
+            <line number="310" hits="593" branch="False" />
             <line number="318" hits="31" branch="False" />
             <line number="320" hits="31" branch="False" />
             <line number="322" hits="31" branch="False" />
             <line number="324" hits="31" branch="False" />
             <line number="325" hits="31" branch="False" />
             <line number="333" hits="0" branch="False" />
-            <line number="343" hits="580" branch="False" />
-            <line number="345" hits="580" branch="False" />
-            <line number="347" hits="580" branch="False" />
+            <line number="343" hits="592" branch="False" />
+            <line number="345" hits="592" branch="False" />
+            <line number="347" hits="592" branch="False" />
             <line number="355" hits="0" branch="False" />
             <line number="357" hits="0" branch="False" />
             <line number="359" hits="0" branch="False" />
@@ -21456,17 +21456,17 @@
             </method>
             <method name="GetFunction" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="245" hits="14108" branch="False" />
+                <line number="245" hits="14132" branch="False" />
               </lines>
             </method>
             <method name="LoadIfNotLoaded" signature="()" line-rate="1" branch-rate="1" complexity="4">
               <lines>
-                <line number="255" hits="11921" branch="True" condition-coverage="100% (2/2)">
+                <line number="255" hits="11945" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
                     <condition number="8" type="jump" coverage="100%" />
                   </conditions>
                 </line>
-                <line number="256" hits="11919" branch="False" />
+                <line number="256" hits="11943" branch="False" />
                 <line number="258" hits="2" branch="False" />
                 <line number="260" hits="2" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
@@ -21653,13 +21653,13 @@
             <line number="229" hits="1" branch="False" />
             <line number="231" hits="1" branch="False" />
             <line number="234" hits="0" branch="False" />
-            <line number="245" hits="14108" branch="False" />
-            <line number="255" hits="11921" branch="True" condition-coverage="100% (2/2)">
+            <line number="245" hits="14132" branch="False" />
+            <line number="255" hits="11945" branch="True" condition-coverage="100% (2/2)">
               <conditions>
                 <condition number="8" type="jump" coverage="100%" />
               </conditions>
             </line>
-            <line number="256" hits="11919" branch="False" />
+            <line number="256" hits="11943" branch="False" />
             <line number="258" hits="2" branch="False" />
             <line number="260" hits="2" branch="True" condition-coverage="100% (2/2)">
               <conditions>
@@ -21775,20 +21775,20 @@
             </method>
             <method name="GetFunction" signature="(System.String)" line-rate="0.6666" branch-rate="0.5" complexity="4">
               <lines>
-                <line number="99" hits="14108" branch="True" condition-coverage="50% (1/2)">
+                <line number="99" hits="14132" branch="True" condition-coverage="50% (1/2)">
                   <conditions>
                     <condition number="6" type="jump" coverage="50%" />
                   </conditions>
                 </line>
                 <line number="100" hits="0" branch="False" />
-                <line number="103" hits="14108" branch="True" condition-coverage="50% (1/2)">
+                <line number="103" hits="14132" branch="True" condition-coverage="50% (1/2)">
                   <conditions>
                     <condition number="32" type="jump" coverage="50%" />
                   </conditions>
                 </line>
                 <line number="104" hits="0" branch="False" />
-                <line number="106" hits="14108" branch="False" />
-                <line number="108" hits="14108" branch="False" />
+                <line number="106" hits="14132" branch="False" />
+                <line number="108" hits="14132" branch="False" />
               </lines>
             </method>
             <method name="LoadLibrary" signature="(System.String)" line-rate="1" branch-rate="1" complexity="2">
@@ -21916,20 +21916,20 @@
             <line number="77" hits="0" branch="False" />
             <line number="94" hits="0" branch="False" />
             <line number="95" hits="0" branch="False" />
-            <line number="99" hits="14108" branch="True" condition-coverage="50% (1/2)">
+            <line number="99" hits="14132" branch="True" condition-coverage="50% (1/2)">
               <conditions>
                 <condition number="6" type="jump" coverage="50%" />
               </conditions>
             </line>
             <line number="100" hits="0" branch="False" />
-            <line number="103" hits="14108" branch="True" condition-coverage="50% (1/2)">
+            <line number="103" hits="14132" branch="True" condition-coverage="50% (1/2)">
               <conditions>
                 <condition number="32" type="jump" coverage="50%" />
               </conditions>
             </line>
             <line number="104" hits="0" branch="False" />
-            <line number="106" hits="14108" branch="False" />
-            <line number="108" hits="14108" branch="False" />
+            <line number="106" hits="14132" branch="False" />
+            <line number="108" hits="14132" branch="False" />
             <line number="113" hits="2" branch="False" />
             <line number="115" hits="2" branch="False" />
             <line number="117" hits="2" branch="True" condition-coverage="100% (2/2)">
