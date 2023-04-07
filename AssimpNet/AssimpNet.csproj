@@ -63,6 +63,10 @@
     <PackageReference Include="StirlingLabs.assimp.native.osx" Version="*" />
     <PackageReference Include="StirlingLabs.assimp.native.win-x64" Version="*" />
   </ItemGroup>
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="nuget\build" />

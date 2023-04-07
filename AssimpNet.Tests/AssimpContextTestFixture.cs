@@ -51,7 +51,7 @@ namespace Assimp.Test
             }
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestExportBadFormatId()
         {
             AssimpContext importer = new AssimpContext();
@@ -62,6 +62,7 @@ namespace Assimp.Test
             {
                 Console.WriteLine(msg);
             });
+
             logStream.Attach();
 
             Scene collada = importer.ImportFile(Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae"));
@@ -73,9 +74,11 @@ namespace Assimp.Test
             success = importer.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/output/exportedCollada.dae"), "collada");
 
             Assert.IsTrue(success);
+
+            logStream.Detach();
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestExportToBlob()
         {
             String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
@@ -89,7 +92,7 @@ namespace Assimp.Test
             Assert.IsTrue(blob.NextBlob.Name.Equals("mtl"));
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportExportFile()
         {
             String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
@@ -100,7 +103,7 @@ namespace Assimp.Test
             context.ExportFile(ducky, plyPath, "ply");
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportExportImportFile()
         {
             String colladaPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
@@ -114,7 +117,7 @@ namespace Assimp.Test
             Assert.IsNotNull(ducky2);
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestExportToFile()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/ExportedTriangle.obj");
@@ -168,9 +171,10 @@ namespace Assimp.Test
             }
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.None)]
         public void TestFreeLogStreams()
         {
+            Assert.Zero(LogStream.AttachedLogStreamCount);
             ConsoleLogStream console1 = new ConsoleLogStream();
             ConsoleLogStream console2 = new ConsoleLogStream();
             ConsoleLogStream console3 = new ConsoleLogStream();
@@ -187,9 +191,11 @@ namespace Assimp.Test
             Assert.IsFalse(console1.IsAttached);
             Assert.IsFalse(console2.IsAttached);
             Assert.IsFalse(console3.IsAttached);
+
+            Assert.Zero(LogStream.AttachedLogStreamCount);
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportFromFile()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/sphere.obj");
@@ -222,7 +228,7 @@ namespace Assimp.Test
             Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportFromStream()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
@@ -245,9 +251,11 @@ namespace Assimp.Test
 
             Assert.IsNotNull(scene);
             Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+
+            logstream.Detach();
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportFromStreamNoFormatHint()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
@@ -270,9 +278,11 @@ namespace Assimp.Test
 
             Assert.IsNotNull(scene);
             Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+
+            logstream.Detach();
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImporterDescriptions()
         {
             AssimpContext importer = new AssimpContext();
@@ -289,7 +299,7 @@ namespace Assimp.Test
             Assert.IsTrue(descr.Name == descr2.Name);
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestSupportedFormats()
         {
             AssimpContext importer = new AssimpContext();
@@ -309,7 +319,7 @@ namespace Assimp.Test
             Assert.IsTrue(importer.IsExportFormatSupported(".obj"));
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestConvertFromFile()
         {
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
@@ -321,9 +331,12 @@ namespace Assimp.Test
             ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "collada");
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestConvertFromStreamNoFormatHint()
         {
+            var logStream = new TestContextLogStream();
+            logStream.Attach();
+            
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
             String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duckNoHint.obj");
 
@@ -332,25 +345,26 @@ namespace Assimp.Test
 
             FileStream fs = File.OpenRead(path);
 
-            new ConsoleLogStream().Attach();
-
             AssimpContext importer = new AssimpContext();
             bool success = importer.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
             Assert.IsTrue(success);
 
             Assert.IsTrue(File.Exists(outputPath));
+
+            logStream.Detach();
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestConvertFromStream()
         {
+            var logStream = new TestContextLogStream();
+            logStream.Attach();
+            
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
             String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck.obj");
             String outputPath2 = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck-fromBlob.obj");
 
             FileStream fs = File.OpenRead(path);
-
-            new ConsoleLogStream().Attach();
 
             AssimpContext importer = new AssimpContext();
             bool success = importer.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
@@ -374,32 +388,30 @@ namespace Assimp.Test
 
             memStream.Close();
 
-            LogStream.DetachAllLogstreams();
+            logStream.Detach();
 
             Assert.IsTrue(success);
         }
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestMultipleImportersMultipleThreads()
         {
             LogStream.IsVerboseLoggingEnabled = true;
 
-            Thread threadA = new Thread(new ThreadStart(LoadSceneB));
-            Thread threadB = new Thread(new ThreadStart(LoadSceneB));
-            Thread threadC = new Thread(new ThreadStart(ConvertSceneC));
+            Thread threadA = new Thread(LoadSceneB);
+            Thread threadB = new Thread(LoadSceneB);
+            Thread threadC = new Thread(ConvertSceneC);
 
-            threadB.Start();
-            threadA.Start();
-            threadC.Start();
+            threadB.Start(new TestContextLogStream());
+            threadA.Start(new TestContextLogStream());
+            threadC.Start(new TestContextLogStream());
 
             threadC.Join();
             threadA.Join();
             threadB.Join();
-
-            LogStream.DetachAllLogstreams();
         }
 
-        [Test, Parallelizable(ParallelScope.None)]
+        [Test, Parallelizable(ParallelScope.All)]
         [Ignore("Ignore impossible test, this is for debugging purposes only")]
         public void TestMultipleImportersMultipleThreadsHardcore([Range(1,128)]int threadCount) {
             var rng = new Random(threadCount);
@@ -410,10 +422,10 @@ namespace Assimp.Test
 
             for (var i = 0; i < threadCount; ++i) {
                 threads.Add((i % 4) switch {
-                        0 => new Thread(new ThreadStart(LoadSceneA)),
-                        1 => new Thread(new ThreadStart(LoadSceneB)),
-                        2 => new Thread(new ThreadStart(ConvertSceneC)),
-                        3 => new Thread(new ThreadStart(ConvertSceneD))
+                        0 => new Thread(LoadSceneA),
+                        1 => new Thread(LoadSceneB),
+                        2 => new Thread(ConvertSceneC),
+                        3 => new Thread(ConvertSceneD)
                     });
             }
 
@@ -426,11 +438,9 @@ namespace Assimp.Test
 
             for (var i = 0; i < threadCount; ++i)
                 threads[i].Join();
-
-            LogStream.DetachAllLogstreams();
         }
 
-        [Test, Parallelizable(ParallelScope.None)]
+        [Test, Parallelizable(ParallelScope.All)]
         public void TestMultipleStreamingImportersMultipleThreads([Range(1,4)]int threadCount) {
             var rng = new Random(threadCount);
             
@@ -440,27 +450,25 @@ namespace Assimp.Test
 
             for (var i = 0; i < threadCount; ++i) {
                 threads.Add((i % 4) switch {
-                    0 => new Thread(new ThreadStart(StreamSceneA)),
-                    1 => new Thread(new ThreadStart(StreamSceneB)),
-                    2 => new Thread(new ThreadStart(ConvertStreamSceneA)),
-                    3 => new Thread(new ThreadStart(ConvertStreamSceneB))
+                    0 => new Thread(StreamSceneA),
+                    1 => new Thread(StreamSceneB),
+                    2 => new Thread(ConvertStreamSceneA),
+                    3 => new Thread(ConvertStreamSceneB)
                 });
             }
 
             threads.Shuffle(rng);
             
             for (var i = 0; i < threadCount; ++i)
-                threads[i].Start();
+                threads[i].Start(new TestContextLogStream());
             
             threads.Shuffle(rng);
 
             for (var i = 0; i < threadCount; ++i)
                 threads[i].Join();
-
-            LogStream.DetachAllLogstreams();
         }
 
-        [Test, Parallelizable(ParallelScope.None)]
+        [Test, Parallelizable(ParallelScope.All)]
         [Ignore("Ignore impossible test, this is for debugging purposes only")]
         public void TestMultipleStreamingImportersMultipleThreadsHardcore([Range(1,128)]int threadCount) {
             var rng = new Random(threadCount);
@@ -471,10 +479,10 @@ namespace Assimp.Test
 
             for (var i = 0; i < threadCount; ++i) {
                 threads.Add((i % 4) switch {
-                    0 => new Thread(new ThreadStart(StreamSceneA)),
-                    1 => new Thread(new ThreadStart(StreamSceneB)),
-                    2 => new Thread(new ThreadStart(ConvertStreamSceneA)),
-                    3 => new Thread(new ThreadStart(ConvertStreamSceneB))
+                    0 => new Thread(StreamSceneA),
+                    1 => new Thread(StreamSceneB),
+                    2 => new Thread(ConvertStreamSceneA),
+                    3 => new Thread(ConvertStreamSceneB)
                 });
             }
 
@@ -487,43 +495,54 @@ namespace Assimp.Test
 
             for (var i = 0; i < threadCount; ++i)
                 threads[i].Join();
-
-            LogStream.DetachAllLogstreams();
         }
 
-        private void LoadSceneA()
+        private void LoadSceneA(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread A:";
+            logStream.Attach();
+            
             Console.WriteLine("Thread A: Starting import.");
             AssimpContext importer = new AssimpContext();
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
 
-            new ConsoleLogStream("Thread A:").Attach();
             Console.WriteLine("Thread A: Importing");
             Scene scene = importer.ImportFile(path);
             Console.WriteLine("Thread A: Done importing");
+            
+            logStream.Detach();
         }
 
-        private void LoadSceneB()
+        private void LoadSceneB(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread B:";
+            logStream.Attach();
+
             Console.WriteLine("Thread B: Starting import.");
             AssimpContext importer = new AssimpContext();
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
-            new ConsoleLogStream("Thread B:").Attach();
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             Console.WriteLine("Thread B: Importing");
             Scene scene = importer.ImportFile(path);
             Console.WriteLine("Thread B: Done importing");
+
+            logStream.Detach();
         }
 
-        private void ConvertSceneC()
+        private void ConvertSceneC(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread C:";
+            logStream.Attach();
+            
             Console.WriteLine("Thread C: Starting convert.");
             AssimpContext importer = new AssimpContext();
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
             String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck2.obj");
 
-            new ConsoleLogStream("Thread C:").Attach();
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             importer.SetConfig(new FavorSpeedConfig(true));
 
@@ -531,16 +550,21 @@ namespace Assimp.Test
             ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "obj");
 
             Console.WriteLine("Thread C: Done converting");
+            
+            logStream.Detach();
         }
 
-        private void ConvertSceneD()
+        private void ConvertSceneD(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread D:";
+            logStream.Attach();
+            
             Console.WriteLine("Thread D: Starting convert.");
             AssimpContext importer = new AssimpContext();
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
             String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.obj");
 
-            new ConsoleLogStream("Thread D:").Attach();
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             importer.SetConfig(new FavorSpeedConfig(true));
 
@@ -548,13 +572,19 @@ namespace Assimp.Test
             ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "obj");
 
             Console.WriteLine("Thread D: Done converting");
+            
+            logStream.Detach();
         }
         
-        private void StreamSceneA()
+        private void StreamSceneA(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread A:";
+            logStream.Attach();
+            
             Console.WriteLine("Thread A: Starting import.");
             AssimpContext importer = new AssimpContext();
-            new ConsoleLogStream("Thread A:").Attach();
+            
             Console.WriteLine("Thread A: Importing");
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
 
@@ -564,13 +594,19 @@ namespace Assimp.Test
 
             // Scene scene = importer.ImportFile(path);
             Console.WriteLine("Thread A: Done importing");
+            
+            logStream.Detach();
         }
 
-        private void StreamSceneB()
+        private void StreamSceneB(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread A:";
+            logStream.Attach();
+            
             Console.WriteLine("Thread A: Starting import.");
             AssimpContext importer = new AssimpContext();
-            new ConsoleLogStream("Thread A:").Attach();
+            
             Console.WriteLine("Thread A: Importing");
             String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
@@ -580,18 +616,23 @@ namespace Assimp.Test
 
             // Scene scene = importer.ImportFile(path);
             Console.WriteLine("Thread A: Done importing");
+            
+            logStream.Detach();
         }
 
-        private void ConvertStreamSceneA()
+        private void ConvertStreamSceneA(object logStreamObj)
         {
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread C:";
+            logStream.Attach();
+            
             Console.WriteLine("Thread C: Starting convert.");
             var importer = new AssimpContext();
             var inputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
             var inputHint = Path.GetExtension(inputFilename).TrimStart('.');
             var outputFilename = Path.GetTempFileName();
             const string outputHint = "obj";
-
-            new ConsoleLogStream("Thread C:").Attach();
+            
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             importer.SetConfig(new FavorSpeedConfig(true));
 
@@ -601,27 +642,34 @@ namespace Assimp.Test
             var s = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputFilename, outputHint);
             sr.Close();
             Console.WriteLine("Thread C: Done converting");
+            
+            logStream.Detach();
         }
 
-        private void ConvertStreamSceneB()
+        private void ConvertStreamSceneB(object logStreamObj)
         {
-            Console.WriteLine("Thread D: Starting convert.");
+            var logStream = (TestContextLogStream)logStreamObj;
+            logStream.UserData = "Thread B:";
+            logStream.Attach();
+            
+            Console.WriteLine("Thread B: Starting convert.");
             var importer = new AssimpContext();
             var inputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
             var inputHint = Path.GetExtension(inputFilename).TrimStart('.');
             var outputFilename = Path.GetTempFileName();
             const string outputHint = "obj";
-
-            new ConsoleLogStream("Thread D:").Attach();
+            
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             importer.SetConfig(new FavorSpeedConfig(true));
 
-            Console.WriteLine("Thread D: Converting");
+            Console.WriteLine("Thread B: Converting");
             using var sr = new StreamReader(inputFilename);
             // var blob = importer.ConvertFromStreamToBlob(sr.BaseStream, inputHint, outputHint);
             var s = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputFilename, outputHint);
             sr.Close();
-            Console.WriteLine("Thread D: Done converting");
+            Console.WriteLine("Thread B: Done converting");
+            
+            logStream.Detach();
         }
 
     }
