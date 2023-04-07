@@ -106,9 +106,9 @@ namespace Assimp
         /// </returns>
         public override bool Equals(object obj)
         {
-            if(obj is MeshKey)
+            if(obj is MeshKey key)
             {
-                return Equals((MeshKey) obj);
+                return Equals(key);
             }
             return false;
         }
