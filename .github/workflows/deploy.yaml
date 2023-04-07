@@ -17,4 +17,5 @@ jobs:
     needs: [ build ]
     uses: StirlingLabs/Actions/.github/workflows/dotnetRelease.yaml@main
     with:
-      nuget: false
+      nuget: true
+      library: true
