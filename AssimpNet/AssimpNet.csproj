@@ -52,12 +52,6 @@
   </Target>
 
   <ItemGroup>
-    <Content Include="..\logo.png" Link="logo.png" PackagePath="" />
-    <Content Include="..\ChangeLog.txt" Link="ChangeLog.txt" PackagePath="" />
-    <Content Include="..\Docs\AssimpNet Documentation %28October 2018%29.chm" Link="AssimpNet Documentation %28October 2018%29.chm" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="StirlingLabs.assimp.native.linux-x64" Version="*" />
     <PackageReference Include="StirlingLabs.assimp.native.osx" Version="*" />
