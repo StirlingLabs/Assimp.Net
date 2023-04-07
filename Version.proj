@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
-        <Authors>The Stirling Labs Team</Authors>
+        <Authors>StirlingLabs, Starnick
+        </Authors>
         <Owners>Stirling Labs</Owners>
         <Company>Stirling Labs</Company>
         <RepositoryType>git</RepositoryType>
