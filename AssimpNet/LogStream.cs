@@ -397,11 +397,11 @@ namespace Assimp
     {
       if (String.IsNullOrEmpty(userData))
       {
-        Console.WriteLine(msg);
+        Console.Write(msg);
       }
       else
       {
-        Console.WriteLine(String.Format("{0}: {1}", userData, msg));
+        Console.Write(String.Format("{0}: {1}", userData, msg));
       }
     }
   }

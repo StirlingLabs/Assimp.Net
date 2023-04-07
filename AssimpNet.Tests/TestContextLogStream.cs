@@ -11,9 +11,6 @@ namespace Assimp.Test;
 /// </summary>
 public class TestContextLogStream : LogStream
 {
-
-  private readonly TestContext.TestAdapter m_test;
-
   private readonly TextWriter m_writer;
 
   /// <summary>
@@ -21,7 +18,6 @@ public class TestContextLogStream : LogStream
   /// </summary>
   public TestContextLogStream() : base()
   {
-    m_test = TestContext.CurrentContext.Test;
     m_writer = TestExecutionContext.CurrentContext.OutWriter;
   }
 
@@ -31,7 +27,6 @@ public class TestContextLogStream : LogStream
   /// <param name="userData">User supplied data</param>
   public TestContextLogStream(String userData) : base(userData)
   {
-    m_test = TestContext.CurrentContext.Test;
     m_writer = TestExecutionContext.CurrentContext.OutWriter;
   }
 
@@ -48,10 +43,10 @@ public class TestContextLogStream : LogStream
   /// <param name="userData">Userdata</param>
   protected override void LogMessage(String msg, String userData)
   {
-    m_writer.WriteLine(
+    m_writer.Write(
       String.IsNullOrEmpty(userData)
-        ? $"{m_test.Name}: {msg}"
-        : $"{m_test.Name}: {userData}: {msg}"
+        ? msg
+        : $"{userData}: {msg}"
     );
   }
 
