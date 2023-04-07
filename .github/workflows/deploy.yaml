@@ -19,3 +19,5 @@ jobs:
     with:
       nuget: true
       library: true
+    secrets:
+      NUGET_STIRLINGLABS_API_KEY: ${{ secrets.NUGET_STIRLINGLABS_API_KEY }}
