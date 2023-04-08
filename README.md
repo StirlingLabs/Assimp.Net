@@ -5,7 +5,7 @@
 ## Introduction ##
 This is a fork of [assimpnet by Starnick](https://bitbucket.org/Starnick/assimpnet), a cross-platform .NET wrapper for the Open Asset Import Library (otherwise known as [Assimp](https://github.com/StirlingLabs/assimp)), which is a 3D model import-export library. The primary motivation is for this library to power content pipelines to import and process 3D models. Please see the Assimp website for a full list of supported formats and features. Each version of the managed wrapper tries to maintain parity with the features of the native version.
 
-We intend to keep this fork close to the original, with the main differences being a focus on supporting modern .Net, Apple Silicon and a open, publicly-verifiable build chain.
+We intend to keep this fork close to the original, with the main differences being a focus on supporting modern .Net, Apple Silicon and a open, publicly verifiable build chain.
 
 The managed assembly is compiled as **AnyCpu** and the native 64-bit multi-threaded binaries are loaded dynamically (including support for Apple Silicon).
 

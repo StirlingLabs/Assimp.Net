@@ -8,16 +8,16 @@ on:
 jobs:
   build:
     name: Build
-    uses: StirlingLabs/Actions/.github/workflows/dotnetBuild.yaml@main
+    uses: StirlingLabs/Actions/.github/workflows/dotnetBuild.yaml@v23.04.0
     with:
       release: true
+    secrets: inherit
   
   release:
     name: Release
     needs: [ build ]
-    uses: StirlingLabs/Actions/.github/workflows/dotnetRelease.yaml@main
+    uses: StirlingLabs/Actions/.github/workflows/dotnetRelease.yaml@v23.04.0
     with:
       nuget: true
       library: true
-    secrets:
-      NUGET_STIRLINGLABS_API_KEY: ${{ secrets.NUGET_STIRLINGLABS_API_KEY }}
+    secrets: inherit
