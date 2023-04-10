@@ -84,7 +84,7 @@ namespace Assimp.Test
             float x = -62, y = 5, z = 10;
 
             Vector3D v = new Vector3D(x, y, z);
-            Assert.AreEqual((float) Math.Sqrt(x * x + y * y + z * z), v.Length(), "Testing v.Length()");
+            Assert.That(v.Length(), Is.EqualTo((float) Math.Sqrt(x * x + y * y + z * z)), "Testing v.Length()");
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace Assimp.Test
             float x = -5, y = 25f, z = 7;
 
             Vector3D v = new Vector3D(x, y, z);
-            Assert.AreEqual((float) (x * x + y * y + z * z), v.LengthSquared(), "Testing v.LengthSquared()");
+            Assert.That(v.LengthSquared(), Is.EqualTo(x * x + y * y + z * z), "Testing v.LengthSquared()");
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Assimp.Test
             float x = 5, y = 12, z = 2;
             Vector3D v = new Vector3D(x, y, z);
             v.Normalize();
-            float invLength = 1.0f / (float) System.Math.Sqrt((x * x) + (y * y) + (z * z));
+            float invLength = 1.0f / (float) Math.Sqrt((x * x) + (y * y) + (z * z));
             x *= invLength;
             y *= invLength;
             z *= invLength;
@@ -236,7 +236,7 @@ namespace Assimp.Test
         }
 
         [Test]
-        public void TestOpTransformBy3x3()
+        public void TestOpTransformBy3X3()
         {
             float m11 = 2, m12 = .2f, m13 = 0;
             float m21 = .2f, m22 = 2, m23 = 0;
@@ -257,7 +257,7 @@ namespace Assimp.Test
         }
 
         [Test]
-        public void TestOpTransformBy4x4()
+        public void TestOpTransformBy4X4()
         {
             float m11 = 2, m12 = .2f, m13 = 0, m14 = 0;
             float m21 = .2f, m22 = 2, m23 = 0, m24 = 0;

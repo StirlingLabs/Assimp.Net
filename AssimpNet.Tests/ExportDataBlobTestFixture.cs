@@ -20,7 +20,6 @@
 * THE SOFTWARE.
 */
 
-using System;
 using System.IO;
 using NUnit.Framework;
 
@@ -32,30 +31,45 @@ namespace Assimp.Test
         [Test]
         public void TestToStream()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            var path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
-            AssimpContext importer = new AssimpContext();
-            ExportDataBlob blob = importer.ConvertFromFileToBlob(path, "obj");
+            var context = new AssimpContext();
+            var logStream = new TestContextLogStream();
+            logStream.Attach();
+            
+            var blob = context.ConvertFromFileToBlob(path, "obj");
 
-            Assert.IsNotNull(blob);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob.HasData, Is.True);
 
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
             blob.ToStream(stream);
 
-            Assert.IsTrue(stream.Length != 0);
+            Assert.That(stream.Length, Is.Not.Zero);
             stream.Position = 0;
 
-            ExportDataBlob blob2 = ExportDataBlob.FromStream(stream);
-
-            Assert.IsNotNull(blob2);
-            Assert.IsTrue(blob.Data.Length == blob.Data.Length);
-
-            if(blob.NextBlob != null)
+            var blob2 = ExportDataBlob.FromStream(stream);
+            Assert.Multiple(() =>
             {
-                Assert.IsTrue(blob2.NextBlob != null);
-                Assert.IsTrue(blob2.NextBlob.Name.Equals(blob.NextBlob.Name));
-                Assert.IsTrue(blob2.NextBlob.Data.Length == blob.NextBlob.Data.Length);
+                Assert.That(blob2, Is.Not.Null);
+                Assert.That(blob2.Data, Has.Length.EqualTo(blob.Data.Length));
+            });
+
+            if (blob.NextBlob != null)
+            {
+                Assert.Multiple(() =>
+                {
+                    Assert.That(blob2.NextBlob, Is.Not.Null);
+                    Assert.That(blob2.NextBlob.Name, Is.EqualTo(blob.NextBlob.Name));
+                    Assert.That(blob2.NextBlob.Data, Has.Length.EqualTo(blob.NextBlob.Data.Length));
+                });
             }
+            else
+            {
+                logStream.Log($"blob.NextBlob is null");
+            }
+
+            logStream.Detach();
         }
     }
 }

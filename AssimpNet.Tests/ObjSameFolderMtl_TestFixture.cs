@@ -32,14 +32,22 @@ namespace Assimp.Test
         [Test]
         public void TestObjLoad()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles/sphere.obj");
+            var path = Path.Combine(TestHelper.RootPath, "TestFiles/sphere.obj");
 
-            AssimpContext importer = new AssimpContext();
-            Scene scene = importer.ImportFile(path);
-
-            Assert.IsNotNull(scene);
-            Assert.IsNotNull(scene.RootNode);
-            Assert.IsTrue(scene.RootNode.Name.Equals("sphere.obj"));
+            var context = new AssimpContext();
+            var logStream = new TestContextLogStream();
+            logStream.Attach();
+            
+            var scene = context.ImportFile(path);
+            Assert.Multiple(() =>
+            {
+                Assert.That(scene, Is.Not.Null);
+                Assert.That(scene.RootNode, Is.Not.Null);
+                Assert.That(scene.RootNode.Name, Is.EqualTo("sphere.obj"));
+                Assert.That(scene.Materials, Is.Not.Empty);
+            });
+            
+            logStream.Detach();
         }
     }
 }

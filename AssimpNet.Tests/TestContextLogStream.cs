@@ -30,12 +30,6 @@ public class TestContextLogStream : LogStream
     m_writer = TestExecutionContext.CurrentContext.OutWriter;
   }
 
-  public string UserData
-  {
-    get { return m_userData; }
-    set { m_userData = value; }
-  }
-
   /// <summary>
   /// Log a message to the test context.
   /// </summary>

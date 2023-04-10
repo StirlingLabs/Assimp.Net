@@ -32,7 +32,7 @@ namespace Assimp.Test
         public void TestIndexer()
         {
             float x = 1, y = 2;
-            Vector2D v = new Vector2D();
+            var v = new Vector2D();
             v[0] = x;
             v[1] = y;
             TestHelper.AssertEquals(x, v[0], "Test Indexer, X");
@@ -43,7 +43,7 @@ namespace Assimp.Test
         public void TestSet()
         {
             float x = 10.5f, y = 109.21f;
-            Vector2D v = new Vector2D();
+            var v = new Vector2D();
             v.Set(x, y);
 
             TestHelper.AssertEquals(x, y, v, "Test v.Set()");
@@ -55,9 +55,9 @@ namespace Assimp.Test
             float x = 1, y = 2;
             float x2 = 3, y2 = 4;
 
-            Vector2D v1 = new Vector2D(x, y);
-            Vector2D v2 = new Vector2D(x, y);
-            Vector2D v3 = new Vector2D(x2, y2);
+            var v1 = new Vector2D(x, y);
+            var v2 = new Vector2D(x, y);
+            var v3 = new Vector2D(x2, y2);
 
             //Test IEquatable Equals
             Assert.IsTrue(v1.Equals(v2), "Test IEquatable equals");
@@ -81,8 +81,8 @@ namespace Assimp.Test
         {
             float x = -62, y = 5;
 
-            Vector2D v = new Vector2D(x, y);
-            Assert.AreEqual((float) Math.Sqrt(x * x + y * y), v.Length(), "Testing v.Length()");
+            var v = new Vector2D(x, y);
+            Assert.That(v.Length(), Is.EqualTo((float) Math.Sqrt(x * x + y * y)), "Testing v.Length()");
         }
 
         [Test]
@@ -90,8 +90,8 @@ namespace Assimp.Test
         {
             float x = -5, y = 25f;
 
-            Vector2D v = new Vector2D(x, y);
-            Assert.AreEqual((float) (x * x + y * y), v.LengthSquared(), "Testing v.LengthSquared()");
+            var v = new Vector2D(x, y);
+            Assert.That(v.LengthSquared(), Is.EqualTo(x * x + y * y), "Testing v.LengthSquared()");
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace Assimp.Test
         {
             float x = 2, y = 5;
 
-            Vector2D v = new Vector2D(x, y);
+            var v = new Vector2D(x, y);
             v.Negate();
             TestHelper.AssertEquals(-x, -y, v, "Testing v.Negate()");
         }
@@ -108,9 +108,9 @@ namespace Assimp.Test
         public void TestNormalize()
         {
             float x = 5, y = 12;
-            Vector2D v = new Vector2D(x, y);
+            var v = new Vector2D(x, y);
             v.Normalize();
-            float invLength = 1.0f / (float) System.Math.Sqrt((x * x) + (y * y));
+            var invLength = 1.0f / (float) Math.Sqrt((x * x) + (y * y));
             x *= invLength;
             y *= invLength;
 
@@ -122,13 +122,13 @@ namespace Assimp.Test
         {
             float x1 = 2, y1 = 5;
             float x2 = 10, y2 = 15;
-            float x = x1 + x2;
-            float y = y1 + y2;
+            var x = x1 + x2;
+            var y = y1 + y2;
 
-            Vector2D v1 = new Vector2D(x1, y1);
-            Vector2D v2 = new Vector2D(x2, y2);
+            var v1 = new Vector2D(x1, y1);
+            var v2 = new Vector2D(x2, y2);
 
-            Vector2D v = v1 + v2;
+            var v = v1 + v2;
 
             TestHelper.AssertEquals(x, y, v, "Testing v1 + v2");
         }
@@ -138,13 +138,13 @@ namespace Assimp.Test
         {
             float x1 = 2, y1 = 5;
             float x2 = 10, y2 = 15;
-            float x = x1 - x2;
-            float y = y1 - y2;
+            var x = x1 - x2;
+            var y = y1 - y2;
 
-            Vector2D v1 = new Vector2D(x1, y1);
-            Vector2D v2 = new Vector2D(x2, y2);
+            var v1 = new Vector2D(x1, y1);
+            var v2 = new Vector2D(x2, y2);
 
-            Vector2D v = v1 - v2;
+            var v = v1 - v2;
 
             TestHelper.AssertEquals(x, y, v, "Testing v1 - v2");
         }
@@ -154,7 +154,7 @@ namespace Assimp.Test
         {
             float x = 22, y = 75;
 
-            Vector2D v = -(new Vector2D(x, y));
+            var v = -(new Vector2D(x, y));
 
             TestHelper.AssertEquals(-x, -y, v, "Testting -v)");
         }
@@ -164,13 +164,13 @@ namespace Assimp.Test
         {
             float x1 = 2, y1 = 5;
             float x2 = 10, y2 = 15;
-            float x = x1 * x2;
-            float y = y1 * y2;
+            var x = x1 * x2;
+            var y = y1 * y2;
 
-            Vector2D v1 = new Vector2D(x1, y1);
-            Vector2D v2 = new Vector2D(x2, y2);
+            var v1 = new Vector2D(x1, y1);
+            var v2 = new Vector2D(x2, y2);
 
-            Vector2D v = v1 * v2;
+            var v = v1 * v2;
 
             TestHelper.AssertEquals(x, y, v, "Testing v1 * v2");
         }
@@ -181,13 +181,13 @@ namespace Assimp.Test
             float x1 = 2, y1 = 5;
             float scalar = 25;
 
-            float x = x1 * scalar;
-            float y = y1 * scalar;
+            var x = x1 * scalar;
+            var y = y1 * scalar;
 
-            Vector2D v1 = new Vector2D(x1, y1);
+            var v1 = new Vector2D(x1, y1);
 
             //Left to right
-            Vector2D v = v1 * scalar;
+            var v = v1 * scalar;
             TestHelper.AssertEquals(x, y, v, "Testing v * scale");
 
             //Right to left
@@ -201,13 +201,13 @@ namespace Assimp.Test
             float x1 = 105f, y1 = 4.5f;
             float x2 = 22f, y2 = 25.2f;
 
-            float x = x1 / x2;
-            float y = y1 / y2;
+            var x = x1 / x2;
+            var y = y1 / y2;
 
-            Vector2D v1 = new Vector2D(x1, y1);
-            Vector2D v2 = new Vector2D(x2, y2);
+            var v1 = new Vector2D(x1, y1);
+            var v2 = new Vector2D(x2, y2);
 
-            Vector2D v = v1 / v2;
+            var v = v1 / v2;
 
             TestHelper.AssertEquals(x, y, v, "Testing v1 / v2");
         }
@@ -216,12 +216,12 @@ namespace Assimp.Test
         public void TestOpDivideByFactor()
         {
             float x1 = 55f, y1 = 2f;
-            float divisor = 5f;
+            var divisor = 5f;
 
-            float x = x1 / divisor;
-            float y = y1 / divisor;
+            var x = x1 / divisor;
+            var y = y1 / divisor;
 
-            Vector2D v = new Vector2D(x1, y1) / divisor;
+            var v = new Vector2D(x1, y1) / divisor;
 
             TestHelper.AssertEquals(x, y, v, "Testing v / divisor");
         }

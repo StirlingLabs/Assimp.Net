@@ -21,11 +21,6 @@
 */
 
 using System;
-using System.IO;
-using System.Threading;
-using System.Collections.Generic;
-using Assimp.Configs;
-using Assimp.Unmanaged;
 using NUnit.Framework;
 
 namespace Assimp.Test

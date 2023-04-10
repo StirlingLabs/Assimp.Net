@@ -61,17 +61,17 @@ namespace Assimp.Test
             // This is how you would use the log stream if writing to Sentry or some other logging service
             var logStream = new LogStream(delegate (string msg, string userData)
             {
-                Console.Write(msg); // Note that the newline is already included in the message
+                Console.Write($"{userData}: {msg}"); // Note that the newline is already included in the message
             }, "TestExportBadFormatId");
             logStream.Attach();
 
             var collada = context.ImportFile(Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae"));
 
             var success = context.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/output/exportedCollada.dae"), "dae");
-            Assert.IsFalse(success);
+            Assert.That(success, Is.False);
 
             success = context.ExportFile(collada, Path.Combine(TestHelper.RootPath, "TestFiles/output/exportedCollada.dae"), "collada");
-            Assert.IsTrue(success);
+            Assert.That(success, Is.True);
 
             logStream.Detach();
         }
@@ -83,12 +83,12 @@ namespace Assimp.Test
 
             var context = new AssimpContext();
             var ducky = context.ImportFile(colladaPath);
-            Assert.IsNotNull(ducky);
+            Assert.That(ducky, Is.Not.Null);
             
             var blob = context.ExportToBlob(ducky, "obj");
-            Assert.IsTrue(blob.HasData);
-            Assert.IsTrue(blob.NextBlob != null);
-            Assert.IsTrue(blob.NextBlob.Name.Equals("mtl"));
+            Assert.That(blob.HasData, Is.True);
+            Assert.That(blob.NextBlob, Is.Not.Null);
+            Assert.That(blob.NextBlob.Name, Is.EqualTo("mtl"));
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -100,8 +100,8 @@ namespace Assimp.Test
             var context = new AssimpContext();
             var ducky = context.ImportFile(colladaPath);
             var success = context.ExportFile(ducky, plyPath, "ply");
-            Assert.IsTrue(success);
-            Assert.IsTrue(File.Exists(plyPath));
+            Assert.That(success, Is.True);
+            Assert.That(File.Exists(plyPath), Is.True);
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -113,10 +113,10 @@ namespace Assimp.Test
             var context = new AssimpContext();
             var ducky = context.ImportFile(colladaPath);
             var success = context.ExportFile(ducky, plyPath, "collada");
-            Assert.IsTrue(success);
+            Assert.That(success, Is.True);
             
             var ducky2 = context.ImportFile(plyPath);
-            Assert.IsNotNull(ducky2);
+            Assert.That(ducky2, Is.Not.Null);
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -134,7 +134,7 @@ namespace Assimp.Test
             mesh.Vertices.Add(new Vector3D(1, 0, 0));
             mesh.Vertices.Add(new Vector3D(5, 5, 0));
             mesh.Vertices.Add(new Vector3D(10, 0, 0));
-            mesh.Faces.Add(new Face(new int[] { 0, 1, 2 }));
+            mesh.Faces.Add(new Face(new[] { 0, 1, 2 }));
             mesh.MaterialIndex = 0;
 
             scene.Meshes.Add(mesh);
@@ -148,29 +148,29 @@ namespace Assimp.Test
 
             var context = new AssimpContext();
             var success = context.ExportFile(scene, path, "obj");
-            Assert.IsTrue(success);
+            Assert.That(success, Is.True);
             
             var importedScene = context.ImportFile(path);
-            Assert.IsTrue(importedScene.MeshCount == scene.MeshCount);
-            Assert.IsTrue(importedScene.MaterialCount == 2); //Always has the default material, should also have our material
+            Assert.That(importedScene.MeshCount, Is.EqualTo(scene.MeshCount));
+            Assert.That(importedScene.MaterialCount, Is.EqualTo(2)); //Always has the default material, should also have our material
 
             //Compare the meshes
             var importedMesh = importedScene.Meshes[0];
-            Assert.IsTrue(importedMesh.VertexCount == mesh.VertexCount);
+            Assert.That(importedMesh.VertexCount, Is.EqualTo(mesh.VertexCount));
             for(var i = 0; i < importedMesh.VertexCount; i++)
             {
-                Assert.IsTrue(importedMesh.Vertices[i].Equals(mesh.Vertices[i]));
+                Assert.That(importedMesh.Vertices[i], Is.EqualTo(mesh.Vertices[i]));
             }
 
             Assert.IsTrue(importedMesh.FaceCount == mesh.FaceCount);
-            for(int i = 0; i < importedMesh.FaceCount; i++)
+            for(var i = 0; i < importedMesh.FaceCount; i++)
             {
-                Face importedFace = importedMesh.Faces[i];
-                Face face = mesh.Faces[i];
+                var importedFace = importedMesh.Faces[i];
+                var face = mesh.Faces[i];
 
-                for(int j = 0; j < importedFace.IndexCount; j++)
+                for(var j = 0; j < importedFace.IndexCount; j++)
                 {
-                    Assert.IsTrue(importedFace.Indices[j] == face.Indices[j]);
+                    Assert.That(importedFace.Indices[j], Is.EqualTo(face.Indices[j]));
                 }
             }
         }
@@ -178,7 +178,7 @@ namespace Assimp.Test
         [Test, Parallelizable(ParallelScope.None)]
         public void TestFreeLogStreams()
         {
-            Assert.Zero(LogStream.AttachedLogStreamCount);
+            Assert.That(LogStream.AttachedLogStreamCount, Is.Zero);
             var console1 = new ConsoleLogStream();
             var console2 = new ConsoleLogStream();
             var console3 = new ConsoleLogStream();
@@ -194,13 +194,14 @@ namespace Assimp.Test
             AssimpLibrary.Instance.FreeLibrary();
 
             var logs = LogStream.GetAttachedLogStreams();
-
-            Assert.IsEmpty(logs);
-            Assert.IsFalse(console1.IsAttached);
-            Assert.IsFalse(console2.IsAttached);
-            Assert.IsFalse(console3.IsAttached);
-
-            Assert.Zero(LogStream.AttachedLogStreamCount);
+            Assert.Multiple(() =>
+            {
+                Assert.That(logs, Is.Empty);
+                Assert.That(console1.IsAttached, Is.False);
+                Assert.That(console2.IsAttached, Is.False);
+                Assert.That(console3.IsAttached, Is.False);
+                Assert.That(LogStream.AttachedLogStreamCount, Is.Zero);
+            });
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -216,52 +217,46 @@ namespace Assimp.Test
             LogStream.IsVerboseLoggingEnabled = true;
 
             var success = context.ContainsConfig(NormalSmoothingAngleConfig.NormalSmoothingAngleConfigName);
-            Assert.IsTrue(success);
+            Assert.That(success, Is.True);
 
             context.RemoveConfigs();
             success = context.ContainsConfig(NormalSmoothingAngleConfig.NormalSmoothingAngleConfigName);
-            Assert.IsFalse(success);
+            Assert.That(success, Is.False);
 
             context.SetConfig(new NormalSmoothingAngleConfig(65.0f));
             context.SetConfig(new NormalSmoothingAngleConfig(22.5f));
             context.RemoveConfig(NormalSmoothingAngleConfig.NormalSmoothingAngleConfigName);
 
             success = context.ContainsConfig(NormalSmoothingAngleConfig.NormalSmoothingAngleConfigName);
-            Assert.IsFalse(success);
+            Assert.That(success, Is.False);
 
             context.SetConfig(new NormalSmoothingAngleConfig(65.0f));
 
             var scene = context.ImportFile(path, PostProcessPreset.TargetRealTimeMaximumQuality);
 
-            Assert.IsNotNull(scene);
-            Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportFromStream()
         {
-            String path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            var path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
 
-            FileStream fs = File.OpenRead(path);
-
-            AssimpContext importer = new AssimpContext();
+            var context = new AssimpContext();
             LogStream.IsVerboseLoggingEnabled = true;
 
-            LogStream logstream = new LogStream(delegate(String msg, String userData)
-            {
-                Console.Write(msg);
-            });
+            var logStream = new TestContextLogStream();
+            logStream.Attach();
 
-            logstream.Attach();
-
-            var scene = importer.ImportFileFromStream(fs, ".dae");
-
+            var fs = File.OpenRead(path);
+            var scene = context.ImportFileFromStream(fs, ".dae");
+            Assert.That(scene, Is.Not.Null);
             fs.Close();
 
-            Assert.IsNotNull(scene);
-            Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            Assert.That(scene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
 
-            logstream.Detach();
+            logStream.Detach();
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -278,8 +273,8 @@ namespace Assimp.Test
             var scene = context.ImportFileFromStream(fs, String.Empty); //null also seems to work well
             fs.Close();
 
-            Assert.IsNotNull(scene);
-            Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
 
             logStream.Detach();
         }
@@ -290,15 +285,18 @@ namespace Assimp.Test
             var context = new AssimpContext();
             var descriptions = context.GetImporterDescriptions();
 
-            Assert.IsNotNull(descriptions);
-            Assert.IsTrue(descriptions.Length > 0);
+            Assert.That(descriptions, Is.Not.Null);
+            Assert.That(descriptions.Length, Is.GreaterThan(0));
 
             var descriptionForObj = context.GetImporterDescriptionFor("obj");
             var descriptionForDotObj = context.GetImporterDescriptionFor(".obj");
-
-            Assert.IsNotNull(descriptionForObj);
-            Assert.IsNotNull(descriptionForDotObj);
-            Assert.IsTrue(descriptionForObj.Name == descriptionForDotObj.Name);
+            Assert.Multiple(() =>
+            {
+                Assert.That(descriptionForObj, Is.Not.Null);
+                Assert.That(descriptionForDotObj, Is.Not.Null);
+                Assert.That(descriptionForObj.Name, Is.EqualTo(descriptionForDotObj.Name));
+                Assert.That(descriptionForObj, Is.EqualTo(descriptionForDotObj));
+            });
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -307,17 +305,46 @@ namespace Assimp.Test
             var context = new AssimpContext();
             var exportFormatDescriptions = context.GetSupportedExportFormats();
             var importFormats = context.GetSupportedImportFormats();
+            Assert.Multiple(() =>
+            {
+                Assert.That(exportFormatDescriptions, Is.Not.Null);
+                Assert.That(importFormats, Is.Not.Null);
+                Assert.That(exportFormatDescriptions, Is.Not.Empty);
+                Assert.That(importFormats, Is.Not.Empty);
+            });
+            
+            Console.WriteLine("Export formats: ");
+            foreach (var description in exportFormatDescriptions)
+            {
+                Assert.Multiple(() =>
+                {
+                    Assert.That(description, Is.Not.Null);
+                    Assert.That(description.FileExtension, Is.Not.Empty);
+                    Assert.That(description.Description, Is.Not.Empty);
+                    Assert.That(description.FormatId, Is.Not.Empty);
+                });
+                Console.WriteLine($"{description.FormatId}: {description.Description} ({description.FileExtension})");
+                Assert.That(context.IsExportFormatSupported(description.FileExtension), Is.True);
+            }
 
-            Assert.IsNotNull(exportFormatDescriptions);
-            Assert.IsNotNull(importFormats);
-            Assert.IsTrue(exportFormatDescriptions.Length >= 1);
-            Assert.IsTrue(importFormats.Length >= 1);
+            Console.WriteLine("Import formats: ");
+            foreach (var format in importFormats)
+            {
+                Assert.That(format, Is.Not.Empty);
+                Console.Write($"{format} ");
+                Assert.That(context.IsImportFormatSupported(format), Is.True);
+            }
 
-            Assert.IsTrue(context.IsExportFormatSupported(exportFormatDescriptions[0].FileExtension));
-            Assert.IsTrue(context.IsImportFormatSupported(importFormats[0]));
-
-            Assert.IsTrue(context.IsExportFormatSupported("obj"));
-            Assert.IsTrue(context.IsExportFormatSupported(".obj"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(context.IsExportFormatSupported("obj"), Is.True);
+                Assert.That(context.IsExportFormatSupported(".obj"), Is.True);
+            });
+            Assert.Multiple(() =>
+            {
+                Assert.That(context.IsImportFormatSupported("obj"), Is.True);
+                Assert.That(context.IsImportFormatSupported(".obj"), Is.True);
+            });
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -330,7 +357,7 @@ namespace Assimp.Test
             context.ConvertFromFileToFile(inputPath, outputPath, "collada");
 
             var blob = context.ConvertFromFileToBlob(inputPath, "collada");
-            Assert.IsTrue(blob.HasData);
+            Assert.That(blob.HasData, Is.True);
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -350,8 +377,13 @@ namespace Assimp.Test
             var fs = File.OpenRead(inputPath);
             var success = context.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
             fs.Close();
-            Assert.IsTrue(success);
-            Assert.IsTrue(File.Exists(outputPath));
+            Assert.Multiple(() =>
+            {
+                Assert.That(success, Is.True);
+                Assert.That(File.Exists(outputPath), Is.True);
+                var fileInfo = new FileInfo(outputPath);
+                Assert.That(fileInfo.Length, Is.GreaterThan(0));
+            });
 
             logStream.Detach();
         }
@@ -369,14 +401,20 @@ namespace Assimp.Test
             var context = new AssimpContext();
 
             var fs = File.OpenRead(inputPath);
-            bool success = context.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
-            Assert.IsTrue(success);
-            Assert.IsTrue(File.Exists(outputPath));
-            
+            var success = context.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
+            Assert.That(success, Is.True);
+            Assert.That(File.Exists(outputPath), Is.True);
+            var fileInfo = new FileInfo(outputPath);
+            Assert.That(fileInfo.Length, Is.GreaterThan(0));
+
             fs.Position = 0;
             var blob = context.ConvertFromStreamToBlob(fs, ".dae", "collada");
             fs.Close();
-            Assert.IsTrue(blob.HasData);
+            Assert.Multiple(() =>
+            {
+                Assert.That(blob.HasData, Is.True);
+                Assert.That(blob.Data, Is.Not.Empty);
+            });
 
             //Take ExportDataBlob's data, write it to a memory stream and export that back to an obj and write it
             var memStream = new MemoryStream();
@@ -384,18 +422,20 @@ namespace Assimp.Test
             memStream.Position = 0;
             success = context.ConvertFromStreamToFile(memStream, ".dae", outputPath2, "obj");
             memStream.Close();
-            Assert.IsTrue(success);
-            Assert.IsTrue(File.Exists(outputPath2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(success, Is.True);
+                Assert.That(File.Exists(outputPath2), Is.True);
+                fileInfo = new FileInfo(outputPath2);
+                Assert.That(fileInfo.Length, Is.GreaterThan(0));
+            });
 
             logStream.Detach();
         }
 
         [Test, Parallelizable(ParallelScope.None)]
-        public void TestMultipleFileImportersMultipleThreads([Range(0,128, 16)]int threadCount)
+        public void TestMultipleFileImportersMultipleThreads([Range(4,132, 16)]int threadCount)
         {
-            if (threadCount == 0)
-                threadCount = Environment.ProcessorCount;
-            
             var rng = new Random(threadCount);
 
             LogStream.IsVerboseLoggingEnabled = true;
@@ -406,7 +446,8 @@ namespace Assimp.Test
                     0 => new Thread(LoadSceneA),
                     1 => new Thread(LoadSceneB),
                     2 => new Thread(ConvertSceneC),
-                    3 => new Thread(ConvertSceneD)
+                    3 => new Thread(ConvertSceneD),
+                    _ => throw new ArgumentOutOfRangeException()
                 });
             }
 
@@ -422,10 +463,7 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.None)]
-        public void TestMultipleStreamingImportersMultipleThreads([Range(0,128, 16)]int threadCount) {
-            if (threadCount == 0)
-                threadCount = Environment.ProcessorCount;
-            
+        public void TestMultipleStreamingImportersMultipleThreads([Range(4,132, 16)]int threadCount) {
             var rng = new Random(threadCount);
             
             LogStream.IsVerboseLoggingEnabled = true;
@@ -436,7 +474,8 @@ namespace Assimp.Test
                     0 => new Thread(StreamSceneE),
                     1 => new Thread(StreamSceneF),
                     2 => new Thread(ConvertStreamSceneG),
-                    3 => new Thread(ConvertStreamSceneH)
+                    3 => new Thread(ConvertStreamSceneH),
+                    _ => throw new ArgumentOutOfRangeException()
                 });
             }
 
@@ -452,10 +491,7 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.None)]
-        public void TestMultipleImportersMultipleThreads([Range(0,128, 16)]int threadCount) {
-            if (threadCount == 0)
-                threadCount = Environment.ProcessorCount;
-            
+        public void TestMultipleImportersMultipleThreads([Range(8,136, 16)]int threadCount) {
             var rng = new Random(threadCount);
             
             LogStream.IsVerboseLoggingEnabled = true;
@@ -471,7 +507,8 @@ namespace Assimp.Test
                     4 => new Thread(StreamSceneE),
                     5 => new Thread(StreamSceneF),
                     6 => new Thread(ConvertStreamSceneG),
-                    7 => new Thread(ConvertStreamSceneH)
+                    7 => new Thread(ConvertStreamSceneH),
+                    _ => throw new ArgumentOutOfRangeException()
                 });
             }
 
@@ -498,8 +535,11 @@ namespace Assimp.Test
 
             logStream.Log("Importing");
             var scene = context.ImportFile(path);
-            Assert.IsNotNull(scene);
-            Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            Assert.Multiple(() =>
+            {
+                Assert.That(scene, Is.Not.Null);
+                Assert.That(scene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
+            });
             logStream.Log("Done importing");
             
             logStream.Detach();
@@ -518,8 +558,11 @@ namespace Assimp.Test
             context.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             logStream.Log("Importing");
             var scene = context.ImportFile(path);
-            Assert.IsNotNull(scene);
-            Assert.IsTrue((scene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            Assert.Multiple(() =>
+            {
+                Assert.That(scene, Is.Not.Null);
+                Assert.That(scene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
+            });
             logStream.Log("Done importing");
 
             logStream.Detach();
@@ -534,14 +577,17 @@ namespace Assimp.Test
             logStream.Log("Establishing Context for conversionEstablishing Context for conversion");
             var context = new AssimpContext();
             var path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck2.obj");
 
             context.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             context.SetConfig(new FavorSpeedConfig(true));
 
             logStream.Log("Converting");
             var blob = context.ConvertFromFileToBlob(path, "obj");
-            Assert.IsTrue(blob.HasData);
+            Assert.Multiple(() =>
+            {
+                Assert.That(blob.HasData, Is.True);
+                Assert.That(blob.Data, Is.Not.Empty);
+            });
             logStream.Log("Done converting");
             
             logStream.Detach();
@@ -562,7 +608,11 @@ namespace Assimp.Test
 
             logStream.Log("Converting");
             var blob = context.ConvertFromFileToBlob(path, "obj");
-            Assert.IsTrue(blob.HasData);
+            Assert.Multiple(() =>
+            {
+                Assert.That(blob.HasData, Is.True);
+                Assert.That(blob.Data, Is.Not.Empty);
+            });
             logStream.Log("Done converting");
             
             logStream.Detach();
@@ -583,8 +633,11 @@ namespace Assimp.Test
             using var sr = new StreamReader(path);
             var streamScene = context.ImportFileFromStream(sr.BaseStream);
             sr.Close();
-            Assert.IsNotNull(streamScene);
-            Assert.IsTrue((streamScene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            Assert.Multiple(() =>
+            {
+                Assert.That(streamScene, Is.Not.Null);
+                Assert.That(streamScene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
+            });
             logStream.Log("Done importing");
             
             logStream.Detach();
@@ -605,8 +658,12 @@ namespace Assimp.Test
             using var sr = new StreamReader(path);
             var streamScene = context.ImportFileFromStream(sr.BaseStream);
             sr.Close();
-            Assert.IsNotNull(streamScene);
-            Assert.IsTrue((streamScene.SceneFlags & SceneFlags.Incomplete) != SceneFlags.Incomplete);
+            
+            Assert.Multiple(() =>
+            {
+                Assert.That(streamScene, Is.Not.Null);
+                Assert.That(streamScene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
+            });
             logStream.Log("Done importing");
             
             logStream.Detach();
@@ -620,20 +677,25 @@ namespace Assimp.Test
             
             logStream.Log("Establishing Context for Stream conversion");
             var importer = new AssimpContext();
-            var inputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            var inputHint = Path.GetExtension(inputFilename).TrimStart('.');
-            var outputFilename = Path.GetTempFileName();
+            var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            var inputHint = Path.GetExtension(inputPath).TrimStart('.');
+            var outputPath = Path.GetTempFileName();
             const string outputHint = "obj";
             
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             importer.SetConfig(new FavorSpeedConfig(true));
 
             logStream.Log("Converting");
-            using var sr = new StreamReader(inputFilename);
-            var success = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputFilename, outputHint);
+            using var sr = new StreamReader(inputPath);
+            var success = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputPath, outputHint);
             sr.Close();
-            Assert.IsTrue(success);
-            Assert.IsTrue(File.Exists(outputFilename));
+            Assert.Multiple(() =>
+            {
+                Assert.That(success, Is.True);
+                Assert.That(File.Exists(outputPath), Is.True);
+                var fileInfo = new FileInfo(outputPath);
+                Assert.That(fileInfo.Length, Is.GreaterThan(0));
+            });
             logStream.Log("Done converting");
             
             logStream.Detach();
@@ -647,24 +709,28 @@ namespace Assimp.Test
             
             logStream.Log("Establishing Context for Stream conversion");
             var importer = new AssimpContext();
-            var inputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
-            var inputHint = Path.GetExtension(inputFilename).TrimStart('.');
-            var outputFilename = Path.GetTempFileName();
+            var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
+            var inputHint = Path.GetExtension(inputPath).TrimStart('.');
+            var outputPath = Path.GetTempFileName();
             const string outputHint = "obj";
             
             importer.SetConfig(new NormalSmoothingAngleConfig(55.0f));
             importer.SetConfig(new FavorSpeedConfig(true));
 
             logStream.Log("Converting");
-            using var sr = new StreamReader(inputFilename);
-            var success = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputFilename, outputHint);
+            using var sr = new StreamReader(inputPath);
+            var success = importer.ConvertFromStreamToFile(sr.BaseStream, inputHint, outputPath, outputHint);
             sr.Close();
-            Assert.IsTrue(success);
-            Assert.IsTrue(File.Exists(outputFilename));
+            Assert.Multiple(() =>
+            {
+                Assert.That(success, Is.True);
+                Assert.That(File.Exists(outputPath), Is.True);
+                var fileInfo = new FileInfo(outputPath);
+                Assert.That(fileInfo.Length, Is.GreaterThan(0));
+            });
             logStream.Log("Done converting");
             
             logStream.Detach();
         }
-
     }
 }
