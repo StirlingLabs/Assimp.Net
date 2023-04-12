@@ -27,86 +27,175 @@ using NUnit.Framework;
 namespace Assimp.Test
 {
     [TestFixture]
-    public class IOSystem_TestFixture
+    public class IoSystemTestFixture
     {
         [Test]
         public void TestMultiSearchDirectoryLoad()
         {
-            String fileName = "fenris.lws";
-            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes"), Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects") };
-            FileIOSystem ioSystem = new FileIOSystem(searchPaths);
+            const string fileName = "fenris.lws";
+            var searchPaths = new []{ Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes"), Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects") };
+            var ioSystem = new FileIOSystem(searchPaths);
 
-            AssimpContext importer = new AssimpContext();
-            importer.SetIOSystem(ioSystem);
+            var context = new AssimpContext();
+            context.SetIOSystem(ioSystem);
 
             //None, using the "target high quality flags caused a crash with this model.
-            Scene scene = importer.ImportFile(fileName, PostProcessSteps.None);
-            Assert.IsNotNull(scene);
+            var scene = context.ImportFile(fileName, PostProcessSteps.None);
+            Assert.Multiple(() =>
+            {
+                Assert.That(scene, Is.Not.Null);
+                Assert.That(scene.RootNode, Is.Not.Null);
+                Assert.That(scene.HasMeshes, Is.True);
+            });
+        }
+        
+        [Test]
+        public void TestMultiSearchDirectoryLoadWrite()
+        {
+            const string fileName = "fenris.lws";
+            var searchPaths = new []{ Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes"), Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects") };
+            var outputFilename = Path.Combine(TestHelper.RootPath, "TestFiles/output/fenris.obj");
+            var ioSystem = new FileIOSystem(searchPaths);
+
+            var context = new AssimpContext();
+            context.SetIOSystem(ioSystem);
+
+            //None, using the "target high quality flags caused a crash with this model.
+            var scene = context.ImportFile(fileName, PostProcessSteps.None);
+            Assert.Multiple(() =>
+            {
+                Assert.That(scene, Is.Not.Null);
+                Assert.That(scene.RootNode, Is.Not.Null);
+                Assert.That(scene.HasMeshes, Is.True);
+            });
+            context.ExportFile(scene, outputFilename, "obj", PostProcessSteps.None);
+            Assert.That(File.Exists(outputFilename), Is.True);
+            var fileInfo = new FileInfo(outputFilename);
+            Assert.That(fileInfo.Length, Is.GreaterThan(0));
         }
 
         [Test]
-        public void TestMultiSearchDirectoryConvert()
+        public void TestMultiSearchDirectoryConvertToFile()
         {
-            String fileName = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes/fenris.lws");
-            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects") };
-            FileIOSystem ioSystem = new FileIOSystem(searchPaths);
+            var fileName = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes/fenris.lws");
+            var searchPath = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects");
+            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/fenris.assbin");
 
-            AssimpContext importer = new AssimpContext();
-            importer.SetIOSystem(ioSystem);
+            if (File.Exists(outputPath))
+                File.Delete(outputPath);
 
-            //Output path has to be specified fully, since we may be creating the file
-            String outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/fenris2.obj");
-            importer.ConvertFromFileToFile(fileName, PostProcessSteps.None, outputPath, "obj", PostProcessSteps.None);
+            var ioSystem = new FileIOSystem(new []{searchPath, Path.GetDirectoryName(fileName), Path.GetDirectoryName(outputPath)});
+
+            var context = new AssimpContext();
+            var log = new TestContextLogStream();
+            log.Attach();
+            LogStream.IsVerboseLoggingEnabled = true;
+            context.SetIOSystem(ioSystem);
+            var exportFormatId = GetExportFormatId(outputPath, context);
+            Assert.That(exportFormatId, Is.Not.Null);
+            
+            context.ConvertFromFileToFile(fileName, outputPath, exportFormatId);
+            Assert.That(File.Exists(outputPath), Is.True);
+            var fileInfo = new FileInfo(outputPath);
+            Assert.That(fileInfo.Length, Is.GreaterThan(0));
+            log.Detach();
+        }
+        
+        [Test]
+        public void TestMultiSearchDirectoryConvertToBlob()
+        {
+            var fileName = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/scenes/fenris.lws");
+            var searchPath = Path.Combine(TestHelper.RootPath, "TestFiles/fenris/objects");
+
+            var ioSystem = new FileIOSystem(new []{searchPath, Path.GetDirectoryName(fileName)});
+
+            var context = new AssimpContext();
+            var log = new TestContextLogStream();
+            log.Attach();
+            LogStream.IsVerboseLoggingEnabled = true;
+            context.SetIOSystem(ioSystem);
+            const string formatId = "assbin";
+            Assert.That(formatId, Is.Not.Null);
+            
+            var blob = context.ConvertFromFileToBlob(fileName, formatId);
+
+            var ms = new MemoryStream(blob.Data);
+            var scene = context.ImportFileFromStream(ms, PostProcessSteps.None, $".{formatId}");
+            ms.Close();
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.MeshCount, Is.GreaterThan(0));
+
+            log.Detach();
+        }
+        
+        private string GetExportFormatId(string filename, AssimpContext context)
+        {
+            var extension = Path.GetExtension(filename);
+            if (String.IsNullOrEmpty(extension))
+                return null;
+
+            extension = extension.Substring(1);
+            var formats = context.GetSupportedExportFormats();
+            foreach (var format in formats)
+            {
+                if (format.FileExtension.Equals(extension, StringComparison.OrdinalIgnoreCase))
+                    return format.FormatId;
+            }
+
+            return null;
         }
 
         [Test]
-        public void TestIOSystemError()
+        public void TestIoSystemError()
         {
-            String fileName = "duckduck.dae"; //GOOSE!
-            String[] searchPaths = { Path.Combine(TestHelper.RootPath, "TestFiles") };
-            FileIOSystem ioSystem = new FileIOSystem(searchPaths);
+            const string fileName = "duckduck.dae"; //GOOSE!
+            var searchPaths = new[]{ Path.Combine(TestHelper.RootPath, "TestFiles") };
+            var ioSystem = new FileIOSystem(searchPaths);
 
-            AssimpContext importer = new AssimpContext();
-            importer.SetIOSystem(ioSystem);
+            var context = new AssimpContext();
+            context.SetIOSystem(ioSystem);
             Assert.Throws<AssimpException>(delegate()
             {
-                importer.ImportFile(fileName, PostProcessSteps.None);
+                context.ImportFile(fileName, PostProcessSteps.None);
             });
         }
 
         [Test]
         public void TestIOSystem_ImportObj()
         {
-            String dir = Path.Combine(TestHelper.RootPath, "TestFiles");
+            var dir = Path.Combine(TestHelper.RootPath, "TestFiles");
+            var logStream = new TestContextLogStream();
+            logStream.Attach();
             LogStream.IsVerboseLoggingEnabled = true;
-            ConsoleLogStream log = new ConsoleLogStream();
-            log.Attach();
 
-            using(AssimpContext importer = new AssimpContext())
+            using(var context = new AssimpContext())
             {
-                FileIOSystem iOSystem = new FileIOSystem(dir);
-                importer.SetIOSystem(iOSystem);
+                var iOSystem = new FileIOSystem(dir);
+                context.SetIOSystem(iOSystem);
 
                 //Using stream does not use the IO system...
                 using(Stream fs = File.OpenRead(Path.Combine(dir, "sphere.obj")))
                 {
-                    Scene scene = importer.ImportFileFromStream(fs, "obj");
-                    Assert.IsTrue(scene != null);
-                    Assert.IsTrue(scene.HasMeshes);
-                    Assert.IsTrue(scene.HasMaterials);
+                    var scene = context.ImportFileFromStream(fs, "obj");
+                    Assert.That(scene, Is.Not.Null);
+                    Assert.That(scene.HasMeshes, Is.True);
+                    Assert.That(scene.HasMaterials, Is.True);
 
                     //No material file, so the mesh will always use the default material
-                    Assert.IsTrue(scene.Materials[scene.Meshes[0].MaterialIndex].Name == "DefaultMaterial");
+                    Assert.That(scene.Materials[scene.Meshes[0].MaterialIndex].Name, Is.EqualTo("DefaultMaterial"));
                 }
 
                 //Using custom IO system requires us to pass in the file name, assimp will ask the io system to get a stream
-                Scene scene2 = importer.ImportFile("sphere.obj");
-                Assert.IsTrue(scene2 != null);
-                Assert.IsTrue(scene2.HasMeshes);
-                Assert.IsTrue(scene2.HasMaterials);
+                var scene2 = context.ImportFile("sphere.obj");
+                Assert.Multiple(() =>
+                {
+                    Assert.That(scene2, Is.Not.Null);
+                    Assert.That(scene2.HasMeshes, Is.True);
+                    Assert.That(scene2.HasMaterials, Is.True);
 
-                //Should have found a material with the name "SphereMaterial" in the mtl file
-                Assert.IsTrue(scene2.Materials[scene2.Meshes[0].MaterialIndex].Name == "SphereMaterial");
+                    //Should have found a material with the name "SphereMaterial" in the mtl file
+                    Assert.That(scene2.Materials[scene2.Meshes[0].MaterialIndex].Name == "SphereMaterial", Is.True);
+                });
             }
         }
     }

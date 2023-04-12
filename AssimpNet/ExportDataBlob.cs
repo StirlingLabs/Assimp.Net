@@ -93,7 +93,7 @@ namespace Assimp
         {
             get
             {
-                return m_data != null;
+                return m_data != null && m_data.Length > 0;
             }
         }
 

@@ -99,68 +99,32 @@ namespace Assimp
         /// <summary>
         /// Gets if the texture has non-compressed texel data. Only valid for non-compressed textures.
         /// </summary>
-        public bool HasNonCompressedData
-        {
-            get
-            {
-                return m_nonCompressedData != null || m_nonCompressedData.Length != 0;
-            }
-        }
+        public bool HasNonCompressedData => m_nonCompressedData != null && m_nonCompressedData.Length != 0;
 
         /// <summary>
         /// Gets the size of the non-compressed texel data. Only valid for non-compressed textures.
         /// </summary>
-        public int NonCompressedDataSize
-        {
-            get
-            {
-                return (m_nonCompressedData == null) ? 0 : m_nonCompressedData.Length;
-            }
-        }
+        public int NonCompressedDataSize => m_nonCompressedData?.Length ?? 0;
 
         /// <summary>
         /// Gets the non-compressed texel data, the array is of size Width * Height. Only valid for non-compressed textures.
         /// </summary>
-        public Texel[] NonCompressedData
-        {
-            get
-            {
-                return m_nonCompressedData;
-            }
-        }
+        public Texel[] NonCompressedData => m_nonCompressedData;
 
         /// <summary>
         /// Gets if the embedded texture has compressed data. Only valid for compressed textures.
         /// </summary>
-        public bool HasCompressedData
-        {
-            get
-            {
-                return m_compressedData != null || m_compressedData.Length != 0;
-            }
-        }
+        public bool HasCompressedData => m_compressedData != null && m_compressedData.Length != 0;
 
         /// <summary>
         /// Gets the size of the compressed data. Only valid for compressed textures.
         /// </summary>
-        public int CompressedDataSize
-        {
-            get
-            {
-                return (m_compressedData == null) ? 0 : m_compressedData.Length;
-            }
-        }
+        public int CompressedDataSize => (m_compressedData == null) ? 0 : m_compressedData.Length;
 
         /// <summary>
         /// Gets the raw byte data representing the compressed texture. Only valid for compressed textures.
         /// </summary>
-        public byte[] CompressedData
-        {
-            get
-            {
-                return m_compressedData;
-            }
-        }
+        public byte[] CompressedData => m_compressedData;
 
         /// <summary>
         /// Gets the format hint to determine the type of compressed data. This hint

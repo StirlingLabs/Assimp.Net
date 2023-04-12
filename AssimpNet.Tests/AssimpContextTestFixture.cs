@@ -239,6 +239,24 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
+        public void TestImportFromFileSimple()
+        {
+            var path = Path.Combine(TestHelper.RootPath, "TestFiles/sphere.obj");
+
+            var context = new AssimpContext();
+            var log = new TestContextLogStream();
+            log.Attach();
+            LogStream.IsVerboseLoggingEnabled = true;
+
+            var scene = context.ImportFile(path, PostProcessPreset.TargetRealTimeMaximumQuality);
+
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.SceneFlags & SceneFlags.Incomplete, Is.Not.EqualTo(SceneFlags.Incomplete));
+            Assert.That(scene.MeshCount, Is.GreaterThan(0));
+            log.Detach();
+        }
+
+        [Test, Parallelizable(ParallelScope.Self)]
         public void TestImportFromStream()
         {
             var path = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
@@ -348,89 +366,106 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
-        public void TestConvertFromFile()
+        public void TestConvertFromFileToFile()
         {
             var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
-            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/Bob.dae");
+            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/Bob.3ds");
 
             var context = new AssimpContext();
-            context.ConvertFromFileToFile(inputPath, outputPath, "collada");
-
-            var blob = context.ConvertFromFileToBlob(inputPath, "collada");
-            Assert.That(blob.HasData, Is.True);
+            var log = new TestContextLogStream();
+            LogStream.IsVerboseLoggingEnabled = true;
+            log.Attach();
+            log.Log($"Convert is very limited; very few formats can be created successfully so that can be read.\n");
+            
+            context.ConvertFromFileToFile(inputPath, outputPath, "3ds");
+            Assert.That(File.Exists(outputPath), Is.True);
+            var fi = new FileInfo(outputPath);
+            Assert.That(fi.Length, Is.GreaterThan(0));
+            
+            var scene = context.ImportFile(outputPath, PostProcessSteps.None);
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.MeshCount, Is.GreaterThan(0));
+            log.Detach();
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
-        public void TestConvertFromStreamNoFormatHint()
+        public void TestConvertFromFileToBlob()
         {
-            var logStream = new TestContextLogStream();
-            logStream.Attach();
+            var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/Bob.md5mesh");
+
+            var context = new AssimpContext();
+            var log = new TestContextLogStream();
+            LogStream.IsVerboseLoggingEnabled = true;
+            log.Attach();
+            log.Log($"Convert is very limited; very few formats can be created successfully so that can be read.\n");
+
+            var blob = context.ConvertFromFileToBlob(inputPath, "3ds", PostProcessSteps.None);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob.HasData, Is.True);
             
+            var ms = new MemoryStream(blob.Data, 0, blob.Data.Length);
+            var scene = context.ImportFileFromStream(ms, PostProcessSteps.None, ".3ds");
+            ms.Close();
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.MeshCount, Is.GreaterThan(0));
+            
+            log.Detach();
+        }
+
+        [Test, Parallelizable(ParallelScope.Self)]
+        public void TestConvertFromStreamToFile()
+        {
             var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duckNoHint.obj");
+            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck.3ds");
 
             if (File.Exists(outputPath))
                 File.Delete(outputPath);
             
             var context = new AssimpContext();
-            
+            LogStream.IsVerboseLoggingEnabled = true;
+            var log = new TestContextLogStream();
+            log.Attach();
+            log.Log($"Convert is very limited; very few formats can be created successfully so that can be read.\n");
+
             var fs = File.OpenRead(inputPath);
-            var success = context.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
+            var success = context.ConvertFromStreamToFile(fs, "collada", outputPath, "3ds");
             fs.Close();
-            Assert.Multiple(() =>
-            {
-                Assert.That(success, Is.True);
-                Assert.That(File.Exists(outputPath), Is.True);
-                var fileInfo = new FileInfo(outputPath);
-                Assert.That(fileInfo.Length, Is.GreaterThan(0));
-            });
-
-            logStream.Detach();
-        }
-
-        [Test, Parallelizable(ParallelScope.Self)]
-        public void TestConvertFromStream()
-        {
-            var logStream = new TestContextLogStream();
-            logStream.Attach();
-            
-            var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
-            var outputPath = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck.obj");
-            var outputPath2 = Path.Combine(TestHelper.RootPath, "TestFiles/output/duck-fromBlob.obj");
-            
-            var context = new AssimpContext();
-
-            var fs = File.OpenRead(inputPath);
-            var success = context.ConvertFromStreamToFile(fs, ".dae", outputPath, "obj");
             Assert.That(success, Is.True);
             Assert.That(File.Exists(outputPath), Is.True);
             var fileInfo = new FileInfo(outputPath);
             Assert.That(fileInfo.Length, Is.GreaterThan(0));
+            
+            var scene = context.ImportFile(outputPath, PostProcessSteps.None);
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.MeshCount, Is.GreaterThan(0));
 
-            fs.Position = 0;
-            var blob = context.ConvertFromStreamToBlob(fs, ".dae", "collada");
+            log.Detach();
+        }
+
+        [Test, Parallelizable(ParallelScope.Self)]
+        public void TestConvertFromStreamToBlob()
+        {
+            var inputPath = Path.Combine(TestHelper.RootPath, "TestFiles/duck.dae");
+            
+            var context = new AssimpContext();
+            var log = new TestContextLogStream();
+            LogStream.IsVerboseLoggingEnabled = true;
+            log.Attach();
+            log.Log($"Convert is very limited; very few formats can be created successfully so that can be read.\n");
+            
+            var fs = File.OpenRead(inputPath);
+            var blob = context.ConvertFromStreamToBlob(fs, "collada", "obj");
             fs.Close();
-            Assert.Multiple(() =>
-            {
-                Assert.That(blob.HasData, Is.True);
-                Assert.That(blob.Data, Is.Not.Empty);
-            });
-
-            //Take ExportDataBlob's data, write it to a memory stream and export that back to an obj and write it
-            var memStream = new MemoryStream();
-            memStream.Write(blob.Data, 0, blob.Data.Length);
-            memStream.Position = 0;
-            success = context.ConvertFromStreamToFile(memStream, ".dae", outputPath2, "obj");
-            memStream.Close();
-            Assert.Multiple(() =>
-            {
-                Assert.That(success, Is.True);
-                Assert.That(File.Exists(outputPath2), Is.True);
-                fileInfo = new FileInfo(outputPath2);
-                Assert.That(fileInfo.Length, Is.GreaterThan(0));
-            });
-
-            logStream.Detach();
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob.HasData, Is.True);
+            
+            var ms = new MemoryStream(blob.Data);
+            var scene = context.ImportFileFromStream(ms, PostProcessSteps.None, "obj");
+            ms.Close();
+            Assert.That(scene, Is.Not.Null);
+            Assert.That(scene.MeshCount, Is.GreaterThan(0));
+            
+            log.Detach();
         }
 
         [Test, Parallelizable(ParallelScope.None)]

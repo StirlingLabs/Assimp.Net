@@ -480,15 +480,15 @@ namespace Assimp
             CheckDisposed();
 
             if (!TestIfExportIdIsValid(exportFormatId))
-                return false;
+                throw new InvalidDataException($"Export format id is not valid: {exportFormatId}");
 
-            IntPtr ptr = IntPtr.Zero;
-            IntPtr fileIO = IntPtr.Zero;
+            IntPtr importedScenePtr = IntPtr.Zero;
+            IntPtr customFileIoPtr = IntPtr.Zero;
 
             //Only do file checks if not using a custom IOSystem
             if(UsingCustomIOSystem)
             {
-                fileIO = m_ioSystem.AiFileIO;
+                customFileIoPtr = m_ioSystem.AiFileIO;
             }
             else if(String.IsNullOrEmpty(inputFilename) || !File.Exists(inputFilename))
             {
@@ -499,17 +499,17 @@ namespace Assimp
 
             try
             {
-                ptr = AssimpLibrary.Instance.ImportFile(inputFilename, PostProcessSteps.None, fileIO, m_propStore);
+                importedScenePtr = AssimpLibrary.Instance.ImportFile(inputFilename, PostProcessSteps.None, customFileIoPtr, m_propStore);
 
-                if(ptr == IntPtr.Zero)
+                if(importedScenePtr == IntPtr.Zero)
                     throw new AssimpException("Error importing file: " + AssimpLibrary.Instance.GetErrorString());
 
-                TransformScene(ptr);
+                TransformScene(importedScenePtr);
 
                 if(importProcessSteps != PostProcessSteps.None)
-                    ptr = AssimpLibrary.Instance.ApplyPostProcessing(ptr, importProcessSteps);
+                    importedScenePtr = AssimpLibrary.Instance.ApplyPostProcessing(importedScenePtr, importProcessSteps);
 
-                ReturnCode status = AssimpLibrary.Instance.ExportScene(ptr, exportFormatId, outputFilename, fileIO, exportProcessSteps);
+                ReturnCode status = AssimpLibrary.Instance.ExportScene(importedScenePtr, exportFormatId, outputFilename, exportProcessSteps);
 
                 return status == ReturnCode.Success;
             }
@@ -517,8 +517,8 @@ namespace Assimp
             {
                 CleanupImport();
 
-                if(ptr != IntPtr.Zero)
-                    AssimpLibrary.Instance.ReleaseImport(ptr);
+                if(importedScenePtr != IntPtr.Zero)
+                    AssimpLibrary.Instance.ReleaseImport(importedScenePtr);
             }
         }
 
