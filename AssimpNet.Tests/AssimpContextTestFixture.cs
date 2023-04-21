@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2012-2020 AssimpNet - Nicholas Woodfield
+* Copyright (c) 2023 AssimpNet - Stirling Labs Pty Ltd
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -298,14 +298,54 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
-        public void TestImporterDescriptions()
+        public void TestSupportedImporterDescriptions()
         {
             var context = new AssimpContext();
             var descriptions = context.GetImporterDescriptions();
-
             Assert.That(descriptions, Is.Not.Null);
             Assert.That(descriptions.Length, Is.GreaterThan(0));
 
+            foreach (var description in descriptions)
+            {
+                Assert.That(description, Is.Not.Null);
+                Assert.That(description.Name, Is.Not.Null);
+                Assert.That(description.Name, Is.Not.Empty);
+                Assert.That(description.FileExtensions, Is.Not.Null);
+                Assert.That(description.FileExtensions, Is.Not.Empty);
+                foreach (var fileExtension in description.FileExtensions)
+                {
+                    Assert.That(context.IsImportFormatSupported(fileExtension), Is.True);
+                }
+                var extensions = string.Join(", ", description.FileExtensions);
+                var version = $"{StringifyVersion(description.MinVersion)}-{StringifyVersion(description.MaxVersion)}";
+                var featureFlags = "";
+                if (description.FeatureFlags.HasFlag(ImporterFeatureFlags.LimitedSupport))
+                {
+                    featureFlags += "LimitedSupport ";
+                }
+                if (description.FeatureFlags.HasFlag(ImporterFeatureFlags.Experimental))
+                {
+                    featureFlags += ", Experimental";
+                }
+                if (description.FeatureFlags.HasFlag(ImporterFeatureFlags.SupportsBinary))
+                {
+                    featureFlags += ", Binary";
+                }
+                if (description.FeatureFlags.HasFlag(ImporterFeatureFlags.SupportsCompressed))
+                {
+                    featureFlags += ", Compressed";
+                }
+                if (description.FeatureFlags.HasFlag(ImporterFeatureFlags.SupportsText))
+                {
+                    featureFlags += ", Text";
+                }
+                featureFlags = string.IsNullOrEmpty(featureFlags) ? "" : $" [{featureFlags.TrimStart(',', ' ')}]";
+                version = (version == "?-?") ? "" : $" v{version}";
+                var comment = string.IsNullOrEmpty(description.Comments) ? "" : $": {description.Comments}";
+                Console.WriteLine($"{description.Name} ({extensions}){version}{featureFlags}{comment}");
+            }
+
+            // Just double-checking
             var descriptionForObj = context.GetImporterDescriptionFor("obj");
             var descriptionForDotObj = context.GetImporterDescriptionFor(".obj");
             Assert.Multiple(() =>
@@ -318,21 +358,20 @@ namespace Assimp.Test
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
-        public void TestSupportedFormats()
+        public void TestSupportedExporterDescriptions()
         {
             var context = new AssimpContext();
-            var exportFormatDescriptions = context.GetSupportedExportFormats();
-            var importFormats = context.GetSupportedImportFormats();
+            var exporterDescriptions = context.GetSupportedExportFormats();
+            var importerDescriptions = context.GetImporterDescriptions();
             Assert.Multiple(() =>
             {
-                Assert.That(exportFormatDescriptions, Is.Not.Null);
-                Assert.That(importFormats, Is.Not.Null);
-                Assert.That(exportFormatDescriptions, Is.Not.Empty);
-                Assert.That(importFormats, Is.Not.Empty);
+                Assert.That(exporterDescriptions, Is.Not.Null);
+                Assert.That(importerDescriptions, Is.Not.Null);
+                Assert.That(exporterDescriptions, Is.Not.Empty);
+                Assert.That(importerDescriptions, Is.Not.Empty);
             });
             
-            Console.WriteLine("Export formats: ");
-            foreach (var description in exportFormatDescriptions)
+            foreach (var description in exporterDescriptions)
             {
                 Assert.Multiple(() =>
                 {
@@ -345,24 +384,37 @@ namespace Assimp.Test
                 Assert.That(context.IsExportFormatSupported(description.FileExtension), Is.True);
             }
 
-            Console.WriteLine("Import formats: ");
-            foreach (var format in importFormats)
-            {
-                Assert.That(format, Is.Not.Empty);
-                Console.Write($"{format} ");
-                Assert.That(context.IsImportFormatSupported(format), Is.True);
-            }
-
+            // Just double-checking
             Assert.Multiple(() =>
             {
                 Assert.That(context.IsExportFormatSupported("obj"), Is.True);
                 Assert.That(context.IsExportFormatSupported(".obj"), Is.True);
             });
-            Assert.Multiple(() =>
+        }
+
+        private string StringifyVersion(Version version)
+        {
+            if (version.Major <= 0 && version.Minor <= 0 && version.Build <= 0)
+                return "?";
+            var major = version.Major >= 0 ? $"{version.Major}" : "";
+            var minor = version.Minor >= 0 ? $".{version.Minor}" : "";
+            var build = version.Build >= 0 ? $".{version.Build}" : "";
+            return $"{major}{minor}{build}";
+        }
+
+        [Test, Parallelizable(ParallelScope.Self)]
+        public void TestSupportedImportConfigurationProperties()
+        {
+            var context = new AssimpContext();
+            var config = context.PropertyConfigurations;
+            var p = new BooleanPropertyConfig("TEST", true);
+            config.Add("Testing", p);
+            foreach (KeyValuePair<string,PropertyConfig> pair in config)
             {
-                Assert.That(context.IsImportFormatSupported("obj"), Is.True);
-                Assert.That(context.IsImportFormatSupported(".obj"), Is.True);
-            });
+                var key = pair.Key;
+                var property = pair.Value;
+                Console.WriteLine($"{key}: {property}");
+            }
         }
 
         [Test, Parallelizable(ParallelScope.Self)]
@@ -425,7 +477,7 @@ namespace Assimp.Test
             LogStream.IsVerboseLoggingEnabled = true;
             var log = new TestContextLogStream();
             log.Attach();
-            log.Log($"Convert is very limited; very few formats can be created successfully so that can be read.\n");
+            log.Log($"Convert is very limited; very few formats can be created successfully so that they can be read back.\n");
 
             var fs = File.OpenRead(inputPath);
             var success = context.ConvertFromStreamToFile(fs, "collada", outputPath, "3ds");
